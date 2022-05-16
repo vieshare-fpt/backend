@@ -8,6 +8,7 @@ import { InvoicesModule } from './models/invoices/invoices.module';
 import { User } from './models/users/entities/user.entity';
 import { Post } from './models/posts/entities/post.entity';
 import { Invoice } from './models/invoices/entities/invoice.entity';
+import { AuthModule } from './models/auth/auth.module';
 
 @Module({
   imports: [
@@ -36,7 +37,8 @@ import { Invoice } from './models/invoices/entities/invoice.entity';
     }),
     UsersModule,
     PostsModule,
-    InvoicesModule
+    InvoicesModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
