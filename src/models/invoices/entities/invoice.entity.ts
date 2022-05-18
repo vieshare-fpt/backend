@@ -26,7 +26,7 @@ export class Invoice {
 
     @ManyToOne(() => User, (user) => user.invoices)
     @JoinColumn({ name: 'userId' })
-    user: User
+    user: Promise<User>
 
 
 }

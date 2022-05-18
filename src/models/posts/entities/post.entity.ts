@@ -1,3 +1,4 @@
+import { Category } from "src/models/categories/entities/category.entity";
 import { User } from "src/models/users/entities/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
@@ -16,8 +17,8 @@ export class Post {
     @Column({ name: 'title', type: 'nvarchar', length: 255 })
     title: string
 
-    @Column({ name: 'subject' })
-    subjectId: number
+    @Column({ name: 'categoryId' })
+    categoryId: number
 
     @Column({ name: 'content', type: 'text' })
     content: string
@@ -39,7 +40,11 @@ export class Post {
 
     @ManyToOne(() => User, (user) => user.posts)
     @JoinColumn({ name: 'ownerId' })
-    owner: User
+    owner: User;
+
+    @ManyToOne(()=>Category,(category)=>category.posts)
+    @JoinColumn({name: 'categoryId'})
+    category: Category;
 
 
 }

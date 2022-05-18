@@ -7,7 +7,7 @@ export class CreateUserDto extends PartialType(UserDto) {
 
     @IsString()
     @IsNotEmpty()
-    password: string;
+    password?: string;
 
 
 }

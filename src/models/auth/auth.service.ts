@@ -2,15 +2,16 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-import { UserDto } from '../users/dto/user.dto';
-import { JwtService } from '@nestjs/jwt';
+import { TokensService } from '../tokens/tokens.service';
+import { User } from '../users/entities/user.entity';
+import { AuthTokenDto } from './dto/auth-token.dto';
 
 
 @Injectable()
 export class AuthService {
   constructor(
+    private tokenService: TokensService,
     private userService: UsersService,
-    private jwtService: JwtService
   ) { }
 
   async isUserExist(username: string): Promise<boolean> {
@@ -35,17 +36,20 @@ export class AuthService {
     return await bcrypt.compare(password, storePasswordHash);
   }
 
-  async validateUser(username: string, password: string): Promise<any> {
+  async validateUser(username: string, password: string): Promise<User | null> {
     const user = await this.userService.findUser(username);
+    if (!user) return null
+
     const check = await this.comparePassword(password, user.hashPassword);
-    if (user && check) {
-      const { hashPassword, ...result } = user;
-      return result;
-    }
-    return null;
+    if (!check) return null;
+
+
+    const { hashPassword, ...result } = user;
+    return result;
+
   }
 
-  async register(user: CreateUserDto): Promise<UserDto> {
+  async register(user: CreateUserDto): Promise<any> {
     const isUserExist = await this.isUserExist(user.username);
 
     if (isUserExist) {
@@ -59,16 +63,25 @@ export class AuthService {
     return this.userService.create(payload)
   }
 
-  async login(user: any): Promise<any> {
-    const result = await this.userService.findUser(user.username);
-    const { hashPassword, ...payload } = result;
+  async login(user: User, agent: string): Promise<AuthTokenDto> {
 
     return {
-      token: this.jwtService.sign(payload)
+      access_token: await this.tokenService.newAccessToken(user),
+      refresh_token: await this.tokenService.newRefeshToken({
+        userId: user.id,
+        agent: agent
+      })
     };
   }
 
-  async profile (id : number): Promise<any>{
+  async logout(user: User, agent: string): Promise<Boolean> {
+    return this.tokenService.removeRefreshToken(user,agent);
+  }
+  async profile(id: number): Promise<any> {
     return await this.userService.findOne(id);
+  }
+
+  async refeshToken(tokens: AuthTokenDto, UserAgent: string) {
+    return await this.tokenService.renewAuthTokens(tokens, UserAgent);
   }
 }

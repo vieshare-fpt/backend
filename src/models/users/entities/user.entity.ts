@@ -1,7 +1,8 @@
 
 import { Invoice } from "src/models/invoices/entities/invoice.entity";
 import { Post } from "src/models/posts/entities/post.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Token } from "src/models/tokens/entities/token.entity";
+import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 
 export enum Role {
@@ -31,7 +32,7 @@ export class User {
     username: string;
 
     @Column({ name: 'hashPassword' })
-    hashPassword: string;
+    hashPassword?: string;
 
     @Column({ name: 'email' })
     email: string;
@@ -50,8 +51,11 @@ export class User {
 
 
     @OneToMany(() => Post, (post) => post.owner)
-    posts?: Post[];
+    posts?: Promise<Post[]>;
 
     @OneToMany(() => Invoice, (invoice) => invoice.user)
-    invoices?: Invoice[];
+    invoices?: Promise<Invoice[]>;
+
+    @OneToOne(()=>Token,(token)=>token.user)
+    token?: Promise<Token>;
 }
