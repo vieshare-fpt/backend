@@ -1,7 +1,10 @@
-
-import { Invoice } from "src/models/invoices/entities/invoice.entity";
-import { Post } from "src/models/posts/entities/post.entity";
-import { Token } from "src/models/tokens/entities/token.entity";
+import { CommentEntity } from "src/models/comments/entities/comment.entity";
+import { FollowEntity } from "src/models/follows/entities/follow.entity";
+import { PostEntity } from "src/models/posts/entities/post.entity";
+import { ReactionEntity } from "src/models/reactions/entities/reaction.entity";
+import { SubscriptionEntity } from "src/models/subscriptions/entities/subscription.entity";
+import { TokenEntity } from "src/models/tokens/entities/token.entity";
+import { WalletEntity } from "src/models/wallets/entities/wallet.entity";
 import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 
@@ -23,7 +26,7 @@ export enum Status {
 }
 
 @Entity({ name: 'user' })
-export class User {
+export class UserEntity {
 
     @PrimaryGeneratedColumn({ name: 'id' })
     id: number;
@@ -50,12 +53,28 @@ export class User {
     userType: UserType;
 
 
-    @OneToMany(() => Post, (post) => post.owner)
-    posts?: Promise<Post[]>;
+    @OneToMany(() => PostEntity, (postEntity) => postEntity.owner)
+    posts?: Promise<PostEntity[]>;
 
-    @OneToMany(() => Invoice, (invoice) => invoice.user)
-    invoices?: Promise<Invoice[]>;
+    @OneToMany(() => SubscriptionEntity, (subscriptionEntity) => subscriptionEntity.user)
+    premiumUsers?: Promise<SubscriptionEntity[]>;
 
-    @OneToMany(()=>Token,(token)=>token.user)
-    tokens?: Promise<Token[]>;
+    @OneToMany(() => TokenEntity, (tokenEntity) => tokenEntity.user)
+    tokens?: Promise<TokenEntity[]>;
+
+    @OneToMany(() => CommentEntity, (commentEntity) => commentEntity.user)
+    comments?: Promise<Comment[]>
+
+    @OneToOne(() => WalletEntity, (walletEntity) => walletEntity.user)
+    wallet?: Promise<WalletEntity>
+
+    @OneToMany(() => FollowEntity, (followEntity) => followEntity.users)
+    followers?: Promise<UserEntity>;
+
+    @OneToMany(() => FollowEntity, (followEntity) => followEntity.userFollowed)
+    userFollows?: Promise<UserEntity[]>;
+
+    @OneToMany(() => ReactionEntity, (reactionEntity) => reactionEntity.user)
+    reactions?: Promise<ReactionEntity[]>
+
 }

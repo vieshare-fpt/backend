@@ -1,6 +1,8 @@
-import { Category } from "src/models/categories/entities/category.entity";
-import { User } from "src/models/users/entities/user.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { CategoryEntity } from "src/models/categories/entities/category.entity";
+import { CommentEntity } from "src/models/comments/entities/comment.entity";
+import { ReactionEntity } from "src/models/reactions/entities/reaction.entity";
+import { UserEntity } from "src/models/users/entities/user.entity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 export enum Status {
     PUBLISH = 'PUBLISH',
@@ -10,7 +12,7 @@ export enum Status {
 }
 
 @Entity({ name: 'post' })
-export class Post {
+export class PostEntity {
     @PrimaryGeneratedColumn({ name: 'id' })
     id: number
 
@@ -38,13 +40,17 @@ export class Post {
     @Column({ name: 'status', type: 'enum', enum: Status, default: Status.PUBLISH, nullable: false })
     status: Status;
 
-    @ManyToOne(() => User, (user) => user.posts)
+    @ManyToOne(() => UserEntity, (userEntity) => userEntity.posts)
     @JoinColumn({ name: 'ownerId' })
-    owner: User;
+    owner: Promise<UserEntity>;
 
-    @ManyToOne(()=>Category,(category)=>category.posts)
-    @JoinColumn({name: 'categoryId'})
-    category: Category;
+    @ManyToOne(() => CategoryEntity, (categoryEntity) => categoryEntity.posts)
+    @JoinColumn({ name: 'categoryId' })
+    category: Promise<CategoryEntity>;
 
+    @OneToMany(() => CommentEntity, (commentEntity) => commentEntity.post)
+    comments?: Promise<CommentEntity[]>
 
+    @OneToMany(() => ReactionEntity, (reactionEntity) => reactionEntity.post)
+    reactions?: Promise<ReactionEntity[]>
 }

@@ -3,9 +3,9 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { jwtConstants, tokenConstatns } from 'src/constrants';
 import { LessThan, MoreThanOrEqual, Repository } from 'typeorm';
-import { User } from '../users/entities/user.entity';
+import { UserEntity } from '../users/entities/user.entity';
 import { CreateTokenDto } from './dto/create-token.dto';
-import { Token } from './entities/token.entity';
+import { TokenEntity } from './entities/token.entity';
 import * as uuid4 from 'uuid4'
 import { UsersService } from '../users/users.service';
 import { AuthTokenDto } from '../auth/dto/auth-token.dto';
@@ -16,11 +16,11 @@ export class TokensService {
   constructor(
     private userService: UsersService,
     private jwtService: JwtService,
-    @InjectRepository(Token)
-    private readonly tokenRepository: Repository<Token>
+    @InjectRepository(TokenEntity)
+    private readonly tokenRepository: Repository<TokenEntity>
   ) { }
 
-  async findTokenByUserId(id: number): Promise<Token> {
+  async findTokenByUserId(id: number): Promise<TokenEntity> {
     return await this.tokenRepository.findOne({
       where: {
         userId: id
@@ -62,7 +62,7 @@ export class TokensService {
     createTokenDto.refreshToken = uuid4();
     if (refreshTokenEntity) {
       await this.update(<UpdateTokenDto>createTokenDto)
-      
+
       return await this.findTokenByUserId(createTokenDto.userId).then(data => data.refreshToken)
     }
 
@@ -81,12 +81,12 @@ export class TokensService {
       return this.issueRefreshToken(tokens.refresh_token, agent)
     }
 
-    const user = await refreshTokenEntity.user;
+  //  const user = await refreshTokenEntity.user;
 
-    return {
-      access_token: await this.newAccessToken(user),
-      refresh_token: tokens.refresh_token
-    };
+    // return {
+    //   access_token: await this.newAccessToken(user),
+    //   refresh_token: tokens.refresh_token
+    // };
   }
   private async issueRefreshToken(refreshToken: string, agent: string): Promise<AuthTokenDto> {
     const refreshTokenEntity = await this.tokenRepository.findOne({
@@ -103,13 +103,13 @@ export class TokensService {
     return this.renewTokens(refreshTokenEntity)
   }
 
-  async newAccessToken(user: User): Promise<string> {
+  async newAccessToken(user: UserEntity): Promise<string> {
     const { hashPassword, ...data } = user;
     return await this.jwtService.sign(data)
   }
 
 
-  private async renewTokens(refreshTokenEntity: Token): Promise<AuthTokenDto> {
+  private async renewTokens(refreshTokenEntity: TokenEntity): Promise<AuthTokenDto> {
     const date = this.newExpirateDate();
     const user = await this.userService.findOne(refreshTokenEntity.userId);
     this.tokenRepository.update({ refreshToken: refreshTokenEntity.refreshToken }, {
@@ -126,7 +126,7 @@ export class TokensService {
     };
   }
 
-  async removeRefreshToken(user: User, agent: string): Promise<AuthTokenDto | any> {
+  async removeRefreshToken(user: UserEntity, agent: string): Promise<AuthTokenDto | any> {
     const update = await this.tokenRepository.delete({ userId: user.id, agent: agent });
     if (update.affected) {
       return {
