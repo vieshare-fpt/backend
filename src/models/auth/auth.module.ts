@@ -8,6 +8,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from 'src/constrants';
 import { TokensService } from '../tokens/tokens.service';
 import { Token } from '../tokens/entities/token.entity';
+import { LocalStrategy } from './strategies/local.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 
 @Module({
@@ -20,6 +22,6 @@ import { Token } from '../tokens/entities/token.entity';
   ],
 
   controllers: [AuthController],
-  providers: [AuthService, UsersService, TokensService]
+  providers: [AuthService, UsersService, TokensService,LocalStrategy,JwtStrategy]
 })
 export class AuthModule { }

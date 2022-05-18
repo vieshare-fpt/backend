@@ -9,6 +9,7 @@ import { Token } from './entities/token.entity';
 import * as uuid4 from 'uuid4'
 import { UsersService } from '../users/users.service';
 import { AuthTokenDto } from '../auth/dto/auth-token.dto';
+import { UpdateTokenDto } from './dto/update-token.dto';
 
 @Injectable()
 export class TokensService {
@@ -29,13 +30,21 @@ export class TokensService {
   async create(createTokenDto: CreateTokenDto) {
     return await this.tokenRepository.save(createTokenDto);
   }
+  async update(updateTokenDto: UpdateTokenDto) {
+    await this.tokenRepository.update({ refreshToken: updateTokenDto.refreshToken }, {
+      userId: updateTokenDto.userId,
+      refreshToken: updateTokenDto.refreshToken,
+      agent: updateTokenDto.agent,
+      dateExpire: updateTokenDto.dateExpire
+    })
+  }
 
 
-  findRefeshToken(refeshToken: string) {
-    return this.tokenRepository.findOne({
+  async findRefeshToken(refeshToken: string) {
+    return await this.tokenRepository.findOne({
       where: {
         id: refeshToken,
-        validUntil: MoreThanOrEqual<Date>(new Date())
+        dateExpire: MoreThanOrEqual<Date>(new Date())
       }
     })
   }
@@ -48,33 +57,24 @@ export class TokensService {
   async newRefeshToken(createTokenDto: CreateTokenDto) {
     const refreshTokenEntity = await this.findTokenByUserId(createTokenDto.userId)
     const date = this.newExpirateDate()
-    if (refreshTokenEntity) {
-      await this.tokenRepository.update(refreshTokenEntity.id, {
-        id: uuid4(),
-        agent: createTokenDto.agent,
-        validUntil: date
-      })
 
-      return await this.findTokenByUserId(createTokenDto.userId).then(data => data.id)
+    createTokenDto.dateExpire = this.newExpirateDate();
+    createTokenDto.refreshToken = uuid4();
+    if (refreshTokenEntity) {
+      await this.update(<UpdateTokenDto>createTokenDto)
+      
+      return await this.findTokenByUserId(createTokenDto.userId).then(data => data.refreshToken)
     }
-    return await this.create(
-      {
-        id: uuid4(),
-        agent: createTokenDto.agent,
-        userId: createTokenDto.userId,
-        validUntil: date
-      }
-    ).then(data => {
-      return data.id;
-    });
+
+    return await this.create(createTokenDto).then(data => data.refreshToken);
   }
 
   async renewAuthTokens(tokens: AuthTokenDto, agent: string): Promise<AuthTokenDto> {
     const refreshTokenEntity = await this.tokenRepository.findOne({
       where: {
-        id: tokens.refresh_token,
+        refreshToken: tokens.refresh_token,
         agent: agent,
-        validUntil: MoreThanOrEqual(new Date()),
+        dateExpire: MoreThanOrEqual(new Date()),
       },
     });
     if (!refreshTokenEntity) {
@@ -91,9 +91,9 @@ export class TokensService {
   private async issueRefreshToken(refreshToken: string, agent: string): Promise<AuthTokenDto> {
     const refreshTokenEntity = await this.tokenRepository.findOne({
       where: {
-        id: refreshToken,
+        refreshToken: refreshToken,
         agent: agent,
-        validUntil: LessThan(new Date()),
+        dateExpire: LessThan(new Date()),
       }
     });
     if (!refreshTokenEntity) {
@@ -112,13 +112,13 @@ export class TokensService {
   private async renewTokens(refreshTokenEntity: Token): Promise<AuthTokenDto> {
     const date = this.newExpirateDate();
     const user = await this.userService.findOne(refreshTokenEntity.userId);
-    this.tokenRepository.update(refreshTokenEntity.id, {
-      id: uuid4(),
-      validUntil: date
+    this.tokenRepository.update({ refreshToken: refreshTokenEntity.refreshToken }, {
+      refreshToken: uuid4(),
+      dateExpire: date
     })
 
     const accessToken = await this.newAccessToken(user);
-    const refreshToken = await (await this.tokenRepository.findOne({ where: { userId: refreshTokenEntity.userId } })).id;
+    const refreshToken = await (await this.tokenRepository.findOne({ where: { userId: refreshTokenEntity.userId } })).refreshToken;
 
     return {
       access_token: accessToken,

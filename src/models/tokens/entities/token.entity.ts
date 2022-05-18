@@ -1,21 +1,24 @@
 import { User } from "src/models/users/entities/user.entity";
-import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Column, OneToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Column, OneToOne, PrimaryColumn } from "typeorm";
 
 @Entity('token')
 export class Token {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn({ name: 'id' })
+    id: string
 
-    @Column()
+    @Column({ name: 'refreshToken', type: 'uuid' })
+    refreshToken: string;
+
+    @Column({name:'userId',type:'number'})
     userId: number;
 
-    @Column({ nullable: true })
+    @Column({ name: 'agent', nullable: true })
     agent: string;
 
-    @Column({ type: 'date' })
-    validUntil: Date;
+    @Column({ name: 'dateExpire'})
+    dateExpire: Date;
 
-    @OneToOne(() => User, (user) => user.token)
+    @ManyToOne(() => User, (user) => user.tokens)
     @JoinColumn({ name: 'userId' })
     user: Promise<User>;
 }

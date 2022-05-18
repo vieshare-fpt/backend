@@ -1,11 +1,19 @@
 
-import {IsUUID,IsNotEmpty,IsDate} from 'class-validator'
+import {IsUUID,IsDate,IsNumber,IsNotEmpty,IsString} from 'class-validator'
 
 export class UpdateTokenDto {
-    @IsUUID()
+    @IsNumber()
     @IsNotEmpty()
-    id: string;
+    userId: number;
+
+    @IsUUID()
+    refreshToken: string;
+
+    @IsString()
+    agent: string;
 
     @IsDate()
-    validUntil: Date;
+    dateExpire: Date;
+
+
 }

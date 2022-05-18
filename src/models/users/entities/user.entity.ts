@@ -56,6 +56,6 @@ export class User {
     @OneToMany(() => Invoice, (invoice) => invoice.user)
     invoices?: Promise<Invoice[]>;
 
-    @OneToOne(()=>Token,(token)=>token.user)
-    token?: Promise<Token>;
+    @OneToMany(()=>Token,(token)=>token.user)
+    tokens?: Promise<Token[]>;
 }
