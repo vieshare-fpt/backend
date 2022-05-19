@@ -9,8 +9,8 @@ export enum Reacts {
     NONE = 'NONE'
 }
 
-@Entity({ name: 'reaction' })
-export class ReactionEntity {
+@Entity({ name: 'react' })
+export class ReactEntity {
     @PrimaryGeneratedColumn({ name: 'id' })
     id: number
 

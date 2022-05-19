@@ -1,10 +1,12 @@
 import { CategoryEntity } from "src/models/categories/entities/category.entity";
 import { CommentEntity } from "src/models/comments/entities/comment.entity";
-import { ReactionEntity } from "src/models/reactions/entities/reaction.entity";
+import { HistoryEntity } from "src/models/history/entities/history.entity";
+import { IncomeStatisticEntity } from "src/models/income-statistics/entities/income-statistic.entity";
+import { ReactEntity } from "src/models/reacts/entities/react.entity";
 import { UserEntity } from "src/models/users/entities/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
-export enum Status {
+export enum postStatus {
     PUBLISH = 'PUBLISH',
     PENDING = 'PENDING',
     HIDDEN = 'HIDDEN',
@@ -37,8 +39,8 @@ export class PostEntity {
     @Column({ name: 'views' })
     views: number
 
-    @Column({ name: 'status', type: 'enum', enum: Status, default: Status.PUBLISH, nullable: false })
-    status: Status;
+    @Column({ name: 'status', type: 'enum', enum: postStatus, default: postStatus.PUBLISH, nullable: false })
+    status: postStatus;
 
     @ManyToOne(() => UserEntity, (userEntity) => userEntity.posts)
     @JoinColumn({ name: 'ownerId' })
@@ -51,6 +53,12 @@ export class PostEntity {
     @OneToMany(() => CommentEntity, (commentEntity) => commentEntity.post)
     comments?: Promise<CommentEntity[]>
 
-    @OneToMany(() => ReactionEntity, (reactionEntity) => reactionEntity.post)
-    reactions?: Promise<ReactionEntity[]>
+    @OneToMany(() => ReactEntity, (reactEntity) => reactEntity.post)
+    reactions?: Promise<ReactEntity[]>
+
+    @OneToMany(() => IncomeStatisticEntity, (incomeStatisticEntity) => incomeStatisticEntity.post)
+    incomeStatistics?: Promise<IncomeStatisticEntity[]>
+
+    @OneToMany(() => HistoryEntity, (historyEntity) => historyEntity.posts)
+    history?: Promise<ReactEntity[]>
 }

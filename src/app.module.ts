@@ -10,18 +10,22 @@ import { TokensModule } from './models/tokens/tokens.module';
 import { CommentsModule } from './models/comments/comments.module';
 import { WalletsModule } from './models/wallets/wallets.module';
 import { FollowsModule } from './models/follows/follows.module';
-import { ReactionsModule } from './models/reactions/reactions.module';
 import { CategoryEntity } from './models/categories/entities/category.entity';
 import { CommentEntity } from './models/comments/entities/comment.entity';
 import { FollowEntity } from './models/follows/entities/follow.entity';
 import { PostEntity } from './models/posts/entities/post.entity';
-import { ReactionEntity } from './models/reactions/entities/reaction.entity';
 import { TokenEntity } from './models/tokens/entities/token.entity';
 import { UserEntity } from './models/users/entities/user.entity';
 import { WalletEntity } from './models/wallets/entities/wallet.entity';
 import { SubscriptionsModule } from './models/subscriptions/subscriptions.module';
 import { SubscriptionEntity } from './models/subscriptions/entities/subscription.entity';
 import { RouterModule } from '@nestjs/core';
+import { ReactsModule } from './models/reacts/reacts.module';
+import { ReactEntity } from './models/reacts/entities/react.entity';
+import { IncomeStatisticsModule } from './models/income-statistics/income-statistics.module';
+import { IncomeStatisticEntity } from './models/income-statistics/entities/income-statistic.entity';
+import { HistoryModule } from './models/history/history.module';
+import { HistoryEntity } from './models/history/entities/history.entity';
 
 @Module({
   imports: [
@@ -44,7 +48,7 @@ import { RouterModule } from '@nestjs/core';
       password: '12345',
       database: 'vieshare',
       // entities: [__dirname + '/**/entities/*.entity{.ts,.js}'],
-      entities: [UserEntity, PostEntity, CategoryEntity, TokenEntity, SubscriptionEntity, WalletEntity, FollowEntity, CommentEntity, ReactionEntity],
+      entities: [UserEntity, PostEntity, CategoryEntity, TokenEntity, SubscriptionEntity, WalletEntity, FollowEntity, CommentEntity, ReactEntity,IncomeStatisticEntity,HistoryEntity],
       synchronize: true,
       dropSchema: true
     }),
@@ -55,7 +59,7 @@ import { RouterModule } from '@nestjs/core';
       { path: 'api', module: CommentsModule },
       { path: 'api', module: WalletsModule },
       { path: 'api', module: FollowsModule },
-      { path: 'api', module: ReactionsModule },
+      { path: 'api', module: ReactsModule },
       { path: 'api', module: SubscriptionsModule },
       { path: 'api', module: TokensModule }
     ]),
@@ -67,8 +71,11 @@ import { RouterModule } from '@nestjs/core';
     CommentsModule,
     WalletsModule,
     FollowsModule,
-    ReactionsModule,
-    SubscriptionsModule
+    ReactsModule,
+    SubscriptionsModule,
+    ReactsModule,
+    IncomeStatisticsModule,
+    HistoryModule
 
   ],
   controllers: [AppController],

@@ -1,16 +1,18 @@
 import { CommentEntity } from "src/models/comments/entities/comment.entity";
 import { FollowEntity } from "src/models/follows/entities/follow.entity";
+import { HistoryEntity } from "src/models/history/entities/history.entity";
 import { PostEntity } from "src/models/posts/entities/post.entity";
-import { ReactionEntity } from "src/models/reactions/entities/reaction.entity";
+import { ReactEntity } from "src/models/reacts/entities/react.entity";
 import { SubscriptionEntity } from "src/models/subscriptions/entities/subscription.entity";
 import { TokenEntity } from "src/models/tokens/entities/token.entity";
 import { WalletEntity } from "src/models/wallets/entities/wallet.entity";
 import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 
-export enum Role {
+export enum UserRole {
     USER = 'USER',
-    WRITER = 'WRITER',
+    CREATOR = 'CREATOR',
+    MODERATOR = 'MODERATOR',
     ADMIN = 'ADMIN'
 }
 
@@ -19,7 +21,7 @@ export enum UserType {
     PREMIUM = 'PREMIUM'
 }
 
-export enum Status {
+export enum UserStatus {
     ACTIVE = 'ACTIVE',
     UNACTIVE = 'UNACTIVE',
     REMOVED = 'REMOVED'
@@ -43,11 +45,11 @@ export class UserEntity {
     @Column({ name: 'fullName', type: 'nvarchar', length: 255 })
     fullName: string;
 
-    @Column({ name: 'role', type: 'enum', enum: Role, default: Role.USER, nullable: false })
-    role: Role;
+    @Column({ name: 'role', type: 'enum', enum: UserRole, default: UserRole.USER, nullable: false })
+    role: UserRole;
 
-    @Column({ name: 'status', type: 'enum', enum: Status, default: Status.ACTIVE, nullable: false })
-    status: Status;
+    @Column({ name: 'status', type: 'enum', enum: UserStatus, default: UserStatus.ACTIVE, nullable: false })
+    status: UserStatus;
 
     @Column({ name: 'userType', type: 'enum', enum: UserType, default: UserType.FREE, nullable: false })
     userType: UserType;
@@ -74,7 +76,11 @@ export class UserEntity {
     @OneToMany(() => FollowEntity, (followEntity) => followEntity.userFollowed)
     userFollows?: Promise<UserEntity[]>;
 
-    @OneToMany(() => ReactionEntity, (reactionEntity) => reactionEntity.user)
-    reactions?: Promise<ReactionEntity[]>
+    @OneToMany(() => ReactEntity, (reactEntity) => reactEntity.user)
+    reactions?: Promise<ReactEntity[]>
+
+    @OneToMany(() => HistoryEntity, (historyEntity) => historyEntity.users)
+    history?: Promise<ReactEntity[]>
+
 
 }

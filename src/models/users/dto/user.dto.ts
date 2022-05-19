@@ -1,5 +1,5 @@
 import { IsString, IsNotEmpty, IsEmail, IsEnum } from 'class-validator'
-import { Role, Status, UserType } from '../entities/user.entity';
+import { UserRole, UserStatus, UserType } from '../entities/user.entity';
 
 export class UserDto {
     @IsString()
@@ -17,10 +17,10 @@ export class UserDto {
     @IsNotEmpty()
     fullName: string;
 
-    @IsEnum(Role)
+    @IsEnum(UserRole)
     role: string;
 
-    @IsEnum(Status)
+    @IsEnum(UserStatus)
     status: string;
 
     @IsEnum(UserType)
