@@ -6,7 +6,7 @@ import { ReactEntity } from "src/models/reacts/entities/react.entity";
 import { UserEntity } from "src/models/users/entities/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
-export enum postStatus {
+export enum PostStatus {
     PUBLISH = 'PUBLISH',
     PENDING = 'PENDING',
     HIDDEN = 'HIDDEN',
@@ -39,8 +39,8 @@ export class PostEntity {
     @Column({ name: 'views' })
     views: number
 
-    @Column({ name: 'status', type: 'enum', enum: postStatus, default: postStatus.PUBLISH, nullable: false })
-    status: postStatus;
+    @Column({ name: 'status', type: 'enum', enum: PostStatus, default: PostStatus.PUBLISH, nullable: false })
+    status: PostStatus;
 
     @ManyToOne(() => UserEntity, (userEntity) => userEntity.posts)
     @JoinColumn({ name: 'ownerId' })

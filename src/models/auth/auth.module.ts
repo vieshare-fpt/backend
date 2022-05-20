@@ -10,6 +10,9 @@ import { TokensService } from '../tokens/tokens.service';
 import { TokenEntity } from '../tokens/entities/token.entity';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './guards/role.guard';
+import { JwtGuard } from './guards/jwt.guard';
 
 
 @Module({
@@ -22,6 +25,6 @@ import { JwtStrategy } from './strategies/jwt.strategy';
   ],
 
   controllers: [AuthController],
-  providers: [AuthService, UsersService, TokensService,LocalStrategy,JwtStrategy]
+  providers: [AuthService, UsersService, TokensService, LocalStrategy, JwtStrategy, RolesGuard,]
 })
 export class AuthModule { }

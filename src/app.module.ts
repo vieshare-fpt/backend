@@ -19,13 +19,15 @@ import { UserEntity } from './models/users/entities/user.entity';
 import { WalletEntity } from './models/wallets/entities/wallet.entity';
 import { SubscriptionsModule } from './models/subscriptions/subscriptions.module';
 import { SubscriptionEntity } from './models/subscriptions/entities/subscription.entity';
-import { RouterModule } from '@nestjs/core';
+import { APP_GUARD, RouterModule } from '@nestjs/core';
 import { ReactsModule } from './models/reacts/reacts.module';
 import { ReactEntity } from './models/reacts/entities/react.entity';
 import { IncomeStatisticsModule } from './models/income-statistics/income-statistics.module';
 import { IncomeStatisticEntity } from './models/income-statistics/entities/income-statistic.entity';
 import { HistoryModule } from './models/history/history.module';
 import { HistoryEntity } from './models/history/entities/history.entity';
+import { RolesGuard } from './models/auth/guards/role.guard';
+import { JwtGuard } from './models/auth/guards/jwt.guard';
 
 @Module({
   imports: [
@@ -48,7 +50,7 @@ import { HistoryEntity } from './models/history/entities/history.entity';
       password: '12345',
       database: 'vieshare',
       // entities: [__dirname + '/**/entities/*.entity{.ts,.js}'],
-      entities: [UserEntity, PostEntity, CategoryEntity, TokenEntity, SubscriptionEntity, WalletEntity, FollowEntity, CommentEntity, ReactEntity,IncomeStatisticEntity,HistoryEntity],
+      entities: [UserEntity, PostEntity, CategoryEntity, TokenEntity, SubscriptionEntity, WalletEntity, FollowEntity, CommentEntity, ReactEntity, IncomeStatisticEntity, HistoryEntity],
       synchronize: true,
       dropSchema: true
     }),
@@ -61,7 +63,9 @@ import { HistoryEntity } from './models/history/entities/history.entity';
       { path: 'api', module: FollowsModule },
       { path: 'api', module: ReactsModule },
       { path: 'api', module: SubscriptionsModule },
-      { path: 'api', module: TokensModule }
+      { path: 'api', module: TokensModule },
+      { path: 'api', module: IncomeStatisticsModule },
+      { path: 'api', module: HistoryModule }
     ]),
     UsersModule,
     PostsModule,
@@ -75,10 +79,15 @@ import { HistoryEntity } from './models/history/entities/history.entity';
     SubscriptionsModule,
     ReactsModule,
     IncomeStatisticsModule,
-    HistoryModule
-
+    HistoryModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, {
+    provide: APP_GUARD,
+    useClass: RolesGuard,
+  }, {
+      provide: APP_GUARD,
+      useClass: JwtGuard,
+    }]
 })
 export class AppModule { }
