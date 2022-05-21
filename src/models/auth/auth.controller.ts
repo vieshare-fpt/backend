@@ -4,9 +4,14 @@ import { UserDto } from '../users/dto/user.dto';
 import { UserEntity, UserRole } from '../users/entities/user.entity';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
+<<<<<<< HEAD
 import { UserAgent } from './decorators/user-agent.decorator';
 import { User } from './decorators/user.decorator';
 import { LocalAuthGuard } from './guards/local.guard';
+=======
+import { JwtGuard } from './guards/jwt.guard';
+import { LocalAuthGuard } from './guards/local.gaurd';
+>>>>>>> 3f7d588e62b04a815ebbd5eca0100c35aa43d1a7
 
 
 @Controller('auth')
@@ -21,11 +26,19 @@ export class AuthController {
   }
 
   @Public()
+<<<<<<< HEAD
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@User() user: UserEntity, @UserAgent() userAgent: string): Promise<any> {
     if (!user.id) return new UnauthorizedException();
     return this.authService.login(user, userAgent);
+=======
+  @Post('login')
+  async login(@Request() request): Promise<any> {
+    console.log(request)
+    if (!request.user.id) return new UnauthorizedException();
+    return this.authService.login(request.user, request.get('user-agent'));
+>>>>>>> 3f7d588e62b04a815ebbd5eca0100c35aa43d1a7
   }
 
 

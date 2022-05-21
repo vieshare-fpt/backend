@@ -26,9 +26,14 @@ import { IncomeStatisticsModule } from './models/income-statistics/income-statis
 import { IncomeStatisticEntity } from './models/income-statistics/entities/income-statistic.entity';
 import { HistoryModule } from './models/history/history.module';
 import { HistoryEntity } from './models/history/entities/history.entity';
+<<<<<<< HEAD
 import { JwtGuard } from './models/auth/guards/jwt.guard';
 import { RolesGuard } from './models/auth/guards/roles.guard';
 import { LocalAuthGuard } from './models/auth/guards/local.guard';
+=======
+import { RolesGuard } from './models/auth/guards/role.guard';
+import { JwtGuard } from './models/auth/guards/jwt.guard';
+>>>>>>> 3f7d588e62b04a815ebbd5eca0100c35aa43d1a7
 
 @Module({
   imports: [
@@ -64,7 +69,9 @@ import { LocalAuthGuard } from './models/auth/guards/local.guard';
       { path: 'api', module: FollowsModule },
       { path: 'api', module: ReactsModule },
       { path: 'api', module: SubscriptionsModule },
-      { path: 'api', module: TokensModule }
+      { path: 'api', module: TokensModule },
+      { path: 'api', module: IncomeStatisticsModule },
+      { path: 'api', module: HistoryModule }
     ]),
     UsersModule,
     PostsModule,
@@ -78,10 +85,10 @@ import { LocalAuthGuard } from './models/auth/guards/local.guard';
     SubscriptionsModule,
     ReactsModule,
     IncomeStatisticsModule,
-    HistoryModule
-
+    HistoryModule,
   ],
   controllers: [AppController],
+<<<<<<< HEAD
   providers: [AppService
     ,
     {
@@ -97,5 +104,14 @@ import { LocalAuthGuard } from './models/auth/guards/local.guard';
     //   useClass: LocalAuthGuard,
     // }
   ],
+=======
+  providers: [AppService, {
+    provide: APP_GUARD,
+    useClass: RolesGuard,
+  }, {
+      provide: APP_GUARD,
+      useClass: JwtGuard,
+    }]
+>>>>>>> 3f7d588e62b04a815ebbd5eca0100c35aa43d1a7
 })
 export class AppModule { }

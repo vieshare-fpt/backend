@@ -47,8 +47,10 @@ export class PostEntity {
     @Column({ name: 'status', type: 'enum', enum: PostStatus, default: PostStatus.PUBLISH, nullable: false })
     status: PostStatus;
 
+
     @Column({ name: 'postType', type: 'enum', enum: PostType, default: PostType.FREE, nullable: false })
-    postType : PostType;
+    postType: PostType;
+
 
     @ManyToOne(() => UserEntity, (userEntity) => userEntity.posts)
     @JoinColumn({ name: 'ownerId' })
