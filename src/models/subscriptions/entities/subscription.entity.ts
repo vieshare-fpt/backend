@@ -1,4 +1,4 @@
-import { User } from "src/models/users/entities/user.entity";
+import { UserEntity } from "src/models/users/entities/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum Status {
@@ -7,8 +7,8 @@ export enum Status {
     PENDING = 'PENDING'
 }
 
-@Entity({ name: 'invoice' })
-export class Invoice {
+@Entity({ name: 'subscription' })
+export class SubscriptionEntity {
     @PrimaryGeneratedColumn({ name: 'id' })
     id: number
 
@@ -24,9 +24,9 @@ export class Invoice {
     @Column({ name: 'status', type: 'enum', enum: Status, default: Status.ACTIVE, nullable: false })
     status: Status;
 
-    @ManyToOne(() => User, (user) => user.invoices)
+    @ManyToOne(() => UserEntity, (userEntity) => userEntity.premiumUsers)
     @JoinColumn({ name: 'userId' })
-    user: Promise<User>
+    user: Promise<UserEntity>
 
 
 }

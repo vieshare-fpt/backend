@@ -1,35 +1,38 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { jwtConstants, tokenConstatns } from 'src/constrants';
 import { LessThan, MoreThanOrEqual, Repository } from 'typeorm';
-import { User } from '../users/entities/user.entity';
+import { UserEntity } from '../users/entities/user.entity';
 import { CreateTokenDto } from './dto/create-token.dto';
-import { Token } from './entities/token.entity';
+import { TokenEntity } from './entities/token.entity';
 import * as uuid4 from 'uuid4'
 import { UsersService } from '../users/users.service';
 import { AuthTokenDto } from '../auth/dto/auth-token.dto';
 import { UpdateTokenDto } from './dto/update-token.dto';
+import e from 'express';
 
 @Injectable()
 export class TokensService {
   constructor(
     private userService: UsersService,
     private jwtService: JwtService,
-    @InjectRepository(Token)
-    private readonly tokenRepository: Repository<Token>
+    @InjectRepository(TokenEntity)
+    private readonly tokenRepository: Repository<TokenEntity>
   ) { }
 
-  async findTokenByUserId(id: number): Promise<Token> {
+  async findTokenByUserId(id: number): Promise<TokenEntity> {
     return await this.tokenRepository.findOne({
       where: {
         userId: id
       },
     });
   }
+
   async create(createTokenDto: CreateTokenDto) {
     return await this.tokenRepository.save(createTokenDto);
   }
+
   async update(updateTokenDto: UpdateTokenDto) {
     await this.tokenRepository.update({ refreshToken: updateTokenDto.refreshToken }, {
       userId: updateTokenDto.userId,
@@ -40,10 +43,12 @@ export class TokensService {
   }
 
 
-  async findRefeshToken(refeshToken: string) {
+  async findRefeshToken(refeshToken: string, agent: string): Promise<TokenEntity> {
+
     return await this.tokenRepository.findOne({
       where: {
-        id: refeshToken,
+        refreshToken: refeshToken,
+        agent: agent,
         dateExpire: MoreThanOrEqual<Date>(new Date())
       }
     })
@@ -51,44 +56,37 @@ export class TokensService {
 
   private newExpirateDate(): Date {
     const date = new Date();
-    return new Date(date.setDate(date.getDate() + tokenConstatns.accessTokenExpire));
+    var minutesToAdd = 30;
+    var currentDate = new Date();
+    var futureDate = new Date(currentDate.getTime() + minutesToAdd * 60000);
+    return new Date(date.setDate(date.getDate() + tokenConstatns.refreshTokenExpire));
   }
 
-  async newRefeshToken(createTokenDto: CreateTokenDto) {
-    const refreshTokenEntity = await this.findTokenByUserId(createTokenDto.userId)
-    const date = this.newExpirateDate()
 
-    createTokenDto.dateExpire = this.newExpirateDate();
-    createTokenDto.refreshToken = uuid4();
-    if (refreshTokenEntity) {
-      await this.update(<UpdateTokenDto>createTokenDto)
-      
-      return await this.findTokenByUserId(createTokenDto.userId).then(data => data.refreshToken)
-    }
 
-    return await this.create(createTokenDto).then(data => data.refreshToken);
-  }
+  async renewTokens(tokens: AuthTokenDto, agent: string): Promise<AuthTokenDto> {
+    let access_token = "";
+    let refresh_token = tokens.refresh_token;
 
-  async renewAuthTokens(tokens: AuthTokenDto, agent: string): Promise<AuthTokenDto> {
-    const refreshTokenEntity = await this.tokenRepository.findOne({
-      where: {
-        refreshToken: tokens.refresh_token,
-        agent: agent,
-        dateExpire: MoreThanOrEqual(new Date()),
-      },
-    });
+    const refreshTokenEntity = await this.findRefeshToken(refresh_token, agent)
+
     if (!refreshTokenEntity) {
-      return this.issueRefreshToken(tokens.refresh_token, agent)
+
+      refresh_token = await this.renewRefreshToken(tokens.refresh_token, agent)
     }
 
-    const user = await refreshTokenEntity.user;
+
+    const newRefeshTokenEntity = await this.findRefeshToken(refresh_token, agent)
+
+    access_token = await this.newAccessToken(await refreshTokenEntity.user);
 
     return {
-      access_token: await this.newAccessToken(user),
-      refresh_token: tokens.refresh_token
+      access_token: access_token,
+      refresh_token: refresh_token
     };
   }
-  private async issueRefreshToken(refreshToken: string, agent: string): Promise<AuthTokenDto> {
+
+  private async renewRefreshToken(refreshToken: string, agent: string): Promise<string> {
     const refreshTokenEntity = await this.tokenRepository.findOne({
       where: {
         refreshToken: refreshToken,
@@ -96,37 +94,54 @@ export class TokensService {
         dateExpire: LessThan(new Date()),
       }
     });
+
+
     if (!refreshTokenEntity) {
       throw new BadRequestException();
     }
 
-    return this.renewTokens(refreshTokenEntity)
+    const date = this.newExpirateDate();
+
+    const newRefreshToken = uuid4()
+    const affected = await this.tokenRepository.update({ refreshToken: refreshTokenEntity.refreshToken }, {
+      refreshToken: newRefreshToken,
+      dateExpire: date
+    })
+      .then(data => data.affected)
+      .catch(err => { throw new BadRequestException(); })
+
+    if (!affected) {
+      throw new ConflictException();
+    }
+
+    return newRefreshToken;
+
   }
 
-  async newAccessToken(user: User): Promise<string> {
+
+  async newAccessToken(user: UserEntity): Promise<string> {
     const { hashPassword, ...data } = user;
     return await this.jwtService.sign(data)
   }
 
+  async newRefeshToken(createTokenDto: CreateTokenDto): Promise<string> {
+    const refreshTokenEntity = await this.findTokenByUserId(createTokenDto.userId)
+    const date = this.newExpirateDate()
 
-  private async renewTokens(refreshTokenEntity: Token): Promise<AuthTokenDto> {
-    const date = this.newExpirateDate();
-    const user = await this.userService.findOne(refreshTokenEntity.userId);
-    this.tokenRepository.update({ refreshToken: refreshTokenEntity.refreshToken }, {
-      refreshToken: uuid4(),
-      dateExpire: date
-    })
+    createTokenDto.dateExpire = this.newExpirateDate();
+    createTokenDto.refreshToken = uuid4();
+    if (refreshTokenEntity) {
+      await this.update(<UpdateTokenDto>createTokenDto)
 
-    const accessToken = await this.newAccessToken(user);
-    const refreshToken = await (await this.tokenRepository.findOne({ where: { userId: refreshTokenEntity.userId } })).refreshToken;
+      return await this.findTokenByUserId(createTokenDto.userId).then(data => data.refreshToken)
+    }
 
-    return {
-      access_token: accessToken,
-      refresh_token: refreshToken
-    };
+    return await this.create(createTokenDto).then(data => data.refreshToken);
   }
 
-  async removeRefreshToken(user: User, agent: string): Promise<AuthTokenDto | any> {
+
+
+  async removeRefreshToken(user: UserEntity, agent: string): Promise<AuthTokenDto | any> {
     const update = await this.tokenRepository.delete({ userId: user.id, agent: agent });
     if (update.affected) {
       return {

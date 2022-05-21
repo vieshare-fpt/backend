@@ -3,7 +3,7 @@ import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { TokensService } from '../tokens/tokens.service';
-import { User } from '../users/entities/user.entity';
+import { UserEntity } from '../users/entities/user.entity';
 import { AuthTokenDto } from './dto/auth-token.dto';
 
 
@@ -36,7 +36,7 @@ export class AuthService {
     return await bcrypt.compare(password, storePasswordHash);
   }
 
-  async validateUser(username: string, password: string): Promise<User | null> {
+  async validateUser(username: string, password: string): Promise<UserEntity | null> {
     const user = await this.userService.findUser(username);
     if (!user) return null
 
@@ -63,7 +63,7 @@ export class AuthService {
     return this.userService.create(payload)
   }
 
-  async login(user: User, agent: string): Promise<AuthTokenDto> {
+  async login(user: UserEntity, agent: string): Promise<AuthTokenDto> {
 
     return {
       access_token: await this.tokenService.newAccessToken(user),
@@ -74,14 +74,14 @@ export class AuthService {
     };
   }
 
-  async logout(user: User, agent: string): Promise<Boolean> {
+  async logout(user: UserEntity, agent: string): Promise<Boolean> {
     return this.tokenService.removeRefreshToken(user,agent);
   }
   async profile(id: number): Promise<any> {
     return await this.userService.findOne(id);
   }
 
-  async refeshToken(tokens: AuthTokenDto, UserAgent: string) {
-    return await this.tokenService.renewAuthTokens(tokens, UserAgent);
+  async refeshAccessTokens(tokens: AuthTokenDto, UserAgent: string) {
+    return await this.tokenService.renewTokens(tokens, UserAgent);
   }
 }

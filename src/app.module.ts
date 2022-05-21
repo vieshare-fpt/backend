@@ -1,18 +1,39 @@
-import { Module } from '@nestjs/common';
+import { Module, Post } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './models/users/users.module';
 import { PostsModule } from './models/posts/posts.module';
-import { InvoicesModule } from './models/invoices/invoices.module';
-import { User } from './models/users/entities/user.entity';
-import { Post } from './models/posts/entities/post.entity';
-import { Invoice } from './models/invoices/entities/invoice.entity';
 import { AuthModule } from './models/auth/auth.module';
 import { CategoriesModule } from './models/categories/categories.module';
-import { Category } from './models/categories/entities/category.entity';
 import { TokensModule } from './models/tokens/tokens.module';
-import { Token } from './models/tokens/entities/token.entity';
+import { CommentsModule } from './models/comments/comments.module';
+import { WalletsModule } from './models/wallets/wallets.module';
+import { FollowsModule } from './models/follows/follows.module';
+import { CategoryEntity } from './models/categories/entities/category.entity';
+import { CommentEntity } from './models/comments/entities/comment.entity';
+import { FollowEntity } from './models/follows/entities/follow.entity';
+import { PostEntity } from './models/posts/entities/post.entity';
+import { TokenEntity } from './models/tokens/entities/token.entity';
+import { UserEntity } from './models/users/entities/user.entity';
+import { WalletEntity } from './models/wallets/entities/wallet.entity';
+import { SubscriptionsModule } from './models/subscriptions/subscriptions.module';
+import { SubscriptionEntity } from './models/subscriptions/entities/subscription.entity';
+import { APP_GUARD, RouterModule } from '@nestjs/core';
+import { ReactsModule } from './models/reacts/reacts.module';
+import { ReactEntity } from './models/reacts/entities/react.entity';
+import { IncomeStatisticsModule } from './models/income-statistics/income-statistics.module';
+import { IncomeStatisticEntity } from './models/income-statistics/entities/income-statistic.entity';
+import { HistoryModule } from './models/history/history.module';
+import { HistoryEntity } from './models/history/entities/history.entity';
+<<<<<<< HEAD
+import { JwtGuard } from './models/auth/guards/jwt.guard';
+import { RolesGuard } from './models/auth/guards/roles.guard';
+import { LocalAuthGuard } from './models/auth/guards/local.guard';
+=======
+import { RolesGuard } from './models/auth/guards/role.guard';
+import { JwtGuard } from './models/auth/guards/jwt.guard';
+>>>>>>> 3f7d588e62b04a815ebbd5eca0100c35aa43d1a7
 
 @Module({
   imports: [
@@ -35,18 +56,62 @@ import { Token } from './models/tokens/entities/token.entity';
       password: '12345',
       database: 'vieshare',
       // entities: [__dirname + '/**/entities/*.entity{.ts,.js}'],
-      entities: [User,Post,Invoice,Category,Token],
+      entities: [UserEntity, PostEntity, CategoryEntity, TokenEntity, SubscriptionEntity, WalletEntity, FollowEntity, CommentEntity, ReactEntity, IncomeStatisticEntity, HistoryEntity],
       synchronize: true,
       dropSchema: true
     }),
+    RouterModule.register([
+      { path: 'api', module: UsersModule },
+      { path: 'api', module: PostsModule },
+      { path: 'api', module: CategoriesModule },
+      { path: 'api', module: CommentsModule },
+      { path: 'api', module: WalletsModule },
+      { path: 'api', module: FollowsModule },
+      { path: 'api', module: ReactsModule },
+      { path: 'api', module: SubscriptionsModule },
+      { path: 'api', module: TokensModule },
+      { path: 'api', module: IncomeStatisticsModule },
+      { path: 'api', module: HistoryModule }
+    ]),
     UsersModule,
     PostsModule,
-    InvoicesModule,
     AuthModule,
     CategoriesModule,
-    TokensModule
+    TokensModule,
+    CommentsModule,
+    WalletsModule,
+    FollowsModule,
+    ReactsModule,
+    SubscriptionsModule,
+    ReactsModule,
+    IncomeStatisticsModule,
+    HistoryModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+<<<<<<< HEAD
+  providers: [AppService
+    ,
+    {
+      provide: APP_GUARD,
+      useClass: JwtGuard,
+    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: RolesGuard,
+    // },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: LocalAuthGuard,
+    // }
+  ],
+=======
+  providers: [AppService, {
+    provide: APP_GUARD,
+    useClass: RolesGuard,
+  }, {
+      provide: APP_GUARD,
+      useClass: JwtGuard,
+    }]
+>>>>>>> 3f7d588e62b04a815ebbd5eca0100c35aa43d1a7
 })
 export class AppModule { }

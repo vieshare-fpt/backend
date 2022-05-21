@@ -1,16 +1,25 @@
-import { Category } from "src/models/categories/entities/category.entity";
-import { User } from "src/models/users/entities/user.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { CategoryEntity } from "src/models/categories/entities/category.entity";
+import { CommentEntity } from "src/models/comments/entities/comment.entity";
+import { HistoryEntity } from "src/models/history/entities/history.entity";
+import { IncomeStatisticEntity } from "src/models/income-statistics/entities/income-statistic.entity";
+import { ReactEntity } from "src/models/reacts/entities/react.entity";
+import { UserEntity } from "src/models/users/entities/user.entity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
-export enum Status {
+export enum PostStatus {
     PUBLISH = 'PUBLISH',
     PENDING = 'PENDING',
     HIDDEN = 'HIDDEN',
     REMOVED = 'REMOVED'
 }
 
+export enum PostType {
+    PREMIUM = 'PREMIUM',
+    FREE = 'FREE'
+}
+
 @Entity({ name: 'post' })
-export class Post {
+export class PostEntity {
     @PrimaryGeneratedColumn({ name: 'id' })
     id: number
 
@@ -35,16 +44,31 @@ export class Post {
     @Column({ name: 'views' })
     views: number
 
-    @Column({ name: 'status', type: 'enum', enum: Status, default: Status.PUBLISH, nullable: false })
-    status: Status;
+    @Column({ name: 'status', type: 'enum', enum: PostStatus, default: PostStatus.PUBLISH, nullable: false })
+    status: PostStatus;
 
-    @ManyToOne(() => User, (user) => user.posts)
+
+    @Column({ name: 'postType', type: 'enum', enum: PostType, default: PostType.FREE, nullable: false })
+    postType: PostType;
+
+
+    @ManyToOne(() => UserEntity, (userEntity) => userEntity.posts)
     @JoinColumn({ name: 'ownerId' })
-    owner: User;
+    owner: Promise<UserEntity>;
 
-    @ManyToOne(()=>Category,(category)=>category.posts)
-    @JoinColumn({name: 'categoryId'})
-    category: Category;
+    @ManyToOne(() => CategoryEntity, (categoryEntity) => categoryEntity.posts)
+    @JoinColumn({ name: 'categoryId' })
+    category: Promise<CategoryEntity>;
 
+    @OneToMany(() => CommentEntity, (commentEntity) => commentEntity.post)
+    comments?: Promise<CommentEntity[]>
 
+    @OneToMany(() => ReactEntity, (reactEntity) => reactEntity.post)
+    reactions?: Promise<ReactEntity[]>
+
+    @OneToMany(() => IncomeStatisticEntity, (incomeStatisticEntity) => incomeStatisticEntity.post)
+    incomeStatistics?: Promise<IncomeStatisticEntity[]>
+
+    @OneToMany(() => HistoryEntity, (historyEntity) => historyEntity.posts)
+    history?: Promise<ReactEntity[]>
 }
