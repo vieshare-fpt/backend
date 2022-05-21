@@ -17,6 +17,7 @@ export class UsersService {
   }
 
   findAll() {
+
     return `This action returns all users`;
   }
 
@@ -50,5 +51,5 @@ export class UsersService {
     );
   }
 
-  
+
 }

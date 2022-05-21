@@ -81,7 +81,7 @@ export class AuthService {
     return await this.userService.findOne(id);
   }
 
-  async refeshToken(tokens: AuthTokenDto, UserAgent: string) {
-    return await this.tokenService.renewAuthTokens(tokens, UserAgent);
+  async refeshAccessTokens(tokens: AuthTokenDto, UserAgent: string) {
+    return await this.tokenService.renewTokens(tokens, UserAgent);
   }
 }

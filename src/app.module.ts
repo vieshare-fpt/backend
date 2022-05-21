@@ -19,13 +19,16 @@ import { UserEntity } from './models/users/entities/user.entity';
 import { WalletEntity } from './models/wallets/entities/wallet.entity';
 import { SubscriptionsModule } from './models/subscriptions/subscriptions.module';
 import { SubscriptionEntity } from './models/subscriptions/entities/subscription.entity';
-import { RouterModule } from '@nestjs/core';
+import { APP_GUARD, RouterModule } from '@nestjs/core';
 import { ReactsModule } from './models/reacts/reacts.module';
 import { ReactEntity } from './models/reacts/entities/react.entity';
 import { IncomeStatisticsModule } from './models/income-statistics/income-statistics.module';
 import { IncomeStatisticEntity } from './models/income-statistics/entities/income-statistic.entity';
 import { HistoryModule } from './models/history/history.module';
 import { HistoryEntity } from './models/history/entities/history.entity';
+import { JwtGuard } from './models/auth/guards/jwt.guard';
+import { RolesGuard } from './models/auth/guards/roles.guard';
+import { LocalAuthGuard } from './models/auth/guards/local.guard';
 
 @Module({
   imports: [
@@ -48,7 +51,7 @@ import { HistoryEntity } from './models/history/entities/history.entity';
       password: '12345',
       database: 'vieshare',
       // entities: [__dirname + '/**/entities/*.entity{.ts,.js}'],
-      entities: [UserEntity, PostEntity, CategoryEntity, TokenEntity, SubscriptionEntity, WalletEntity, FollowEntity, CommentEntity, ReactEntity,IncomeStatisticEntity,HistoryEntity],
+      entities: [UserEntity, PostEntity, CategoryEntity, TokenEntity, SubscriptionEntity, WalletEntity, FollowEntity, CommentEntity, ReactEntity, IncomeStatisticEntity, HistoryEntity],
       synchronize: true,
       dropSchema: true
     }),
@@ -79,6 +82,20 @@ import { HistoryEntity } from './models/history/entities/history.entity';
 
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService
+    ,
+    {
+      provide: APP_GUARD,
+      useClass: JwtGuard,
+    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: RolesGuard,
+    // },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: LocalAuthGuard,
+    // }
+  ],
 })
 export class AppModule { }
