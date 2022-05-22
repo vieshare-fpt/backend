@@ -28,7 +28,7 @@ import { LoginWithGoogleRequest } from '@data/request/login-with-google.request'
 @ApiTags('Authentication')
 @Controller('api/auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   @Public()
   @Post('login')
@@ -37,6 +37,7 @@ export class AuthController {
     @Body() request: LoginRequest,
     @Headers('User-Agent') agent: string,
   ): Promise<HttpResponse<LoginResponse>> {
+    console.log('req : ', request)
     const result = await this.authService.login(request, agent);
 
     return HttpResponse.success(result);

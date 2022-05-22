@@ -15,6 +15,8 @@ import { UtilController } from '@api/util.controller';
 import { UtilModule } from '@service/util/util.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { PostController } from '@api/post.controller';
+import { PostModule } from '@service/post/post.module';
 
 @Module({
   imports: [
@@ -38,11 +40,13 @@ import { join } from 'path';
     AuthModule,
     UserModule,
     UtilModule,
+    PostModule
   ],
   controllers: [
     AuthController,
     UserController,
     UtilController,
+    PostController
   ],
   providers: [
     AppService,
@@ -56,4 +60,4 @@ import { join } from 'path';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }
