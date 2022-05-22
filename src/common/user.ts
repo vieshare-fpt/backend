@@ -9,4 +9,5 @@ export class User {
   phone: string;
   gender: Gender;
   dob: string;
+  isPremium: boolean;
 }
