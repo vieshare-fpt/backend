@@ -1,7 +1,8 @@
 import { StatusPost } from "@constant/status-post.enum"
 import { TypePost } from "@constant/types-post.enum";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { UserEntity } from "@data/entity/user.entity";
+import { CommentEntity } from "./comment.entity";
 
 @Entity('posts')
 export class PostEntity {
@@ -37,4 +38,7 @@ export class PostEntity {
 
     @Column({ name: 'postType', type: 'enum', enum: TypePost, default: TypePost.Free, nullable: false })
     type: TypePost;
+
+    @OneToMany(()=>CommentEntity,(commentEntity)=>commentEntity.post)
+    comments : Promise<CommentEntity[]>
 }

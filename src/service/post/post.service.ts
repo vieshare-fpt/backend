@@ -12,7 +12,7 @@ import { TypePost } from "@constant/types-post.enum";
 import { User } from "@common/user";
 import { StatusPost } from "@constant/status-post.enum";
 import { Role } from "@constant/role.enum";
-import { Equal , Not} from "typeorm";
+import { Equal, Not } from "typeorm";
 @Injectable()
 export class PostService {
     constructor(
@@ -96,7 +96,12 @@ export class PostService {
     }
 
     async getPostsByUserId(authorId: string): Promise<any> {
-        const posts = await this.postRepository.find({ where: { authorId: authorId } })
+        const author = await this.userRepository.findOne({ where: { id: authorId } });
+        if(!author){
+            throw new UserNotExistedException()
+        }
+        
+        const posts = await this.postRepository.find({ where: { authorId: author.id } })
         const postsResponse = posts.map(({ content, ...postResponse }) => postResponse)
         return postsResponse;
     }

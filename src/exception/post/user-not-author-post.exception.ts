@@ -4,6 +4,6 @@ import { HttpStatus } from '@nestjs/common';
 
 export class UserNotAuthorPostException extends AppException {
   constructor() {
-    super(StatusCode.USER_NOT_OWNER_POST, HttpStatus.BAD_REQUEST);
+    super(StatusCode.USER_NOT_AUTHOR_POST, HttpStatus.BAD_REQUEST);
   }
 }

@@ -23,5 +23,7 @@ export const MessageResponse: IMessageResponse = {
   [StatusCode.USER_NOT_EXISTED]: 'User not existed',
   [StatusCode.CONTACT_EXISTED]: 'Contact existed',
   [StatusCode.CONTACT_NOT_EXISTED]: 'Contact not existed',
-  [StatusCode.INVALID_FROM_OR_TO]: 'Invalid From or To param. To must be later than From'
+  [StatusCode.INVALID_FROM_OR_TO]: 'Invalid From or To param. To must be later than From',
+  [StatusCode.POST_NOT_EXISTED]: 'The post does not exist',
+  [StatusCode.USER_NOT_AUTHOR_POST]: 'The user is not the author of the post or has insufficient permissions.'
 };
