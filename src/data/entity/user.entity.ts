@@ -46,7 +46,7 @@ export class UserEntity {
   @Column({ nullable: true, default: false })
   isDefaultPassword: boolean;
 
-  @Column({ nullable: true, default: false })
+  @Column({ default: false })
   isPremium: boolean;
 
   @OneToMany(() => TokenEntity, (token) => token.user)

@@ -24,7 +24,7 @@ export class HttpResponse<T> {
   }
 }
 
-class HttpResponseBuilder<T> {
+export class HttpResponseBuilder<T> {
   private statusCode: StatusCode;
   private message: string;
   private data: T;
@@ -43,6 +43,8 @@ class HttpResponseBuilder<T> {
     this.data = data;
     return this;
   }
+
+
 
   build(): HttpResponse<T> {
     const httpResponse = new HttpResponse<T>();

@@ -13,6 +13,7 @@ import { User } from "@common/user";
 import { StatusPost } from "@constant/status-post.enum";
 import { Role } from "@constant/role.enum";
 import { Equal, Not } from "typeorm";
+import { UserNotPremiumException } from "@exception/user/user-not-premium.exception";
 @Injectable()
 export class PostService {
     constructor(
@@ -88,19 +89,37 @@ export class PostService {
 
 
 
+    async getPostById(id: string): Promise<PostEntity> {
+        const post = await this.postRepository.findOne({ id: id })
+        return post
+    }
 
-    async getPosts(): Promise<any> {
-        const posts = await this.postRepository.find()
+    async countPosts(): Promise<number> {
+        return await this.postRepository.count();
+    }
+
+    async getPosts(skip?: number, take?: number): Promise<any[]> {
+        const posts = await this.postRepository.find({ skip: skip || 0, take: take || null })
         const postsResponse = posts.map(({ content, ...postResponse }) => postResponse)
         return postsResponse;
     }
 
+    async getFreePostsById(postId: string): Promise<PostEntity> {
+        const post = await this.getPostById(postId);
+        const isPremium = post.type.includes(TypePost.Premium)
+        if (isPremium) {
+            throw new UserNotPremiumException()
+        }
+
+        return post;
+    }
+
     async getPostsByUserId(authorId: string): Promise<any> {
         const author = await this.userRepository.findOne({ where: { id: authorId } });
-        if(!author){
+        if (!author) {
             throw new UserNotExistedException()
         }
-        
+
         const posts = await this.postRepository.find({ where: { authorId: author.id } })
         const postsResponse = posts.map(({ content, ...postResponse }) => postResponse)
         return postsResponse;
