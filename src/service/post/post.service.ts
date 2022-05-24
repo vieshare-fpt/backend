@@ -12,7 +12,7 @@ import { TypePost } from "@constant/types-post.enum";
 import { User } from "@common/user";
 import { StatusPost } from "@constant/status-post.enum";
 import { Role } from "@constant/role.enum";
-import { Equal, Not } from "typeorm";
+import { Equal, Not, UpdateResult } from "typeorm";
 import { UserNotPremiumException } from "@exception/user/user-not-premium.exception";
 import { HttpResponse } from "@common/http.response";
 import { PagingRepsone } from "@data/response/paging.response";
@@ -155,7 +155,7 @@ export class PostService {
     }
 
 
-    async deletePost(user: User, id: string): Promise<any> {
+    async deletePost(user: User, id: string): Promise<UpdateResult> {
         const existedPost = await this.postRepository.findOne(id);
         if (!existedPost) {
             throw new PostNotExistedException();
@@ -165,7 +165,7 @@ export class PostService {
             throw new UserNotAuthorPostException();
         }
 
-        this.postRepository.update({ id: id }, { status: StatusPost.Delete })
+        return await this.postRepository.update({ id: id }, { status: StatusPost.Delete })
     }
 
     async canAccessAll(user: User, postId: string): Promise<boolean> {

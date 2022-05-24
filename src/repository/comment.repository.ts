@@ -17,12 +17,24 @@ export class CommmentRepository extends Repository<CommentEntity>{
         return comments;
     }
 
-    async getPostsByUserId(userId?: string, skip?: number, take?: number): Promise<CommentEntity[]> {
+    async getCommentsByUserId(userId?: string, skip?: number, take?: number): Promise<CommentEntity[]> {
         const comments = await this.find({ where: { userId: userId }, skip: skip || 0, take: take || null })
         return comments;
     }
 
-    async isCommenter(userId: string, commentId: string) : Promise<Boolean> {
+    async getCommentsByPostId(postId?: string, skip?: number, take?: number): Promise<CommentEntity[]> {
+        const comments = await this.find({ where: { postId: postId }, skip: skip || 0, take: take || null })
+        return comments;
+    }
+
+    async isCommenter(userId: string, commentId: string): Promise<Boolean> {
         return (await this.count({ where: { userId: userId, id: commentId } })) == 0 ? false : true
+    }
+
+    async countComments(postId?: string): Promise<number> {
+        if (postId) {
+            return await this.count({ where: { postId: postId } })
+        }
+        return await this.count()
     }
 }

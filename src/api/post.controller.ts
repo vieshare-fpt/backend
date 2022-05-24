@@ -15,6 +15,7 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { PostService } from "@service/post/post.service";
 import { UserService } from "@service/user/user.service";
+import { UpdateResult } from "typeorm";
 
 @ApiTags('Post')
 @Controller('api/posts')
@@ -98,7 +99,7 @@ export class PostController {
     async deletePost(
         @CurrentUser() user: User,
         @Param() param
-    ) {
+    ): Promise<HttpResponse<UpdateResult>> {
         const deletePost = await this.postService.deletePost(user, param.id)
         return HttpResponse.success(deletePost);
     }
