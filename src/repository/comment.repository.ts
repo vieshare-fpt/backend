@@ -11,4 +11,18 @@ export class CommmentRepository extends Repository<CommentEntity>{
         comment.publishDate = new Date().getTime();
         return await this.save(comment);
     }
+
+    async getComments(skip?: number, take?: number): Promise<CommentEntity[]> {
+        const comments = await this.find({ skip: skip || 0, take: take || null })
+        return comments;
+    }
+
+    async getPostsByUserId(userId?: string, skip?: number, take?: number): Promise<CommentEntity[]> {
+        const comments = await this.find({ where: { userId: userId }, skip: skip || 0, take: take || null })
+        return comments;
+    }
+
+    async isCommenter(userId: string, commentId: string) : Promise<Boolean> {
+        return (await this.count({ where: { userId: userId, id: commentId } })) == 0 ? false : true
+    }
 }

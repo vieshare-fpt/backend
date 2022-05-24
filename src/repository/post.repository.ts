@@ -15,7 +15,7 @@ export class PostRepository extends Repository<PostEntity>{
         return postsResponse;
     }
 
-    async isAuthor(userId: string, postId) {
+    async isAuthor(userId: string, postId: string) {
         return await this.count({ where: { authorId: userId, id: postId } })
     }
 }

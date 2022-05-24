@@ -17,11 +17,13 @@ import { UserNotPremiumException } from "@exception/user/user-not-premium.except
 import { HttpResponse } from "@common/http.response";
 import { PagingRepsone } from "@data/response/paging.response";
 import { HttpPagingResponse } from "@common/http-paging.response";
+import { UserService } from "@service/user/user.service";
 @Injectable()
 export class PostService {
     constructor(
         private postRepository: PostRepository,
-        private userRepository: UserRepository
+        private userRepository: UserRepository,
+        private userSerice: UserService
     ) { }
 
     async isAuthor(userId: string, postId): Promise<boolean> {
@@ -164,5 +166,14 @@ export class PostService {
         }
 
         this.postRepository.update({ id: id }, { status: StatusPost.Delete })
+    }
+
+    async canAccessAll(user: User, postId: string): Promise<boolean> {
+        const userExsited = user?.id ? await this.userSerice.getUserByUserId(user.id) : null;
+        const idAdmin = userExsited ? userExsited.roles.includes(Role.Admin) : false;
+        const isAuthor = userExsited ? await this.isAuthor(user.id, postId) : false;
+        const isPremium = userExsited ? userExsited.isPremium : false;
+
+        return !userExsited && (idAdmin || isAuthor || isPremium)
     }
 }

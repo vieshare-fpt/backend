@@ -4,6 +4,7 @@ import { User } from "@common/user";
 import { Role } from "@constant/role.enum";
 import { PostEntity } from "@data/entity/post.entity";
 import { NewPostRequest } from "@data/request/new-post.request";
+import { PagingRequest } from "@data/request/paging.request";
 import { UpdatePostRequest } from "@data/request/update-post.request";
 import { PostsResponse } from "@data/response/posts.response";
 import { CurrentUser } from "@decorator/current-user.decorator";
@@ -20,8 +21,6 @@ import { UserService } from "@service/user/user.service";
 export class PostController {
     constructor(
         private postService: PostService,
-        private userSerice: UserService
-
     ) { }
 
     @ApiBearerAuth()
@@ -53,24 +52,22 @@ export class PostController {
     @ApiQuery({ name: 'page', type: 'number', example: 1, required: false })
     @HttpCode(HttpStatus.OK)
     async getPosts(
-        @Query('per_page') perPage: number,
-        @Query('page') page: number
+        @Query() paging: PagingRequest
     ): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
-        return await this.postService.getPosts(perPage, page)
+        return await this.postService.getPosts(paging.per_page, paging.page)
     }
 
     @Public()
-    @Get('/user/:id')
-    @ApiParam({ name: 'id', type: 'string', required: true, example: 'ccff1be6-8db1-4d95-8022-41b62df5edb4' })
+    @Get('/user/:author_id')
+    @ApiParam({ name: 'author_id', type: 'string', required: true, example: 'ccff1be6-8db1-4d95-8022-41b62df5edb4' })
     @ApiQuery({ name: 'per_page', type: 'number', example: 10, required: false })
     @ApiQuery({ name: 'page', type: 'number', example: 1, required: false })
     @HttpCode(HttpStatus.OK)
     async getPostsByUserId(
-        @Param('id') id: string,
-        @Query('per_page') perPage: number,
-        @Query('page') page: number
+        @Param('author_id') author_id: string,
+        @Query() paging: PagingRequest
     ): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
-        return await this.postService.getPostsByUserId(id, perPage, page)
+        return await this.postService.getPostsByUserId(author_id, paging.per_page, paging.page)
     }
 
 
@@ -84,15 +81,11 @@ export class PostController {
         @CurrentUser() user: User,
         @Param('id') postId: string
     ): Promise<HttpResponse<PostEntity>> {
-        const userExsited = user?.id ? await this.userSerice.getUserByUserId(user.id) : null;
-        const idAdmin = userExsited ? userExsited.roles.includes(Role.Admin) : false;
-        const isAuthor = userExsited ? await this.postService.isAuthor(user.id, postId) : false;
-        const isPremium = userExsited ? userExsited.isPremium : false;
 
-        if (!userExsited || !(idAdmin || isAuthor || isPremium)) {
+        const canAccessAll = await this.postService.canAccessAll(user, postId);
+        if (!canAccessAll) {
             return HttpResponse.success(await this.postService.getFreePostsById(postId));
         }
-
 
 
         const post = await this.postService.getPostById(postId)

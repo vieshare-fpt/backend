@@ -27,4 +27,12 @@ export class CommentService {
         return await this.commentRepository.newComment(postExsited.id, userExsited.id, content)
     }
 
+    async getCommetByPostId(
+        postId: string,
+        perPage: number,
+        page: number
+    ) {
+        this.commentRepository.find({ where: { postId: postId } })
+    }
+
 }
