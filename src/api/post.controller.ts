@@ -2,19 +2,14 @@ import { HttpPagingResponse } from "@common/http-paging.response";
 import { HttpResponse } from "@common/http.response";
 import { User } from "@common/user";
 import { Role } from "@constant/role.enum";
-import { TypePost } from "@constant/types-post.enum";
 import { PostEntity } from "@data/entity/post.entity";
 import { NewPostRequest } from "@data/request/new-post.request";
 import { UpdatePostRequest } from "@data/request/update-post.request";
-import { PagingRepsone } from "@data/response/paging.response";
 import { PostsResponse } from "@data/response/posts.response";
-import { RegisterResponse } from "@data/response/register.response";
 import { CurrentUser } from "@decorator/current-user.decorator";
 import { PublicPrivate } from "@decorator/public-private.decorator";
 import { Public } from "@decorator/public.decorator";
 import { Roles } from "@decorator/role.decorator";
-import { UserNotExistedException } from "@exception/user/user-not-existed.exception";
-import { UserNotPremiumException } from "@exception/user/user-not-premium.exception";
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from "@nestjs/common";
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { PostService } from "@service/post/post.service";
@@ -31,6 +26,7 @@ export class PostController {
 
     @ApiBearerAuth()
     @Post()
+    @Roles(Role.Creator)
     @HttpCode(HttpStatus.CREATED)
     async createPost(
         @CurrentUser() user: User,
@@ -60,27 +56,21 @@ export class PostController {
         @Query('per_page') perPage: number,
         @Query('page') page: number
     ): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
-        if (!perPage) {
-            const posts = await this.postService.getPosts()
-            return HttpResponse.success(posts);
-        }
-
-        const posts = await this.postService.getPosts(perPage * (page - 1), perPage)
-        const total = await this.postService.countPosts();
-        const totalPages = Math.ceil(total / perPage);
-
-        const metaData = new PagingRepsone(page, perPage, total, totalPages);
-
-        return HttpPagingResponse.success(posts, metaData);
+        return await this.postService.getPosts(perPage, page)
     }
 
     @Public()
     @Get('/user/:id')
     @ApiParam({ name: 'id', type: 'string', required: true, example: 'ccff1be6-8db1-4d95-8022-41b62df5edb4' })
+    @ApiQuery({ name: 'per_page', type: 'number', example: 10, required: false })
+    @ApiQuery({ name: 'page', type: 'number', example: 1, required: false })
     @HttpCode(HttpStatus.OK)
-    async getPostsByUserId(@Param() param): Promise<HttpResponse<PostsResponse[]>> {
-        const posts = await this.postService.getPostsByUserId(param.id)
-        return HttpResponse.success(posts);
+    async getPostsByUserId(
+        @Param('id') id: string,
+        @Query('per_page') perPage: number,
+        @Query('page') page: number
+    ): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
+        return await this.postService.getPostsByUserId(id, perPage, page)
     }
 
 
@@ -95,16 +85,14 @@ export class PostController {
         @Param('id') postId: string
     ): Promise<HttpResponse<PostEntity>> {
         const userExsited = user?.id ? await this.userSerice.getUserByUserId(user.id) : null;
-        console.log('userExsited', userExsited)
-        if (
-            !userExsited
-            || (userExsited.roles.length === 1
-                && userExsited.roles.includes[Role.User]
-                && !userExsited.isPremium
-            )
-        ) {
+        const idAdmin = userExsited ? userExsited.roles.includes(Role.Admin) : false;
+        const isAuthor = userExsited ? await this.postService.isAuthor(user.id, postId) : false;
+        const isPremium = userExsited ? userExsited.isPremium : false;
+
+        if (!userExsited || !(idAdmin || isAuthor || isPremium)) {
             return HttpResponse.success(await this.postService.getFreePostsById(postId));
         }
+
 
 
         const post = await this.postService.getPostById(postId)
