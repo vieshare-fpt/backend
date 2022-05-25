@@ -12,7 +12,11 @@ import { TypePost } from "@constant/types-post.enum";
 import { User } from "@common/user";
 import { StatusPost } from "@constant/status-post.enum";
 import { Role } from "@constant/role.enum";
-import { Equal , Not} from "typeorm";
+import { Equal, Not } from "typeorm";
+import { UserNotPremiumException } from "@exception/user/user-not-premium.exception";
+import { HttpResponse } from "@common/http.response";
+import { PagingRepsone } from "@data/response/paging.response";
+import { HttpPagingResponse } from "@common/http-paging.response";
 @Injectable()
 export class PostService {
     constructor(
@@ -20,6 +24,12 @@ export class PostService {
         private userRepository: UserRepository
     ) { }
 
+    async isAuthor(userId: string, postId): Promise<boolean> {
+        if (!userId || !postId) {
+            return false
+        }
+        return await this.postRepository.isAuthor(userId, postId) === 0 ? false : true
+    }
     async createNewPost(
         newPostRequest: NewPostRequest,
         authorId: string
@@ -88,17 +98,58 @@ export class PostService {
 
 
 
-
-    async getPosts(): Promise<any> {
-        const posts = await this.postRepository.find()
-        const postsResponse = posts.map(({ content, ...postResponse }) => postResponse)
-        return postsResponse;
+    async getPostById(id: string): Promise<PostEntity> {
+        const post = await this.postRepository.findOne({ id: id })
+        return post
     }
 
-    async getPostsByUserId(authorId: string): Promise<any> {
-        const posts = await this.postRepository.find({ where: { authorId: authorId } })
-        const postsResponse = posts.map(({ content, ...postResponse }) => postResponse)
-        return postsResponse;
+    async countPosts(): Promise<number> {
+        return await this.postRepository.count();
+    }
+
+    async getPosts(perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
+        page = page ? page : 1;
+        const posts = await this.postRepository.getPosts(perPage * (page - 1), perPage)
+        const total = await this.countPosts();
+        const totalPages = Math.ceil(total / perPage);
+        const metaData = new PagingRepsone(page, perPage, total, totalPages);
+
+        if (!perPage) {
+            return HttpResponse.success(posts);
+        }
+        return HttpPagingResponse.success(posts, metaData);
+    }
+
+    async getFreePostsById(postId: string): Promise<PostEntity> {
+        const post = await this.getPostById(postId);
+        const isPremium = post.type.includes(TypePost.Premium)
+        if (isPremium) {
+            throw new UserNotPremiumException()
+        }
+
+        return post;
+    }
+
+    async getPostsByUserId(
+        authorId: string,
+        perPage: number,
+        page: number
+    ): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
+        const author = await this.userRepository.findOne({ where: { id: authorId } });
+        if (!author) {
+            throw new UserNotExistedException()
+        }
+
+        page = page | 1;
+        const posts = await this.postRepository.getPostsByUserId(authorId, perPage * (page - 1), perPage)
+        const total = await this.countPosts();
+        const totalPages = Math.ceil(total / perPage);
+        const metaData = new PagingRepsone(page, perPage, total, totalPages);
+
+        if (!perPage) {
+            return HttpResponse.success(posts);
+        }
+        return HttpPagingResponse.success(posts, metaData);
     }
 
 

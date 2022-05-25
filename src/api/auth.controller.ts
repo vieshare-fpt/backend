@@ -10,7 +10,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeaders, ApiTags } from '@nestjs/swagger';
 import { AuthService } from '@service/auth/auth.service';
 import { Public } from '@decorator/public.decorator';
 import { LoginRequest } from '@data/request/login.request';

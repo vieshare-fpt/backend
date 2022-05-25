@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { TokenEntity } from '@data/entity/token.entity';
 import { PostEntity } from './post.entity';
+import { CommentEntity } from './comment.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -45,12 +46,16 @@ export class UserEntity {
   @Column({ nullable: true, default: false })
   isDefaultPassword: boolean;
 
-  @Column({ nullable: true, default: false })
+  @Column({ default: false })
   isPremium: boolean;
 
   @OneToMany(() => TokenEntity, (token) => token.user)
   tokens: Promise<TokenEntity[]>;
 
   @OneToMany(() => PostEntity, (post) => post.author)
-  posts: Promise<PostEntity[]>
+  posts: Promise<PostEntity[]>;
+
+  @OneToMany(() => CommentEntity, (commentEntity) => commentEntity.user)
+  comments: Promise<CommentEntity[]>
+
 }

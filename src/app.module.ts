@@ -17,6 +17,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PostController } from '@api/post.controller';
 import { PostModule } from '@service/post/post.module';
+import { CommentModule } from '@service/comment/comment.module';
+import { CommentController } from '@api/comment.controller';
 
 @Module({
   imports: [
@@ -40,13 +42,15 @@ import { PostModule } from '@service/post/post.module';
     AuthModule,
     UserModule,
     UtilModule,
-    PostModule
+    PostModule,
+    CommentModule
   ],
   controllers: [
     AuthController,
     UserController,
     UtilController,
-    PostController
+    PostController,
+    CommentController
   ],
   providers: [
     AppService,

@@ -1,5 +1,6 @@
 import { StatusPost } from '@constant/status-post.enum';
 import { TypePost } from '@constant/types-post.enum';
+import { PostEntity } from '@data/entity/post.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class PostsResponse {
@@ -30,16 +31,18 @@ export class PostsResponse {
     @ApiProperty()
     type: TypePost;
 
-
-    constructor(id: string, title: string, categoryId: string, authorId: string, publishDate: number, lastUpdated: number | null, views: number, status: StatusPost, type: TypePost) {
-        this.id = id;
-        this.title = title;
-        this.categoryId = categoryId;
-        this.authorId = authorId;
-        this.publishDate = publishDate;
-        this.lastUpdated = lastUpdated;
-        this.views = views;
-        this.status = status;
-        this.type = type
+    constructor(post : PostEntity) {
+        this.id = post.id;
+        this.title = post.title;
+        this.categoryId = post.categoryId;
+        this.authorId = post.authorId;
+        this.publishDate = post.publishDate;
+        this.lastUpdated = post.lastUpdated;
+        this.views = post.views;
+        this.status = post.status;
+        this.type = post.type
     }
+
+
+
 }
