@@ -8,8 +8,10 @@ import {
   OneToOne,
 } from 'typeorm';
 import { TokenEntity } from '@data/entity/token.entity';
-import { PostEntity } from './post.entity';
+
 import { CommentEntity } from './comment.entity';
+import { HistoryEntity } from './history.entity';
+import { PostEntity } from './post.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -20,6 +22,7 @@ export class UserEntity {
   name: string;
 
   @Column({ type: 'date', nullable: true })
+
   dob: string;
 
   @Column('enum', { enum: Gender, nullable: true })
@@ -58,4 +61,9 @@ export class UserEntity {
   @OneToMany(() => CommentEntity, (commentEntity) => commentEntity.user)
   comments: Promise<CommentEntity[]>
 
+  @OneToMany(
+    () => HistoryEntity,
+    (historyEntity) => historyEntity.user
+  )
+  history: Promise<HistoryEntity[]>;
 }

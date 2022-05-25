@@ -19,6 +19,8 @@ import { PostController } from '@api/post.controller';
 import { PostModule } from '@service/post/post.module';
 import { CommentModule } from '@service/comment/comment.module';
 import { CommentController } from '@api/comment.controller';
+import { CategoryModule } from '@service/category/category.module';
+import { CategoryController } from '@api/category.controller';
 
 @Module({
   imports: [
@@ -43,14 +45,16 @@ import { CommentController } from '@api/comment.controller';
     UserModule,
     UtilModule,
     PostModule,
-    CommentModule
+    CommentModule,
+    CategoryModule,
   ],
   controllers: [
     AuthController,
     UserController,
     UtilController,
     PostController,
-    CommentController
+    CommentController,
+    CategoryController,
   ],
   providers: [
     AppService,
