@@ -50,7 +50,7 @@ export class PostController {
   }
 
   @PublicPrivate()
-  @Get('/order-by')
+  @Get('')
   @HttpCode(HttpStatus.OK)
   @ApiQuery({ name: 'orderBy', type: 'enum', enum: PostOrderBy, example: PostOrderBy.views, required: false })
   @ApiQuery({ name: 'sort', type: 'enum', enum: Sort, example: Sort.DESC, required: false })
@@ -80,32 +80,6 @@ export class PostController {
   ): Promise<HttpResponse<any>> {
     const post = await this.postService.updateViewsPost(postId);
     return HttpResponse.success(post)
-  }
-
-  @Public()
-  @Get('')
-  @ApiQuery({ name: 'per_page', type: 'number', example: 10, required: false })
-  @ApiQuery({ name: 'page', type: 'number', example: 1, required: false })
-  @HttpCode(HttpStatus.OK)
-  async getPosts(
-    @Query('per_page') perPage: number,
-    @Query('page') page: number
-  ): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
-    return await this.postService.getPosts(perPage, page)
-  }
-
-  @Public()
-  @Get('/user/:id')
-  @ApiParam({ name: 'id', type: 'string', required: true, example: 'ccff1be6-8db1-4d95-8022-41b62df5edb4' })
-  @ApiQuery({ name: 'per_page', type: 'number', example: 10, required: false })
-  @ApiQuery({ name: 'page', type: 'number', example: 1, required: false })
-  @HttpCode(HttpStatus.OK)
-  async getPostsByUserId(
-    @Param('id') id: string,
-    @Query('per_page') perPage: number,
-    @Query('page') page: number
-  ): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
-    return await this.postService.getPostsByUserId(id, perPage, page)
   }
 
 
