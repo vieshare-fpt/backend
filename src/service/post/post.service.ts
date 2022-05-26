@@ -181,9 +181,13 @@ export class PostService {
 
 
   async getPostOrderBy(orderBy: PostOrderBy, sort: Sort, userId: string, perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
-    sort = Sort[sort.toLocaleUpperCase()] ? Sort[sort] : Sort.ASC;
-    if (!orderBy) {
+    sort = sort && Sort[sort.toLocaleUpperCase()] ? Sort[sort] : Sort.ASC;
+    if (!orderBy && userId) {
       return this.getPostsByUserId(userId, perPage, page);
+    }
+
+    if(!orderBy){
+      return this.getPosts(perPage, page);
     }
 
     orderBy = PostOrderBy[orderBy];
