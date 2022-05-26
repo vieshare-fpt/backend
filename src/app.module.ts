@@ -11,15 +11,12 @@ import { DatabaseConfig, DB_PATH_CONFIG } from '@config/database.config';
 import { UserModule } from '@service/user/user.module';
 import { AuthController } from '@api/auth.controller';
 import { UserController } from '@api/user.controller';
-import { UtilController } from '@api/util.controller';
-import { UtilModule } from '@service/util/util.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PostController } from '@api/post.controller';
 import { PostModule } from '@service/post/post.module';
 import { CommentModule } from '@service/comment/comment.module';
 import { CommentController } from '@api/comment.controller';
-import { CategoryEntity } from '@data/entity/category.entity';
 import { CategoryModule } from '@service/category/category.module';
 import { CategoryController } from '@api/category.controller';
 
@@ -44,7 +41,6 @@ import { CategoryController } from '@api/category.controller';
     }),
     AuthModule,
     UserModule,
-    UtilModule,
     CategoryModule,
     PostModule,
     CommentModule
@@ -53,7 +49,6 @@ import { CategoryController } from '@api/category.controller';
   controllers: [
     AuthController,
     UserController,
-    UtilController,
     CategoryController,
     PostController,
     CommentController

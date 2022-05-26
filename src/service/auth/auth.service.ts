@@ -21,8 +21,6 @@ import { GOOGLE_CONFIG, GoogleConfig } from '@config/google.config';
 import { UserService } from '@service/user/user.service';
 import { RegisterRequest } from '@data/request/register.request';
 import { LogoutRequest } from '@data/request/logout.request';
-import { UtilService } from '@service/util/util.service';
-import axios from 'axios';
 import { google } from 'googleapis';
 import { LoginWithGoogleRequest } from '@data/request/login-with-google.request';
 const { OAuth2 } = google.auth;
@@ -39,7 +37,6 @@ export class AuthService {
     private userRepository: UserRepository,
     private tokenRepository: TokenRepository,
     private configService: ConfigService,
-    private utilService: UtilService,
   ) {
     this.googleConfig = configService.get<GoogleConfig>(GOOGLE_CONFIG);
     this.googleClient = new OAuth2(
