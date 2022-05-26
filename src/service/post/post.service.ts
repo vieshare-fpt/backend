@@ -172,7 +172,7 @@ export class PostService {
       throw new PostNotExistedException();
     }
 
-    if (user.roles.includes(Role.Creator) && user.id !== existedPost.authorId) {
+    if (user.roles.includes(Role.Writer) && user.id !== existedPost.authorId) {
       throw new UserNotAuthorPostException();
     }
 

@@ -10,7 +10,6 @@ import { UpdatePostRequest } from "@data/request/update-post.request";
 import { PostsResponse } from "@data/response/posts.response";
 import { CurrentUser } from "@decorator/current-user.decorator";
 import { PublicPrivate } from "@decorator/public-private.decorator";
-import { Public } from "@decorator/public.decorator";
 import { Roles } from "@decorator/role.decorator";
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from "@nestjs/common";
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
@@ -28,7 +27,7 @@ export class PostController {
 
   @ApiBearerAuth()
   @Post()
-  @Roles(Role.Creator)
+  @Roles(Role.Writer)
   @HttpCode(HttpStatus.CREATED)
   async createPost(
     @CurrentUser() user: User,
