@@ -19,6 +19,7 @@ import { PostController } from '@api/post.controller';
 import { PostModule } from '@service/post/post.module';
 import { CommentModule } from '@service/comment/comment.module';
 import { CommentController } from '@api/comment.controller';
+import { CategoryEntity } from '@data/entity/category.entity';
 import { CategoryModule } from '@service/category/category.module';
 import { CategoryController } from '@api/category.controller';
 
@@ -44,17 +45,19 @@ import { CategoryController } from '@api/category.controller';
     AuthModule,
     UserModule,
     UtilModule,
-    PostModule,
-    CommentModule,
     CategoryModule,
+    PostModule,
+    CommentModule
+
   ],
   controllers: [
     AuthController,
     UserController,
     UtilController,
-    PostController,
-    CommentController,
     CategoryController,
+    PostController,
+    CommentController
+
   ],
   providers: [
     AppService,

@@ -14,6 +14,10 @@ export class NewPostRequest {
 
     @ApiProperty()
     @IsNotEmpty()
+    description: string
+
+    @ApiProperty()
+    @IsNotEmpty()
     content: string
 
     @ApiProperty({ format: "enum", enum: TypePost })

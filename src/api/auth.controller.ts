@@ -10,7 +10,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { ApiBearerAuth, ApiHeaders, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiHeaders, ApiTags } from '@nestjs/swagger';
 import { AuthService } from '@service/auth/auth.service';
 import { Public } from '@decorator/public.decorator';
 import { LoginRequest } from '@data/request/login.request';
@@ -32,6 +32,7 @@ export class AuthController {
 
   @Public()
   @Post('login')
+  @ApiHeader({ name: 'User-Agent', required: false })
   @HttpCode(HttpStatus.OK)
   async login(
     @Body() request: LoginRequest,
