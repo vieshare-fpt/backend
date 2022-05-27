@@ -16,13 +16,13 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
 
-  if (serverConfig.env == Environment.Development) {
+// if (serverConfig.env == Environment.Development) {
     const document = SwaggerModule.createDocument(
       app,
       SwaggerConfig.getDocumentConfig(),
     );
     SwaggerModule.setup('api/document', app, document);
-  }
+ // }
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
