@@ -8,7 +8,7 @@ import { CreateCategoryResponse } from "@data/response/new-category.response";
 import { UpdateCategoryRequest } from "@data/request/update-category.request";
 import { Roles } from "@decorator/role.decorator";
 import { Role } from "@constant/role.enum";
-import { CategoryResponse } from "@data/response/category.respone";
+import { CategoryResponse } from "@data/response/category.response";
 import { UpdateResult } from "typeorm";
 import { Public } from "@decorator/public.decorator";
 
