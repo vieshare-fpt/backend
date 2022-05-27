@@ -10,7 +10,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserRepository } from '@repository/user.repository';
 import { TokenRepository } from '@repository/token.repository';
 import { UserService } from '@service/user/user.service';
-import { UtilService } from '@service/util/util.service';
 
 @Module({
   imports: [
@@ -29,7 +28,6 @@ import { UtilService } from '@service/util/util.service';
     ConfigService,
     CryptStrategy,
     UserService,
-    UtilService,
   ],
   exports: [AuthService, CryptStrategy],
 })

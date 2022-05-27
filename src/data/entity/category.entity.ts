@@ -19,7 +19,7 @@ export class CategoryEntity {
         () => PostEntity,
         (postEntity) => postEntity.category
     )
-    post: Promise<PostEntity[]>;
+    posts: Promise<PostEntity[]>;
 
 
 

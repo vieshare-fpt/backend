@@ -8,50 +8,53 @@ import { HistoryEntity } from "./history.entity";
 
 @Entity('posts')
 export class PostEntity {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column({ name: 'title', type: 'nvarchar', length: 255 })
-    title: string
+  @Column({ name: 'title', type: 'nvarchar', length: 255 })
+  title: string
 
-    @Column({ name: 'categoryId' })
-    categoryId: string
+  @Column({ name: 'categoryId' })
+  categoryId: string
 
-    @ManyToOne(
-        () => CategoryEntity, (categoryEntity) => categoryEntity.post)
-    @JoinColumn({ name: 'categoryId' })
-    category: Promise<CategoryEntity>;
+  @ManyToOne(
+    () => CategoryEntity, (categoryEntity) => categoryEntity.posts)
+  @JoinColumn({ name: 'categoryId' })
+  category: Promise<CategoryEntity>;
 
-    @Column({ name: 'content', type: 'text' })
-    content: string
+  @Column({ name: 'description', type: 'text' })
+  description: string
 
-    @ManyToOne(() => UserEntity, (userEntity) => userEntity.posts)
-    @JoinColumn({ name: 'authorId' })
-    author: Promise<UserEntity>;
-    @Column({ name: 'authorId' })
-    authorId: string
+  @Column({ name: 'content', type: 'text' })
+  content: string
 
-    @Column({ name: 'publishDate', type: 'bigint' })
-    publishDate: number
+  @ManyToOne(() => UserEntity, (userEntity) => userEntity.posts)
+  @JoinColumn({ name: 'authorId' })
+  author: Promise<UserEntity>;
+  @Column({ name: 'authorId' })
+  authorId: string
 
-    @Column({ name: 'lastUpdated', type: 'bigint' })
-    lastUpdated: number
+  @Column({ name: 'publishDate', type: 'bigint' })
+  publishDate: number
 
-    @Column({ name: 'views', default: 0 })
-    views: number
+  @Column({ name: 'lastUpdated', type: 'bigint' })
+  lastUpdated: number
 
-    @Column({ name: 'status', type: 'enum', enum: StatusPost, default: StatusPost.Publish, nullable: false })
-    status: StatusPost;
+  @Column({ name: 'views', default: 0 })
+  views: number
 
-    @Column({ name: 'postType', type: 'enum', enum: TypePost, default: TypePost.Free, nullable: false })
-    type: TypePost;
+  @Column({ name: 'status', type: 'enum', enum: StatusPost, default: StatusPost.Publish, nullable: false })
+  status: StatusPost;
 
-    @OneToMany(() => CommentEntity, (commentEntity) => commentEntity.post)
-    comments: Promise<CommentEntity[]>
+  @Column({ name: 'postType', type: 'enum', enum: TypePost, default: TypePost.Free, nullable: false })
+  type: TypePost;
 
-    @OneToMany(
-        () => HistoryEntity,
-        (historyEntity) => historyEntity.post
-    )
-    history: Promise<HistoryEntity[]>;
+  @OneToMany(() => CommentEntity, (commentEntity) => commentEntity.post)
+  comments: Promise<CommentEntity[]>
+
+  @OneToMany(
+    () => HistoryEntity,
+    (historyEntity) => historyEntity.post
+  )
+  history: Promise<HistoryEntity[]>;
 }
