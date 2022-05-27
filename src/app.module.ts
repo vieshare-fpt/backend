@@ -21,6 +21,8 @@ import { CategoryModule } from '@service/category/category.module';
 import { CategoryController } from '@api/category.controller';
 import { FollowModule } from '@service/follow/follow.module';
 import { FollowController } from '@api/follow.controller';
+import { HistoryModule } from '@service/history/history.module';
+import { HistoryController } from '@api/history.controller';
 
 @Module({
   imports: [
@@ -47,6 +49,7 @@ import { FollowController } from '@api/follow.controller';
     PostModule,
     CommentModule,
     FollowModule,
+    HistoryModule
 
   ],
   controllers: [
@@ -56,6 +59,7 @@ import { FollowController } from '@api/follow.controller';
     PostController,
     CommentController,
     FollowController,
+    HistoryController
 
   ],
   providers: [

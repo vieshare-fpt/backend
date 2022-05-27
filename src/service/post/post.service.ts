@@ -18,9 +18,9 @@ import { PagingRepsone } from "@data/response/paging.response";
 import { HttpPagingResponse } from "@common/http-paging.response";
 import { CategoryRepository } from "@repository/category.repository";
 import { CategoryNotExistedException } from "@exception/category/category-not-existed.exception";
-import { PostOrderBy } from "@constant/post-oder-by.enum";
+import { PostOrderBy } from "@constant/post-order-by.enum";
 import { Sort } from "@constant/sort.enum";
-import { kill } from "process";
+
 
 @Injectable()
 export class PostService {

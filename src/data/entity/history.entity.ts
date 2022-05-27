@@ -19,6 +19,9 @@ export class HistoryEntity {
   @Column('userId')
   userId: string;
 
+  @Column({ nullable: true })
+  agent: string;
+
   @ManyToOne(
     () => PostEntity,
     (postEntity) => postEntity.history
@@ -30,7 +33,7 @@ export class HistoryEntity {
   postId: string;
 
   @Column({ name: 'lastDateRead', type: 'bigint' })
-  lastDateRead: Date;
+  lastDateRead: number;
 
 
 }

@@ -1,4 +1,4 @@
-import { PostOrderBy } from "@constant/post-oder-by.enum";
+import { PostOrderBy } from "@constant/post-order-by.enum";
 import { Role } from "@constant/role.enum";
 import { Sort } from "@constant/sort.enum";
 import { PostEntity } from "@data/entity/post.entity";
