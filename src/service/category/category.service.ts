@@ -6,7 +6,7 @@ import { NewCategoryRequest } from "@data/request/new-category.request";
 import { CategoryNotExistedException } from "@exception/category/category-not-existed.exception";
 import { UpdateCategoryRequest } from "@data/request/update-category.request";
 import { HttpResponse } from "@common/http.response";
-import { CategoryResponse } from "@data/response/category.respone";
+import { CategoryResponse } from "@data/response/category.response";
 
 
 @Injectable()

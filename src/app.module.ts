@@ -19,6 +19,8 @@ import { CommentModule } from '@service/comment/comment.module';
 import { CommentController } from '@api/comment.controller';
 import { CategoryModule } from '@service/category/category.module';
 import { CategoryController } from '@api/category.controller';
+import { FollowModule } from '@service/follow/follow.module';
+import { FollowController } from '@api/follow.controller';
 
 @Module({
   imports: [
@@ -43,7 +45,8 @@ import { CategoryController } from '@api/category.controller';
     UserModule,
     CategoryModule,
     PostModule,
-    CommentModule
+    CommentModule,
+    FollowModule,
 
   ],
   controllers: [
@@ -51,7 +54,8 @@ import { CategoryController } from '@api/category.controller';
     UserController,
     CategoryController,
     PostController,
-    CommentController
+    CommentController,
+    FollowController,
 
   ],
   providers: [
