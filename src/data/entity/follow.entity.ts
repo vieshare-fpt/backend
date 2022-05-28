@@ -5,24 +5,24 @@ import { UserEntity } from './user.entity';
 export class FollowEntity {
     @PrimaryGeneratedColumn()
     id: string;
-    
+
     // @Column({type: 'uuid', nullable: false})
     // userId: string;
     @ManyToOne(
         () => UserEntity,
         (userEntity) => userEntity.user)
-    @JoinColumn()
-    userID : string;
+    @JoinColumn({ name: 'userId' })
+    userID: string;
 
     // @Column({name:'followerID', type: 'uuid', nullable: false})
     // followerId: string;
     @ManyToOne(
         () => UserEntity,
         (userEntity) => userEntity.follower)
-    @JoinColumn()
-    followerID : string;
+    @JoinColumn({ name: 'followerId' })
+    followerID: string;
 
-    @CreateDateColumn({name: 'dateFollowed', nullable: false})  
-    follow_at : Date;
+    @CreateDateColumn({ name: 'dateFollowed', nullable: false })
+    follow_at: Date;
 
 }

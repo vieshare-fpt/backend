@@ -34,14 +34,14 @@ export class FollowController {
     }
 
     @ApiBearerAuth()
-    @Delete('/:follow_id')
-    @ApiQuery({ name: 'follow_id', type: 'string', required: true })
+    @Delete('/:follower_id')
+    @ApiQuery({ name: 'follower_id', type: 'string', required: true })
     @HttpCode(HttpStatus.OK)
     async deleteFollow(
         @CurrentUser() user: User,
-        @Param('follow_id') id: string,
+        @Param('follow_id') follower_id: string,
     ): Promise<HttpResponse<UpdateResult>> {
-        const deleteFollow = await this.followService.deleteFollow(id);
+        const deleteFollow = await this.followService.deleteFollow(user.id, follower_id);
         return HttpResponse.success(deleteFollow);
     }
 
@@ -49,9 +49,10 @@ export class FollowController {
     @ApiBearerAuth()
     @HttpCode(HttpStatus.OK)
     async createFollow(
-        @Query() followReq: CreateFollowRequest
+        @Query() followReq: CreateFollowRequest,
+        @CurrentUser() user: User
     ) {
-        return await this.followService.createFollow(followReq);
+        return await this.followService.createFollow(user.id, followReq);
     }
 
     
