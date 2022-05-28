@@ -3,7 +3,7 @@ import { PostRepository } from "@repository/post.repository";
 import { NewPostRequest } from "@data/request/new-post.request"
 import { PostEntity } from "@data/entity/post.entity";
 import { UserRepository } from "@repository/user.repository";
-import { UserNotExistedException } from "@exception/user/user-not-existed.exception";
+import { AuthorNotExistedException, UserNotExistedException } from "@exception/user/user-not-existed.exception";
 import { UpdatePostRequest } from "@data/request/update-post.request";
 import { PostNotExistedException } from "@exception/post/post-not-existed.exception";
 import { UserNotAuthorPostException } from "@exception/post/user-not-author-post.exception";
@@ -20,6 +20,7 @@ import { CategoryRepository } from "@repository/category.repository";
 import { CategoryNotExistedException } from "@exception/category/category-not-existed.exception";
 import { PostOrderBy } from "@constant/post-oder-by.enum";
 import { Sort } from "@constant/sort.enum";
+import { kill } from "process";
 
 @Injectable()
 export class PostService {
@@ -131,19 +132,13 @@ export class PostService {
 
   async getPosts(perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
     page = page ? page : 1;
-    const posts = await this.postRepository.getPosts(perPage * (page - 1), perPage)
+    const postsResponse = await this.postRepository.getPosts(perPage * (page - 1), perPage)
     const total = await this.countPosts();
-    const totalPages = Math.ceil(total / perPage);
-    const metaData = new PagingRepsone(page, perPage, total, totalPages);
-
-    if (!perPage) {
-      return HttpResponse.success(posts);
-    }
-    return HttpPagingResponse.success(posts, metaData);
+    return this.getPagingResponse(postsResponse, perPage, page, total)
   }
 
 
-  async getPostsByUserId(
+  async getPostsByAuthorId(
     authorId: string,
     perPage: number,
     page: number
@@ -154,15 +149,10 @@ export class PostService {
     }
 
     page = page | 1;
-    const posts = await this.postRepository.getPostsByUserId(authorId, perPage * (page - 1), perPage)
-    const total = await this.postRepository.countPostsByUserId(authorId);
-    const totalPages = Math.ceil(total / perPage);
-    const metaData = new PagingRepsone(page, perPage, total, totalPages);
+    const postsResponse = await this.postRepository.getPostsByAuthorId(authorId, perPage * (page - 1), perPage)
+    const total = await this.postRepository.countPostsByAuthorId(authorId);
+    return this.getPagingResponse(postsResponse, perPage, page, total)
 
-    if (!perPage) {
-      return HttpResponse.success(posts);
-    }
-    return HttpPagingResponse.success(posts, metaData);
   }
 
 
@@ -180,13 +170,15 @@ export class PostService {
   }
 
 
-  async getPostOrderBy(orderBy: PostOrderBy, sort: Sort, userId: string, perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
+  async getPostOrderBy(orderBy: PostOrderBy, sort: Sort, authorId: string, perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
     sort = sort && Sort[sort.toLocaleUpperCase()] ? Sort[sort] : Sort.ASC;
-    if (!orderBy && userId) {
-      return this.getPostsByUserId(userId, perPage, page);
+    page = page ? page : 1;
+
+    if (!orderBy && authorId) {
+      return this.getPostsByAuthorId(authorId, perPage, page);
     }
 
-    if(!orderBy){
+    if (!orderBy) {
       return this.getPosts(perPage, page);
     }
 
@@ -195,30 +187,36 @@ export class PostService {
       throw new BadRequestException()
     }
 
-
-    if (userId) {
-      const author = await this.userRepository.findOne({ where: { id: userId } });
+    if (authorId) {
+      const author = await this.userRepository.findOne({ where: { id: authorId } });
       if (!author) {
-        throw new UserNotExistedException()
+        throw new AuthorNotExistedException()
       }
-      const postsResponse = await this.postRepository.getPostsByUserIdAndOrderBy(author.id, orderBy, sort, perPage * (page - 1), perPage);
-      const posts = await this.postRepository.countPostsByUserIdAndOrderBy(author.id, orderBy, sort)
-      const total = await this.countPosts();
-      const totalPages = Math.ceil(total / perPage);
-      const metaData = new PagingRepsone(page, perPage, total, totalPages);
-      return HttpPagingResponse.success(postsResponse, metaData);
-
+      const postsResponse = await this.postRepository.getPostsByAuthorIdAndOrderBy(author.id, orderBy, sort, perPage * (page - 1), perPage);
+      const total = await this.postRepository.countPostsByAuthorIdAndOrderBy(author.id, orderBy, sort)
+      return this.getPagingResponse(postsResponse, perPage, page, total)
 
     }
 
-    page = page | 1;
+
     const postsResponse = await this.postRepository.getPostsOrderBy(orderBy, sort, perPage * (page - 1), perPage);
     const total = await this.postRepository.countPostsOrderBy(orderBy, sort);
-    const totalPages = Math.ceil(total / perPage);
-    const metaData = new PagingRepsone(page, perPage, total, totalPages);
-    return HttpPagingResponse.success(postsResponse, metaData);
+
+    return this.getPagingResponse(postsResponse, perPage, page, total)
+
 
   }
 
+  private getPagingResponse(postResponse: PostsResponse[], perPage: number, page: number, total: number): HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]> {
+    let totalPages = Math.ceil(total / perPage);
+
+    if (!perPage) {
+      const metaData = new PagingRepsone(page, total, total, 1);
+      return HttpPagingResponse.success(postResponse, metaData);
+    }
+    const metaData = new PagingRepsone(page, perPage, total, totalPages);
+    return HttpPagingResponse.success(postResponse, metaData);
+
+  }
 
 }

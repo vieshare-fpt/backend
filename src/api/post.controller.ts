@@ -51,19 +51,19 @@ export class PostController {
   @PublicPrivate()
   @Get('')
   @HttpCode(HttpStatus.OK)
-  @ApiQuery({ name: 'orderBy', type: 'enum', enum: PostOrderBy, example: PostOrderBy.views, required: false })
+  @ApiQuery({ name: 'order_by', type: 'enum', enum: PostOrderBy, example: PostOrderBy.views, required: false })
   @ApiQuery({ name: 'sort', type: 'enum', enum: Sort, example: Sort.DESC, required: false })
-  @ApiQuery({ name: 'userId', type: 'string', example: 'ccff1be6-8db1-4d95-8022-41b62df5edb4', required: false })
+  @ApiQuery({ name: 'author_id', type: 'string', example: 'ccff1be6-8db1-4d95-8022-41b62df5edb4', required: false })
   @ApiQuery({ name: 'per_page', type: 'number', example: 10, required: false })
   @ApiQuery({ name: 'page', type: 'number', example: 1, required: false })
   async getAllPostTopViews(
-    @Query('orderBy') orderBy: PostOrderBy,
+    @Query('order_by') orderBy: PostOrderBy,
     @Query('sort') sort: Sort,
-    @Query('userId') userId: string,
+    @Query('author_id') authorId: string,
     @Query('per_page') perPage: number,
     @Query('page') page: number
   ): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
-    const postsResponse = await this.postService.getPostOrderBy(orderBy, sort, userId, perPage, page);
+    const postsResponse = await this.postService.getPostOrderBy(orderBy, sort, authorId, perPage, page);
     return postsResponse;
   }
 

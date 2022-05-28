@@ -6,26 +6,31 @@ import { UserEntity } from "./user.entity";
 
 @Entity('history')
 export class HistoryEntity {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column({ name: 'totalTime', type: 'bigint' })
-    totalTime: number;
+  @ManyToOne(
+    () => UserEntity,
+    (userEntity) => userEntity.history
+  )
+  @JoinColumn({ name: 'userId' })
+  user: Promise<UserEntity>
 
-    @CreateDateColumn({ name: 'lastDateRead' })
-    lastDateRead: Date;
+  @Column('userId')
+  userId: string;
 
-    @ManyToOne(
-        () => UserEntity,
-        (userEntity) => userEntity.history
-    )
-    @JoinColumn({ name: 'userId' })
-    user: string;
+  @ManyToOne(
+    () => PostEntity,
+    (postEntity) => postEntity.history
+  )
+  @JoinColumn({ name: 'postId' })
+  post: Promise<PostEntity>
 
-    @ManyToOne(
-        () => PostEntity,
-        (postEntity) => postEntity.history
-    )
-    @JoinColumn({ name: 'postId' })
-    post: string;
+  @Column('postId')
+  postId: string;
+
+  @Column({ name: 'lastDateRead', type: 'bigint' })
+  lastDateRead: Date;
+
+
 }

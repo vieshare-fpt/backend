@@ -7,3 +7,10 @@ export class UserNotExistedException extends AppException {
     super(StatusCode.USER_NOT_EXISTED, HttpStatus.BAD_REQUEST);
   }
 }
+
+
+export class AuthorNotExistedException extends AppException {
+  constructor() {
+    super(StatusCode.USER_NOT_EXISTED, HttpStatus.BAD_REQUEST);
+  }
+}
