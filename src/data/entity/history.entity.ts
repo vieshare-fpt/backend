@@ -19,9 +19,6 @@ export class HistoryEntity {
   @Column('userId')
   userId: string;
 
-  @Column({ nullable: true })
-  agent: string;
-
   @ManyToOne(
     () => PostEntity,
     (postEntity) => postEntity.history
