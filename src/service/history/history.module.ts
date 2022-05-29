@@ -1,17 +1,15 @@
 import { HistoryService } from './history.service';
-/*
-https://docs.nestjs.com/modules
-*/
-
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HistoryRepository } from '@repository/history.repository';
-import { PostRepository } from '@repository/post.repository';
 import { UserRepository } from '@repository/user.repository';
+import { PostRepository } from '@repository/post.repository';
+import { PostModule } from '@service/post/post.module';
+
 
 @Module({
-    imports: [TypeOrmModule.forFeature([UserRepository, PostRepository, HistoryRepository])],
-    controllers: [HistoryService],
-    providers: [HistoryService,],
+  imports: [TypeOrmModule.forFeature([HistoryRepository, UserRepository, PostRepository])],
+  providers: [HistoryService],
+  exports: [HistoryService],
 })
 export class HistoryModule { }

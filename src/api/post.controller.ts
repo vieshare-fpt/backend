@@ -1,11 +1,12 @@
 import { HttpPagingResponse } from "@common/http-paging.response";
 import { HttpResponse } from "@common/http.response";
 import { User } from "@common/user";
-import { PostOrderBy } from "@constant/post-oder-by.enum";
+import { PostOrderBy } from "@constant/post-order-by.enum";
 import { Role } from "@constant/role.enum";
 import { Sort } from "@constant/sort.enum";
 import { PostEntity } from "@data/entity/post.entity";
 import { NewPostRequest } from "@data/request/new-post.request";
+import { PagingRequest } from "@data/request/paging.request";
 import { UpdatePostRequest } from "@data/request/update-post.request";
 import { PostsResponse } from "@data/response/posts.response";
 import { CurrentUser } from "@decorator/current-user.decorator";
@@ -60,10 +61,9 @@ export class PostController {
     @Query('order_by') orderBy: PostOrderBy,
     @Query('sort') sort: Sort,
     @Query('author_id') authorId: string,
-    @Query('per_page') perPage: number,
-    @Query('page') page: number
+    @Query() paging: PagingRequest
   ): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
-    const postsResponse = await this.postService.getPostOrderBy(orderBy, sort, authorId, perPage, page);
+    const postsResponse = await this.postService.getPostOrderBy(orderBy, sort, authorId, paging.per_page, paging.page);
     return postsResponse;
   }
 

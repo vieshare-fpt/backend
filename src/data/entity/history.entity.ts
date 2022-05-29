@@ -30,7 +30,7 @@ export class HistoryEntity {
   postId: string;
 
   @Column({ name: 'lastDateRead', type: 'bigint' })
-  lastDateRead: Date;
+  lastDateRead: number;
 
 
 }
