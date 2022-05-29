@@ -17,19 +17,6 @@ export class HistoryController {
 
 
   @ApiBearerAuth()
-  @Post('')
-  @HttpCode(HttpStatus.OK)
-  async addHistory(
-    @CurrentUser() user: User,
-    @Body() postIdRequest: PostIdRequest
-  ): Promise<HttpResponse<HistoryEntity>> {
-
-    const history = await this.historyService.saveHistoryForUsers(postIdRequest.postId, user.id);
-    return HttpResponse.success(history)
-  }
-
-
-  @ApiBearerAuth()
   @Get('')
   @HttpCode(HttpStatus.OK)
   async getHistory(

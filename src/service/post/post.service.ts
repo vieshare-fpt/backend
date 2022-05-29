@@ -142,6 +142,10 @@ export class PostService {
     return this.getPagingResponse(postsResponse, perPage, page, total)
   }
 
+  async isExisted(postId: string): Promise<boolean> {
+    return (await this.postRepository.count({ where: { id: postId } })) > 0 ? true : false;
+  }
+
 
   async getPostsByAuthorId(
     authorId: string,
@@ -250,4 +254,6 @@ export class PostService {
 
     return this.getPagingResponse(postsResponse, perPage, page, total)
   }
+
+
 }
