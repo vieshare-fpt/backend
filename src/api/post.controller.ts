@@ -11,6 +11,7 @@ import { UpdatePostRequest } from "@data/request/update-post.request";
 import { PostsResponse } from "@data/response/posts.response";
 import { CurrentUser } from "@decorator/current-user.decorator";
 import { PublicPrivate } from "@decorator/public-private.decorator";
+import { Public } from "@decorator/public.decorator";
 import { Roles } from "@decorator/role.decorator";
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from "@nestjs/common";
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
@@ -67,6 +68,22 @@ export class PostController {
     return postsResponse;
   }
 
+  @PublicPrivate()
+  @ApiBearerAuth()
+  @Get('suggest')
+  @HttpCode(HttpStatus.OK)
+  @ApiQuery({ name: 'per_page', type: 'number', example: 10, required: false })
+  @ApiQuery({ name: 'page', type: 'number', example: 1, required: false })
+  async getSuggestPost(
+    @CurrentUser() user: User,
+    @Query() paging: PagingRequest
+  ): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
+    if (!user) {
+      return await this.postService.suggestForAnonymus(paging.per_page, paging.page)
+    }
+    return await this.postService.suggestForUser(user.id, paging.per_page, paging.page)
+  }
+
 
   @ApiBearerAuth()
   @PublicPrivate()
@@ -100,7 +117,6 @@ export class PostController {
     if (!userExsited || !(idAdmin || isAuthor || isPremium)) {
       return HttpResponse.success(await this.postService.getFreePostsById(postId));
     }
-
 
 
     const post = await this.postService.getPostById(postId)

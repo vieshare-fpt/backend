@@ -14,7 +14,7 @@ import { UpdatePassRequest } from '@data/request/update-pass.request';
 @ApiTags('User')
 @Controller('api/users')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService) { }
 
   @Public()
   @Post('register')
@@ -60,4 +60,6 @@ export class UserController {
 
     return HttpResponse.success();
   }
+
+  
 }
