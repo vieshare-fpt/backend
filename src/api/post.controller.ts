@@ -12,8 +12,10 @@ import { PostsResponse } from "@data/response/posts.response";
 import { CurrentUser } from "@decorator/current-user.decorator";
 import { PublicPrivate } from "@decorator/public-private.decorator";
 import { Roles } from "@decorator/role.decorator";
+import { PostNotExistedException } from "@exception/post/post-not-existed.exception";
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from "@nestjs/common";
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { HistoryService } from "@service/history/history.service";
 import { PostService } from "@service/post/post.service";
 import { UserService } from "@service/user/user.service";
 
@@ -22,7 +24,8 @@ import { UserService } from "@service/user/user.service";
 export class PostController {
   constructor(
     private postService: PostService,
-    private userSerice: UserService
+    private userSerice: UserService,
+    private historyService : HistoryService
 
   ) { }
 
@@ -67,18 +70,20 @@ export class PostController {
     return postsResponse;
   }
 
-
-  @ApiBearerAuth()
   @PublicPrivate()
-  @ApiParam({ name: 'postId', type: 'string', required: true, example: 'ccff1be6-8db1-4d95-8022-41b62df5edb4' })
-  @Patch('view/:postId')
+  @ApiBearerAuth()
+  @Get('suggest')
   @HttpCode(HttpStatus.OK)
-  async updateViewsPost(
+  @ApiQuery({ name: 'per_page', type: 'number', example: 10, required: false })
+  @ApiQuery({ name: 'page', type: 'number', example: 1, required: false })
+  async getSuggestPost(
     @CurrentUser() user: User,
-    @Param('postId') postId: string,
-  ): Promise<HttpResponse<any>> {
-    const post = await this.postService.updateViewsPost(postId);
-    return HttpResponse.success(post)
+    @Query() paging: PagingRequest
+  ): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
+    if (!user) {
+      return await this.postService.suggestForAnonymus(paging.per_page, paging.page)
+    }
+    return await this.postService.suggestForUser(user.id, paging.per_page, paging.page)
   }
 
 
@@ -92,21 +97,28 @@ export class PostController {
     @CurrentUser() user: User,
     @Param('id') postId: string
   ): Promise<HttpResponse<PostEntity>> {
+    const postExisted = await this.postService.isExisted(postId);
     const userExsited = user?.id ? await this.userSerice.getUserByUserId(user.id) : null;
     const idAdmin = userExsited ? userExsited.roles.includes(Role.Admin) : false;
     const isAuthor = userExsited ? await this.postService.isAuthor(user.id, postId) : false;
     const isPremium = userExsited ? userExsited.isPremium : false;
 
+    if (!postExisted) {
+      throw new PostNotExistedException()
+    }
+
     if (!userExsited || !(idAdmin || isAuthor || isPremium)) {
-      return HttpResponse.success(await this.postService.getFreePostsById(postId));
+      const postFree = await this.postService.getFreePostsById(postId);
+      await this.postService.updateViewsPost(postId);
+      return HttpResponse.success(postFree)
     }
 
 
-
     const post = await this.postService.getPostById(postId)
+    await this.historyService.saveHistoryForUsers(postId, user.id);
+    await this.postService.updateViewsPost(postId);
     return HttpResponse.success(post);
   }
-
 
 
   @ApiBearerAuth()
@@ -114,9 +126,13 @@ export class PostController {
   @Delete(':id')
   async deletePost(
     @CurrentUser() user: User,
-    @Param() param
+    @Param('id') postId: string
   ) {
-    const deletePost = await this.postService.deletePost(user, param.id)
+    const postExisted = await this.postService.isExisted(postId);
+    if (!postExisted) {
+      throw new PostNotExistedException()
+    }
+    const deletePost = await this.postService.deletePost(user, postId)
     return HttpResponse.success(deletePost);
   }
 

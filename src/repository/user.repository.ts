@@ -17,23 +17,4 @@ export class UserRepository extends Repository<UserEntity> {
     });
   }
 
-  async findOneAnonymousUser(): Promise<UserEntity> {
-    return await this.findOne({
-      where: {
-        roles: [Role.Anonymous]
-      },
-    });
-  }
-
-  async generateAnonymousUser() {
-
-    const userEntity: UserEntity = new UserEntity();
-    userEntity.dob = '0000-00-00';
-    userEntity.gender = Gender.Other;
-    userEntity.roles = [Role.Anonymous];
-    userEntity.password = ''
-    userEntity.isDefaultPassword = false;
-
-    return await this.save(userEntity);
-  }
 }
