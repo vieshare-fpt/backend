@@ -251,7 +251,9 @@ export class PostService {
 
     const postsResponse = await this.postRepository.getSuggestPosts(listCategoryIdReaded, listPostsIdReaded, perPage * (page - 1), perPage)
     const total = await this.postRepository.countSuggestPosts(listCategoryIdReaded, listPostsIdReaded,);
-
+    if (postsResponse.length <= 10) {
+      return await this.suggestForAnonymus(perPage, page)
+    }
     return this.getPagingResponse(postsResponse, perPage, page, total)
   }
 
