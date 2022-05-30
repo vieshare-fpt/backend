@@ -1,7 +1,3 @@
-/*
-https://docs.nestjs.com/controllers#controllers
-*/
-
 import { HttpPagingResponse } from '@common/http-paging.response';
 import { HttpResponse } from '@common/http.response';
 import { User } from '@common/user';
@@ -9,7 +5,6 @@ import { CreateFollowRequest } from '@data/request/new-follow.request';
 import { PagingRequest } from '@data/request/paging.request';
 import { FollowResponse } from '@data/response/follow.response';
 import { CurrentUser } from '@decorator/current-user.decorator';
-import { Public } from '@decorator/public.decorator';
 import { Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { FollowService } from '@service/follow/follow.service';

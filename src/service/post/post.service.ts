@@ -18,16 +18,21 @@ import { PagingRepsone } from "@data/response/paging.response";
 import { HttpPagingResponse } from "@common/http-paging.response";
 import { CategoryRepository } from "@repository/category.repository";
 import { CategoryNotExistedException } from "@exception/category/category-not-existed.exception";
-import { PostOrderBy } from "@constant/post-oder-by.enum";
+import { PostOrderBy } from "@constant/post-order-by.enum";
 import { Sort } from "@constant/sort.enum";
-import { kill } from "process";
+import { HistoryRepository } from "@repository/history.repository";
+import { HistoryEntity } from "@data/entity/history.entity";
+import { CategoryEntity } from "@data/entity/category.entity";
+import { In, Not } from "typeorm";
+
 
 @Injectable()
 export class PostService {
   constructor(
     private postRepository: PostRepository,
     private userRepository: UserRepository,
-    private cateRepostory: CategoryRepository
+    private cateRepostory: CategoryRepository,
+    private historyRepository: HistoryRepository
   ) { }
 
   async isAuthor(userId: string, postId): Promise<boolean> {
@@ -137,6 +142,10 @@ export class PostService {
     return this.getPagingResponse(postsResponse, perPage, page, total)
   }
 
+  async isExisted(postId: string): Promise<boolean> {
+    return (await this.postRepository.count({ where: { id: postId } })) > 0 ? true : false;
+  }
+
 
   async getPostsByAuthorId(
     authorId: string,
@@ -219,4 +228,38 @@ export class PostService {
 
   }
 
+<<<<<<< HEAD
 }
+=======
+  async suggestForAnonymus(perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
+    page = page ? page : 1;
+    const postsResponse = await this.postRepository.getPostsRandom(perPage * (page - 1), perPage)
+    const total = await this.countPosts();
+    return this.getPagingResponse(postsResponse, perPage, page, total)
+  }
+
+  async suggestForUser(userId: string, perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
+    const userExsited = await this.userRepository.findOne({ id: userId });
+    if (!userExsited) {
+      throw new UserNotExistedException();
+    }
+
+    const postsIdReadedByUserId = await this.historyRepository.getPostsIdReadedByUserId(userId);
+    const listPostsIdReaded = postsIdReadedByUserId.map(item => item.postId)
+    if (postsIdReadedByUserId.length == 0) {
+      return await this.suggestForAnonymus(perPage, page)
+    }
+    const categoryReadMostByUserId = await this.historyRepository.getCategoryReadMostByUserId(userId);
+    const listCategoryIdReaded = categoryReadMostByUserId.map(item => item.categoryId);
+
+    const postsResponse = await this.postRepository.getSuggestPosts(listCategoryIdReaded, listPostsIdReaded, perPage * (page - 1), perPage)
+    const total = await this.postRepository.countSuggestPosts(listCategoryIdReaded, listPostsIdReaded,);
+    if (postsResponse.length <= 10) {
+      return await this.suggestForAnonymus(perPage, page)
+    }
+    return this.getPagingResponse(postsResponse, perPage, page, total)
+  }
+
+
+}
+>>>>>>> 1ce20b60cfc3980468b7f2b1da3a8b27ac66cf85

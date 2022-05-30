@@ -9,6 +9,7 @@ import { UpdatePassRequest } from '@data/request/update-pass.request';
 import { EmailExistedException } from '@exception/user/email-existed.exception';
 import { OldPasswordIncorrectException } from '@exception/user/old-password-not-correct.exception';
 import { UserNotExistedException } from '@exception/user/user-not-existed.exception';
+import { Gender } from '@constant/user-gender.enum';
 
 const MAX_RECOMMEND_USER = 15;
 
@@ -17,7 +18,7 @@ export class UserService {
   constructor(
     private userRepository: UserRepository,
     private cryptStrategy: CryptStrategy,
-  ) {}
+  ) { }
 
   async createUser(
     request: RegisterRequest,
@@ -69,7 +70,7 @@ export class UserService {
     userId: string,
     request: UpdatePassRequest,
   ): Promise<any> {
-    const user = await this.userRepository.findOne({id: userId});
+    const user = await this.userRepository.findOne({ id: userId });
 
     if (!user.isDefaultPassword)
       if (
@@ -95,4 +96,5 @@ export class UserService {
     }
     return existedUser.id;
   }
+
 }

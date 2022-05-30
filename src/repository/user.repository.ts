@@ -1,5 +1,7 @@
 import { EntityRepository, In, Like, Repository } from 'typeorm';
 import { UserEntity } from '@data/entity/user.entity';
+import { Gender } from '@constant/user-gender.enum';
+import { Role } from '@constant/role.enum';
 
 @EntityRepository(UserEntity)
 export class UserRepository extends Repository<UserEntity> {
@@ -14,4 +16,5 @@ export class UserRepository extends Repository<UserEntity> {
       },
     });
   }
+
 }

@@ -33,13 +33,13 @@ export class UserEntity {
   @Column({ nullable: true })
   phone: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: true })
   email: string;
 
   @Column()
   password: string;
 
-  @Column({ type: 'simple-array' })
+  @Column({ type: 'simple-array', nullable: true })
   roles: Role[];
 
   @Column({ nullable: true })
