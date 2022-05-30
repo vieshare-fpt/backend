@@ -31,6 +31,7 @@ export class PostEntity {
   @ManyToOne(() => UserEntity, (userEntity) => userEntity.posts)
   @JoinColumn({ name: 'authorId' })
   author: Promise<UserEntity>;
+
   @Column({ name: 'authorId' })
   authorId: string
 

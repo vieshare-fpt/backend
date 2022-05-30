@@ -1,3 +1,4 @@
+
 import { CacheModule, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppService } from '@app/app.service';
@@ -49,7 +50,7 @@ import { HistoryController } from '@api/history.controller';
     PostModule,
     CommentModule,
     FollowModule,
-    HistoryModule
+    HistoryModule,
 
   ],
   controllers: [
@@ -59,7 +60,7 @@ import { HistoryController } from '@api/history.controller';
     PostController,
     CommentController,
     FollowController,
-    HistoryController
+    HistoryController,
 
   ],
   providers: [
