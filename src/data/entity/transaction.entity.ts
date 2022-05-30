@@ -15,10 +15,10 @@ export class TransactionEntity {
         (wallet) => wallet.transactions
 
     )
-    @JoinColumn({name: 'walletID'})
+    @JoinColumn({name: 'walletId'})
     wallet: Promise<WalletEntity>;
-    @Column({name: 'walletID'})
-    wallet_id: string;
+    @Column({name: 'walletId'})
+    walletId: string;
 
 
     @PrimaryColumn({ name: 'date' })
@@ -32,10 +32,10 @@ export class TransactionEntity {
         () => BankEntity,
         (bank) => bank.transaction
     )
-    @JoinColumn({name: 'bankID'})
+    @JoinColumn({name: 'bankId'})
     bank: Promise<BankEntity>;
-    @Column({name: 'bankID'})
-    bank_id: string;
+    @Column({name: 'bankId'})
+    bankId: string;
 
     @Column({ name: 'typeTrans', type: 'enum', enum :TransactionEnum, nullable: false})
     type: TransactionEnum;

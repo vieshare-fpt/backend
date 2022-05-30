@@ -11,17 +11,18 @@ export class WalletEntity {
         () => UserEntity,
         (user) => user.wallet
     )
-    @JoinColumn({ name: 'userID'})
+    @JoinColumn({ name: 'userId'})
     user: Promise<UserEntity>;
-    @Column({ name: 'userID'})
-    user_id: string;
+    
+    @Column({ name: 'userId'})
+    userId: string;
 
     @Column({ name: 'balance', type: 'float', default: 0 })
     balance: number;
 
     @OneToMany(
         () => TransactionEntity,
-        (transactions) => transactions.wallet_id
+        (transactions) => transactions.wallet
     )
     transactions: Promise<TransactionEntity[]>;
 

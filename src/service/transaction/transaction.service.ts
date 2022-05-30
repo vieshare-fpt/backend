@@ -18,7 +18,7 @@ export class TransactionService {
 
 
     async createTransaction(
-        user_id: string,
+        userId: string,
         status: boolean,
         transactionRequest: TransactionRequest,
     ): Promise<TransactionEntity> {
@@ -26,8 +26,8 @@ export class TransactionService {
 
         transaction.date = new Date();
         transaction.amount = transactionRequest.amount;
-        transaction.bank_id = transactionRequest.bankID;
-        transaction.wallet_id = transactionRequest.walletID;
+        transaction.bankId = transactionRequest.bankId;
+        transaction.walletId = transactionRequest.walletId;
         transaction.type = transactionRequest.typeTransaction;
         transaction.isStatus =  status;
 

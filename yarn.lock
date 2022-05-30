@@ -730,9 +730,9 @@
   dependencies:
     path-to-regexp "0.1.7"
 
-"@nestjs/swagger@^5.0.9":
+"@nestjs/swagger@^5.2.1":
   version "5.2.1"
-  resolved "https://registry.npmjs.org/@nestjs/swagger/-/swagger-5.2.1.tgz"
+  resolved "https://registry.yarnpkg.com/@nestjs/swagger/-/swagger-5.2.1.tgz#0fbd5dbc84aeebc2912009cce1309d4bebe9a52c"
   integrity sha512-7dNa08WCnTsW/oAk3Ujde+z64JMfNm19DhpXasFR8oJp/9pggYAbYU927HpA+GJsSFJX6adjIRZsCKUqaGWznw==
   dependencies:
     "@nestjs/mapped-types" "1.0.1"
@@ -747,9 +747,9 @@
     optional "0.1.4"
     tslib "2.4.0"
 
-"@nestjs/typeorm@^8.0.2":
+"@nestjs/typeorm@^8.0.4":
   version "8.0.4"
-  resolved "https://registry.npmjs.org/@nestjs/typeorm/-/typeorm-8.0.4.tgz"
+  resolved "https://registry.yarnpkg.com/@nestjs/typeorm/-/typeorm-8.0.4.tgz#ce6dbacb4c2a75e7d341da90a0d355bffd3149b4"
   integrity sha512-l1Fv+XicVFs7j4EKTq32lJ6QomYLlXZwvug9zcts6IBDVd8rYYBPy28pyBMDzLtnm0zD4tcW298rpylL7eTZtQ==
   dependencies:
     uuid "8.3.2"

@@ -15,46 +15,46 @@ export class WalletService {
     ) { }
 
     async createWallet(
-        user_id: string,
+        userId: string,
     ): Promise<WalletEntity> {
-        const existedUser = await this.userRepository.findOne(user_id);
+        const existedUser = await this.userRepository.findOne(userId);
         if (!existedUser) {
             throw new UserNotExistedException();
         }
 
         const walletEntity: WalletEntity = new WalletEntity();
-        walletEntity.user_id = user_id;
+        walletEntity.userId = userId;
         walletEntity.balance = 0;
 
         return await this.walletRepository.save(walletEntity);
     }
 
     async updateWallet(
-        user_id: string,
+        userId: string,
         amount: number,
         typeTransaction: TransactionEnum,
     ): Promise<boolean> {
-        const existedUser = await this.userRepository.findOne(user_id);
+        const existedUser = await this.userRepository.findOne(userId);
         if (!existedUser) {
             throw new UserNotExistedException();
         }
-        const isCheck = await this.walletRepository.isCheck(user_id, amount, typeTransaction);
+        const isCheck = await this.walletRepository.isCheck(userId, amount, typeTransaction);
         if (!isCheck) {
             throw new BalanceNotEnough();
         }
         return (await this.walletRepository.
-            update({ id: user_id }, { balance: amount })).affected ? true : false;
+            update({ id: userId }, { balance: amount })).affected ? true : false;
     }
 
     async getWalletByID(
-        user_id: string
+        userId: string
     ): Promise<WalletEntity> {
-        const existedUser = await this.userRepository.findOne(user_id);
+        const existedUser = await this.userRepository.findOne(userId);
         if (!existedUser) {
             throw new UserNotExistedException();
         }
 
-        return await this.walletRepository.findOne(user_id);
+        return await this.walletRepository.findOne(userId);
     }
 
     //TODO: deleteWallet
