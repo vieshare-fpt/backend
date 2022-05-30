@@ -36,8 +36,8 @@ export class FollowService {
 
         const newFollow: FollowEntity = new FollowEntity();
         newFollow.follow_at = new Date();
-        newFollow.userID = userID;
-        newFollow.followerID = createFollowReq.followerID;
+        newFollow.user_id = userID;
+        newFollow.follower_id = createFollowReq.followerID;
 
         return await this.followRepository.save(newFollow);
     }

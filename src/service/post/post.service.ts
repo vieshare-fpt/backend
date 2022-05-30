@@ -228,9 +228,6 @@ export class PostService {
 
   }
 
-<<<<<<< HEAD
-}
-=======
   async suggestForAnonymus(perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
     page = page ? page : 1;
     const postsResponse = await this.postRepository.getPostsRandom(perPage * (page - 1), perPage)
@@ -262,4 +259,3 @@ export class PostService {
 
 
 }
->>>>>>> 1ce20b60cfc3980468b7f2b1da3a8b27ac66cf85
