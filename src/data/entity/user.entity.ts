@@ -13,6 +13,7 @@ import { CommentEntity } from './comment.entity';
 import { HistoryEntity } from './history.entity';
 import { PostEntity } from './post.entity';
 import { FollowEntity } from './follow.entity';
+import { SubscriptionEntity } from './subscription.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -79,4 +80,10 @@ export class UserEntity {
     (followEntity) => followEntity.userID
   )
   follower?: Promise<FollowEntity[]>;
+
+  @OneToMany(
+    () => SubscriptionEntity,
+    (subscriptionEntity) => subscriptionEntity.userID
+  )
+  subscription?: Promise<SubscriptionEntity[]>;
 }

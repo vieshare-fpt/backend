@@ -1,3 +1,4 @@
+import { SubscriptionModule } from './service/subscription/subscription.module';
 import { CacheModule, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppService } from '@app/app.service';
@@ -24,6 +25,7 @@ import { FollowController } from '@api/follow.controller';
 
 @Module({
   imports: [
+    SubscriptionModule,
     CacheModule.register({
       ttl: 0,
       isGlobal: true,

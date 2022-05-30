@@ -3,7 +3,7 @@ import { UserEntity } from './user.entity';
 
 @Entity('follows')
 export class FollowEntity {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn('uuid')
     id: string;
 
     // @Column({type: 'uuid', nullable: false})
