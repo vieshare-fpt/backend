@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn
 import { TransactionEntity } from "./transaction.entity";
 import { UserEntity } from "./user.entity";
 
-@Entity('wallet')
+@Entity('wallets')
 export class WalletEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;

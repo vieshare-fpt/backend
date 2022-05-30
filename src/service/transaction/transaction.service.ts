@@ -19,17 +19,17 @@ export class TransactionService {
 
     async createTransaction(
         userId: string,
-        status: boolean,
+        isSuccess: boolean,
         transactionRequest: TransactionRequest,
     ): Promise<TransactionEntity> {
         const transaction: TransactionEntity = new TransactionEntity();
 
-        transaction.date = new Date();
+        transaction.date = new Date().getTime();
         transaction.amount = transactionRequest.amount;
         transaction.bankId = transactionRequest.bankId;
         transaction.walletId = transactionRequest.walletId;
         transaction.type = transactionRequest.typeTransaction;
-        transaction.isStatus =  status;
+        transaction.isSuccess =  isSuccess;
 
         return await this.transactionRepository.create();
     }
