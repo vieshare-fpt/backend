@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { SubscriptionEntity } from "./subscription.entity";
 
 @Entity('packages')
 export class PackageEntity {
@@ -16,4 +17,13 @@ export class PackageEntity {
 
   @Column({ name: 'createDate', type: 'bigint' })
   createDate: number;
+
+  @Column({ name: 'isActive', type: 'boolean' })
+  isActive: Boolean;
+
+  @OneToMany(
+    () => SubscriptionEntity,
+    (subscriptionEntity) => subscriptionEntity.package
+  )
+  packages: Promise<PackageEntity[]>
 }

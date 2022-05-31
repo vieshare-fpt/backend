@@ -24,6 +24,8 @@ import { FollowModule } from '@service/follow/follow.module';
 import { FollowController } from '@api/follow.controller';
 import { HistoryModule } from '@service/history/history.module';
 import { HistoryController } from '@api/history.controller';
+import { PackageModule } from '@service/package/package.module';
+import { PackageController } from '@api/package.controller';
 
 @Module({
   imports: [
@@ -51,6 +53,7 @@ import { HistoryController } from '@api/history.controller';
     CommentModule,
     FollowModule,
     HistoryModule,
+    PackageModule
 
   ],
   controllers: [
@@ -61,6 +64,7 @@ import { HistoryController } from '@api/history.controller';
     CommentController,
     FollowController,
     HistoryController,
+    PackageController
 
   ],
   providers: [
