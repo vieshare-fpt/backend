@@ -26,8 +26,8 @@ export class SubscriptionEntity {
   @Column({ name: 'packageId' })
   packageId: string;
 
-  @Column({ name: 'date', type: 'bigint' })
-  date: number
+  @Column({ name: 'date', type: 'date' })
+  date: Date
 
 
 

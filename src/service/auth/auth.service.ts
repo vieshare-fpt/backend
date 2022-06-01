@@ -79,7 +79,7 @@ export class AuthService {
     const refreshTokenEntity = await this.tokenRepository.findOne({
       where: {
         id: refreshToken,
-        validUntil: MoreThanOrEqual(new Date().getTime()),
+        validUntil: MoreThanOrEqual(new Date()),
       },
     });
 
@@ -97,7 +97,6 @@ export class AuthService {
       phone: user.phone,
       gender: user.gender,
       dob: user.dob,
-      isPremium : user.isPremium
     });
 
     return new RenewAccessTokenResponse(token);
@@ -158,7 +157,6 @@ export class AuthService {
       phone: user.phone,
       gender: user.gender,
       dob: user.dob,
-      isPremium : user.isPremium
     });
 
     const refreshToken = await this.issueRefreshToken(user, agent);

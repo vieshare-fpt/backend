@@ -53,9 +53,9 @@ export class PackageService {
   async createNewPackage(newPackage: NewPackageRequest) {
     const packageEntity = new PackageEntity()
     packageEntity.name = newPackage.name;
-    packageEntity.expirationTime = newPackage.expirationTime * 24 * 60 * 60 * 1000;
+    packageEntity.expiresAfterNumberOfDays = newPackage.expiresAfterNumberOfDays;
     packageEntity.price = newPackage.price;
-    packageEntity.createDate = new Date().getTime()
+    packageEntity.createDate = new Date();
     packageEntity.isActive = true;
     return await this.packageRepository.save(packageEntity)
   }
@@ -73,7 +73,7 @@ export class PackageService {
       },
       {
         name: updatePackage.name ? updatePackage.name : packageExisted.name,
-        expirationTime: updatePackage.expirationTime ? updatePackage.expirationTime : packageExisted.expirationTime,
+        expiresAfterNumberOfDays: updatePackage.expiresAfterNumberOfDays ? updatePackage.expiresAfterNumberOfDays : packageExisted.expiresAfterNumberOfDays,
         price: updatePackage.price ? updatePackage.price : packageExisted.price,
         isActive: (typeof updatePackage.isActive == "boolean" ? updatePackage.isActive : packageExisted.isActive)
       }

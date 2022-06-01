@@ -1,5 +1,5 @@
 export enum PackageOrderBy {
-  expirationTime = 'expirationTime',
+  expiresAfterNumberOfDays = 'expiresAfterNumberOfDays',
   price = 'price',
   createDate = 'createDate',
   isActive = 'isActive'

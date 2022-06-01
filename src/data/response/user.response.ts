@@ -21,9 +21,9 @@ export class UserResponse {
 
   isDefaultPassword: boolean;
 
-  isPremium : boolean
+  isPremium: boolean
 
-  static fromUserEntity(user: UserEntity): UserResponse {
+  static fromUserEntity(user: UserEntity, isPremium: boolean): UserResponse {
     const userResponse = new UserResponse();
     userResponse.id = user.id;
     userResponse.name = user.name;
@@ -34,7 +34,7 @@ export class UserResponse {
     userResponse.roles = user.roles;
     userResponse.avatar = user.avatar;
     userResponse.isDefaultPassword = user.isDefaultPassword;
-    userResponse.isPremium  = user.isPremium;
+    userResponse.isPremium = isPremium;
 
     return userResponse;
   }

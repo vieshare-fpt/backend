@@ -21,8 +21,8 @@ export class TransactionEntity {
   walletId: string;
 
 
-  @PrimaryColumn({ name: 'date', type: 'bigint' })
-  date: number;
+  @PrimaryColumn({ name: 'date', type: 'date' })
+  date: Date;
 
   @Column({ name: 'amount', type: 'float' })
   amount: number;

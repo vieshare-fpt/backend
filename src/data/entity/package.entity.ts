@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { SubscriptionEntity } from "./subscription.entity";
 
 @Entity('packages')
@@ -9,14 +9,14 @@ export class PackageEntity {
   @Column({ name: 'name' })
   name: string;
 
-  @Column({ name: 'expirationTime', type: 'bigint' })
-  expirationTime: number;
+  @Column({ name: 'expiresAfterNumberOfDays'})
+  expiresAfterNumberOfDays: number;
 
   @Column({ name: 'price', type: 'float' })
   price: number;
 
-  @Column({ name: 'createDate', type: 'bigint' })
-  createDate: number;
+  @CreateDateColumn({ name: 'createDate'})
+  createDate: Date;
 
   @Column({ name: 'isActive', type: 'boolean' })
   isActive: Boolean;

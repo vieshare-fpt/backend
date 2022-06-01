@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { PostEntity } from "./post.entity";
 import { UserEntity } from "./user.entity";
 
@@ -24,8 +24,8 @@ export class CommentEntity {
     @Column({ name: 'connent', type: 'text' })
     content: string;
 
-    @Column({ name: 'publishDate', type: 'bigint' })
-    publishDate: number;
+    @CreateDateColumn({ name: 'publishDate'})
+    publishDate: Date;
 
     @Column({ default: false })
     isDelete: boolean;

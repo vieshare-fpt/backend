@@ -5,7 +5,7 @@ export class UpdatePackageRequest {
   name: string
 
   @ApiProperty()
-  expirationTime: number;
+  expiresAfterNumberOfDays: number;
 
   @ApiProperty()
   price: number

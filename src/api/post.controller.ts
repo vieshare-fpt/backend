@@ -17,6 +17,7 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { HistoryService } from "@service/history/history.service";
 import { PostService } from "@service/post/post.service";
+import { SubscriptionService } from "@service/subcription/subscription.service";
 import { UserService } from "@service/user/user.service";
 
 @ApiTags('Post')
@@ -25,7 +26,8 @@ export class PostController {
   constructor(
     private postService: PostService,
     private userSerice: UserService,
-    private historyService : HistoryService
+    private historyService: HistoryService,
+    private subscriptionService: SubscriptionService
 
   ) { }
 
@@ -101,7 +103,7 @@ export class PostController {
     const userExsited = user?.id ? await this.userSerice.getUserByUserId(user.id) : null;
     const idAdmin = userExsited ? userExsited.roles.includes(Role.Admin) : false;
     const isAuthor = userExsited ? await this.postService.isAuthor(user.id, postId) : false;
-    const isPremium = userExsited ? userExsited.isPremium : false;
+    const isPremium = userExsited ? this.subscriptionService.checkUserIsPremium(userExsited.id) : false;
 
     if (!postExisted) {
       throw new PostNotExistedException()

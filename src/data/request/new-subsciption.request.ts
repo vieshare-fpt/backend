@@ -1,6 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty } from "class-validator";
 
 export class NewSubscriptionRequest {
-    @ApiProperty()
-    options: number;
+  @ApiProperty()
+  @IsNotEmpty()
+  packageId: string;
 }

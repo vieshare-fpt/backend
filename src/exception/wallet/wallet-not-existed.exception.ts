@@ -3,8 +3,8 @@ import { AppException } from "@exception/app.exception";
 import { HttpStatus } from "@nestjs/common";
 
 
-export class BalanceNotEnoughException extends AppException {
+export class WalletNotExistedException extends AppException {
     constructor() {
-        super(StatusCode.BALANCE_NOT_ENOUGH, HttpStatus.BAD_REQUEST )
+        super(StatusCode.WALLET_NOT_EXISTED, HttpStatus.BAD_REQUEST )
     }
 }

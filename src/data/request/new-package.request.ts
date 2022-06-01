@@ -8,7 +8,7 @@ export class NewPackageRequest {
 
   @ApiProperty({ examples: ["1,20,30"], description: "After how many days will the package expire?" })
   @IsNotEmpty()
-  expirationTime: number;
+  expiresAfterNumberOfDays: number;
 
   @ApiProperty()
   @IsNotEmpty()

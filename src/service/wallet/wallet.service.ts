@@ -2,7 +2,8 @@
 import { TransactionEnum } from '@constant/type-transaction.enum';
 import { WalletEntity } from '@data/entity/wallet.entity';
 import { UserNotExistedException } from '@exception/user/user-not-existed.exception';
-import { BalanceNotEnough } from '@exception/wallet/balance-not-enough.exception';
+import { BalanceNotEnoughException } from '@exception/wallet/balance-not-enough.exception';
+import { WalletAlreadyExistedException } from '@exception/wallet/wallet-already-existed.exception';
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from '@repository/user.repository';
 import { WalletRepository } from '@repository/wallet.repository';
@@ -17,11 +18,15 @@ export class WalletService {
     async createWallet(
         userId: string,
     ): Promise<WalletEntity> {
-        const existedUser = await this.userRepository.findOne(userId);
-        if (!existedUser) {
+        const userExisted = await this.userRepository.findOne(userId);
+        if (!userExisted) {
             throw new UserNotExistedException();
         }
 
+        const walletExisted = await this.walletRepository.findOne({userId:userExisted.id});
+        if(walletExisted){
+          throw new WalletAlreadyExistedException();
+        }
         const walletEntity: WalletEntity = new WalletEntity();
         walletEntity.userId = userId;
         walletEntity.balance = 0;
@@ -34,19 +39,20 @@ export class WalletService {
         amount: number,
         typeTransaction: TransactionEnum,
     ): Promise<boolean> {
-        const existedUser = await this.userRepository.findOne(userId);
-        if (!existedUser) {
+        const userExisted = await this.userRepository.findOne(userId);
+        if (!userExisted) {
             throw new UserNotExistedException();
         }
         const isCheck = await this.walletRepository.isCheck(userId, amount, typeTransaction);
         if (!isCheck) {
-            throw new BalanceNotEnough();
+            throw new BalanceNotEnoughException();
         }
         return (await this.walletRepository.
             update({ id: userId }, { balance: amount })).affected ? true : false;
     }
+    
 
-    async getWalletByID(
+    async getWalletByUserId(
         userId: string
     ): Promise<WalletEntity> {
         const existedUser = await this.userRepository.findOne(userId);

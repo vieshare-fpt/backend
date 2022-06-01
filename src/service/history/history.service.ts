@@ -32,7 +32,7 @@ export class HistoryService {
     const history = new HistoryEntity();
     history.userId = user.id;
     history.postId = post.id;
-    history.lastDateRead = new Date().getTime();
+    history.lastDateRead = new Date();
     return this.historyRepository.save(history)
   }
 

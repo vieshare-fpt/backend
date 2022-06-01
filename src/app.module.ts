@@ -26,6 +26,10 @@ import { HistoryModule } from '@service/history/history.module';
 import { HistoryController } from '@api/history.controller';
 import { PackageModule } from '@service/package/package.module';
 import { PackageController } from '@api/package.controller';
+import { Subscription } from 'rxjs';
+import { SubscriptionModule } from '@service/subcription/subscription.module';
+import { SubscriptionController } from '@api/subscription.controller';
+import { WalletModule } from '@service/wallet/wallet.module';
 
 @Module({
   imports: [
@@ -53,7 +57,9 @@ import { PackageController } from '@api/package.controller';
     CommentModule,
     FollowModule,
     HistoryModule,
-    PackageModule
+    PackageModule,
+    SubscriptionModule,
+    WalletModule
 
   ],
   controllers: [
@@ -64,7 +70,8 @@ import { PackageController } from '@api/package.controller';
     CommentController,
     FollowController,
     HistoryController,
-    PackageController
+    PackageController,
+    SubscriptionController
 
   ],
   providers: [

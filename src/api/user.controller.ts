@@ -10,11 +10,17 @@ import { User } from '@common/user';
 import { UserResponse } from '@data/response/user.response';
 import { UpdateInfoRequest } from '@data/request/update-info.request';
 import { UpdatePassRequest } from '@data/request/update-pass.request';
+import { WalletService } from '@service/wallet/wallet.service';
+import { SubscriptionService } from '@service/subcription/subscription.service';
 
 @ApiTags('User')
 @Controller('api/users')
 export class UserController {
-  constructor(private userService: UserService) { }
+  constructor(
+    private userService: UserService,
+    private walletService: WalletService,
+    private subscriptionService: SubscriptionService
+  ) { }
 
   @Public()
   @Post('register')
@@ -22,7 +28,9 @@ export class UserController {
     @Body() request: RegisterRequest,
   ): Promise<HttpResponse<RegisterResponse>> {
     const userEntity = await this.userService.createUser(request, false);
-
+    if (userEntity) {
+      await this.walletService.createWallet(userEntity.id)
+    }
     return HttpResponse.success(new RegisterResponse(userEntity.id));
   }
 
@@ -31,9 +39,10 @@ export class UserController {
   async getInfo(
     @CurrentUser() user: User,
   ): Promise<HttpResponse<UserResponse>> {
-    const userResponse = UserResponse.fromUserEntity(
-      await this.userService.getUserByUserId(user.id),
-    );
+    const userEntity = await this.userService.getUserByUserId(user.id);
+    const isPremium = await this.subscriptionService.checkUserIsPremium(user.id);
+    const userResponse = UserResponse.fromUserEntity(userEntity, isPremium);
+
 
     return HttpResponse.success(userResponse);
   }
@@ -45,7 +54,8 @@ export class UserController {
     @Body() newInfo: UpdateInfoRequest,
   ): Promise<HttpResponse<UserResponse>> {
     const userEntity = await this.userService.updateInfo(user.id, newInfo);
-    const userResponse = UserResponse.fromUserEntity(userEntity);
+    const isPremium = await this.subscriptionService.checkUserIsPremium(user.id);
+    const userResponse = UserResponse.fromUserEntity(userEntity, isPremium);
 
     return HttpResponse.success(userResponse);
   }
@@ -61,5 +71,5 @@ export class UserController {
     return HttpResponse.success();
   }
 
-  
+
 }
