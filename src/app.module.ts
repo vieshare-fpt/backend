@@ -30,6 +30,7 @@ import { Subscription } from 'rxjs';
 import { SubscriptionModule } from '@service/subcription/subscription.module';
 import { SubscriptionController } from '@api/subscription.controller';
 import { WalletModule } from '@service/wallet/wallet.module';
+import { WalletController } from '@api/wallet.controller';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { WalletModule } from '@service/wallet/wallet.module';
     HistoryModule,
     PackageModule,
     SubscriptionModule,
+    WalletModule,
     WalletModule
 
   ],
@@ -71,7 +73,8 @@ import { WalletModule } from '@service/wallet/wallet.module';
     FollowController,
     HistoryController,
     PackageController,
-    SubscriptionController
+    SubscriptionController,
+    WalletController
 
   ],
   providers: [
