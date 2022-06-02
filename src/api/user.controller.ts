@@ -1,7 +1,7 @@
 import { HttpResponse } from '@common/http.response';
 import { Public } from '@decorator/public.decorator';
-import { Body, Controller, Get, Post, Patch, Query } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Post, Patch, Query, Param } from '@nestjs/common';
+import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { RegisterRequest } from '@data/request/register.request';
 import { RegisterResponse } from '@data/response/register.response';
 import { UserService } from '@service/user/user.service';
@@ -12,6 +12,7 @@ import { UpdateInfoRequest } from '@data/request/update-info.request';
 import { UpdatePassRequest } from '@data/request/update-pass.request';
 import { WalletService } from '@service/wallet/wallet.service';
 import { SubscriptionService } from '@service/subcription/subscription.service';
+import { InfoUserResponse } from '@data/response/info-user.response';
 
 @ApiTags('User')
 @Controller('api/users')
@@ -32,6 +33,15 @@ export class UserController {
       await this.walletService.createWallet(userEntity.id)
     }
     return HttpResponse.success(new RegisterResponse(userEntity.id));
+  }
+
+  @Get(':id')
+  @ApiParam({ name: 'id', type: 'string', required: true, example: 'ccff1be6-8db1-4d95-8022-41b62df5edb4' })
+  async getInfoByUserId(
+    @Param('id') userId : string 
+  ):Promise<InfoUserResponse>{
+    const info =  await this.userService.getInfoByUserId(userId)
+    return info;
   }
 
   @ApiBearerAuth()

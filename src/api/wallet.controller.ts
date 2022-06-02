@@ -1,5 +1,6 @@
 
 import { User } from "@common/user";
+import { WalletEntity } from "@data/entity/wallet.entity";
 import { CurrentUser } from "@decorator/current-user.decorator";
 import { Controller, Get } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
@@ -18,7 +19,7 @@ export class WalletController {
   @Get('')
   async createWallet(
     @CurrentUser() currentUser: User,
-  ): Promise<any> {
+  ): Promise<WalletEntity> {
     const walletReponse = await this.walletService.getWalletByUserId(currentUser.id);
     return walletReponse;
   }

@@ -10,59 +10,59 @@ import { WalletRepository } from '@repository/wallet.repository';
 
 @Injectable()
 export class WalletService {
-    constructor(
-        private walletRepository: WalletRepository,
-        private userRepository: UserRepository,
-    ) { }
+  constructor(
+    private walletRepository: WalletRepository,
+    private userRepository: UserRepository,
+  ) { }
 
-    async createWallet(
-        userId: string,
-    ): Promise<WalletEntity> {
-        const userExisted = await this.userRepository.findOne(userId);
-        if (!userExisted) {
-            throw new UserNotExistedException();
-        }
-
-        const walletExisted = await this.walletRepository.findOne({userId:userExisted.id});
-        if(walletExisted){
-          throw new WalletAlreadyExistedException();
-        }
-        const walletEntity: WalletEntity = new WalletEntity();
-        walletEntity.userId = userId;
-        walletEntity.balance = 0;
-
-        return await this.walletRepository.save(walletEntity);
+  async createWallet(
+    userId: string,
+  ): Promise<WalletEntity> {
+    const userExisted = await this.userRepository.findOne(userId);
+    if (!userExisted) {
+      throw new UserNotExistedException();
     }
 
-    async updateWallet(
-        userId: string,
-        amount: number,
-        typeTransaction: TransactionEnum,
-    ): Promise<boolean> {
-        const userExisted = await this.userRepository.findOne(userId);
-        if (!userExisted) {
-            throw new UserNotExistedException();
-        }
-        const isCheck = await this.walletRepository.isCheck(userId, amount, typeTransaction);
-        if (!isCheck) {
-            throw new BalanceNotEnoughException();
-        }
-        return (await this.walletRepository.
-            update({ id: userId }, { balance: amount })).affected ? true : false;
+    const walletExisted = await this.walletRepository.findOne({ userId: userExisted.id });
+    if (walletExisted) {
+      throw new WalletAlreadyExistedException();
     }
-    
+    const walletEntity: WalletEntity = new WalletEntity();
+    walletEntity.userId = userId;
+    walletEntity.balance = 0;
 
-    async getWalletByUserId(
-        userId: string
-    ): Promise<WalletEntity> {
-        const existedUser = await this.userRepository.findOne(userId);
-        if (!existedUser) {
-            throw new UserNotExistedException();
-        }
+    return await this.walletRepository.save(walletEntity);
+  }
 
-        return await this.walletRepository.findOne(userId);
+  //To do fix
+  async updateWallet(
+    userId: string,
+    amount: number,
+    typeTransaction: TransactionEnum,
+  ): Promise<boolean> {
+    const userExisted = await this.userRepository.findOne(userId);
+    if (!userExisted) {
+      throw new UserNotExistedException();
+    }
+    const isCheck = await this.walletRepository.isCheck(userId, amount, typeTransaction);
+    if (!isCheck) {
+      throw new BalanceNotEnoughException();
+    }
+    return (await this.walletRepository.
+      update({ id: userId }, { balance: amount })).affected ? true : false;
+  }
+
+
+  async getWalletByUserId(
+    userId: string
+  ): Promise<WalletEntity> {
+    const existedUser = await this.userRepository.findOne(userId);
+    if (!existedUser) {
+      throw new UserNotExistedException();
     }
 
-    //TODO: deleteWallet
+    return await this.walletRepository.findOne({ userId: userId });
+  }
+
 
 }
