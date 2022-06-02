@@ -35,7 +35,7 @@ export class UserController {
     return HttpResponse.success(new RegisterResponse(userEntity.id));
   }
 
-  @Get(':id')
+  @Get('/info/:id')
   @ApiParam({ name: 'id', type: 'string', required: true, example: 'ccff1be6-8db1-4d95-8022-41b62df5edb4' })
   async getInfoByUserId(
     @Param('id') userId : string 

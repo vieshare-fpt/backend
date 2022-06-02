@@ -15,6 +15,7 @@ import { PostEntity } from './post.entity';
 import { FollowEntity } from './follow.entity';
 import { WalletEntity } from './wallet.entity';
 import { SubscriptionEntity } from './subscription.entity';
+import { VoteEntity } from './vote.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -91,5 +92,11 @@ export class UserEntity {
     (subscriptionEntity) => subscriptionEntity.user
   )
   subcription: Promise<SubscriptionEntity[]>
+
+  @OneToMany(
+    () => VoteEntity,
+    (voteEntity) => voteEntity.user
+  )
+  votes: Promise<VoteEntity[]>
 
 }

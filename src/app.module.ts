@@ -31,6 +31,8 @@ import { SubscriptionModule } from '@service/subcription/subscription.module';
 import { SubscriptionController } from '@api/subscription.controller';
 import { WalletModule } from '@service/wallet/wallet.module';
 import { WalletController } from '@api/wallet.controller';
+import { VoteModule } from '@service/vote/vote.module';
+import { VoteController } from '@api/vote.controller';
 
 @Module({
   imports: [
@@ -61,7 +63,7 @@ import { WalletController } from '@api/wallet.controller';
     PackageModule,
     SubscriptionModule,
     WalletModule,
-    WalletModule
+    VoteModule
 
   ],
   controllers: [
@@ -74,7 +76,8 @@ import { WalletController } from '@api/wallet.controller';
     HistoryController,
     PackageController,
     SubscriptionController,
-    WalletController
+    WalletController,
+    VoteController
 
   ],
   providers: [
