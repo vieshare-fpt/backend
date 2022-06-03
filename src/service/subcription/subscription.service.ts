@@ -75,8 +75,8 @@ export class SubscriptionService {
   }
 
   async checkUserIsPremium(userId: string): Promise<boolean> {
-    const allSubsciption = await this.subscriptionRepository.isPremium(userId)
-    return allSubsciption;
+    const isPremium = await this.subscriptionRepository.isPremium(userId);
+    return isPremium;
 
   }
 }

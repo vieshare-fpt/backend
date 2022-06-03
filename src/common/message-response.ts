@@ -30,5 +30,7 @@ export const MessageResponse: IMessageResponse = {
   [StatusCode.PACKAGE_NOT_EXISTING]: 'The package is not existed.',
   [StatusCode.WALLET_ALREADY_EXISTED]: 'The user already have a wallet, each user can only own one wallet.',
   [StatusCode.WALLET_NOT_EXISTED]: 'The not existed.',
-  [StatusCode.USER_ALREADY_PREMIUM]: "User is already a premium user, can't subscribe to the packages now."
+  [StatusCode.USER_ALREADY_PREMIUM]: "User is already a premium user, can't subscribe to the packages now.",
+  [StatusCode.USER_NOT_PREMIUM_CAN_NOT_VOTE_POST]: 'This is a premium post, only premium users can vote for this post, become premium user to vote',
+  [StatusCode.OUT_OF_RANGE_VOTE]: 'Voting only between 0 and 5'
 };

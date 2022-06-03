@@ -5,6 +5,7 @@ import { UserEntity } from "@data/entity/user.entity";
 import { CommentEntity } from "./comment.entity";
 import { CategoryEntity } from "./category.entity";
 import { HistoryEntity } from "./history.entity";
+import { VoteEntity } from "./vote.entity";
 
 @Entity('posts')
 export class PostEntity {
@@ -35,10 +36,10 @@ export class PostEntity {
   @Column({ name: 'authorId' })
   authorId: string;
 
-  @CreateDateColumn({ name: 'publishDate'})
+  @CreateDateColumn({ name: 'publishDate' })
   publishDate: Date;
 
-  @UpdateDateColumn({ name: 'lastUpdated'})
+  @UpdateDateColumn({ name: 'lastUpdated' })
   lastUpdated: Date;
 
   @Column({ name: 'views', default: 0 })
@@ -50,8 +51,17 @@ export class PostEntity {
   @Column({ name: 'postType', type: 'enum', enum: TypePost, default: TypePost.Free, nullable: false })
   type: TypePost;
 
-  @OneToMany(() => CommentEntity, (commentEntity) => commentEntity.post)
+  @OneToMany(
+    () => CommentEntity,
+    (commentEntity) => commentEntity.post
+  )
   comments: Promise<CommentEntity[]>
+
+  @OneToMany(
+    () => VoteEntity,
+    (voteEntity) => voteEntity.post
+  )
+  votes: Promise<VoteEntity[]>
 
   @OneToMany(
     () => HistoryEntity,
