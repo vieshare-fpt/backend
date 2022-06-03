@@ -16,9 +16,9 @@ export class TransactionRequest{
     @ApiProperty()
     @IsNotEmpty()
     @IsUUID()
-    bankID: string;
+    bankId: string;
 
     @ApiProperty()
     @IsUUID()
-    walletID: string;
+    walletId: string;
 }

@@ -10,6 +10,7 @@ import { EmailExistedException } from '@exception/user/email-existed.exception';
 import { OldPasswordIncorrectException } from '@exception/user/old-password-not-correct.exception';
 import { UserNotExistedException } from '@exception/user/user-not-existed.exception';
 import { Gender } from '@constant/user-gender.enum';
+import { InfoUserResponse } from '@data/response/info-user.response';
 
 const MAX_RECOMMEND_USER = 15;
 
@@ -50,6 +51,13 @@ export class UserService {
 
   async getUsersByEmails(email: string[]): Promise<UserEntity[]> {
     return await this.userRepository.findAllByEmails(email);
+  }
+
+  async getInfoByUserId(userId: string): Promise<InfoUserResponse> {
+    const userEntity = await this.getUserByUserId(userId);
+    const infoUserResponse = InfoUserResponse.fromUserEntity(userEntity);
+
+    return infoUserResponse
   }
 
   async updateInfo(

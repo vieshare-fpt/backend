@@ -5,7 +5,6 @@ https://docs.nestjs.com/providers#services
 import { TransactionEnum } from '@constant/type-transaction.enum';
 import { TransactionEntity } from '@data/entity/transaction.entity';
 import { TransactionRequest } from '@data/request/new-transaction.request';
-import { BalanceNotEnough } from '@exception/wallet/balance-not-enough.exception';
 import { Injectable } from '@nestjs/common';
 import { TransactionRepository } from '@repository/transaction.repository';
 import { WalletRepository } from '@repository/wallet.repository';
@@ -18,18 +17,22 @@ export class TransactionService {
 
 
     async createTransaction(
-        user_id: string,
-        status: boolean,
+        userId: string,
+        isSuccess: boolean,
         transactionRequest: TransactionRequest,
     ): Promise<TransactionEntity> {
         const transaction: TransactionEntity = new TransactionEntity();
 
         transaction.date = new Date();
         transaction.amount = transactionRequest.amount;
-        transaction.bank_id = transactionRequest.bankID;
-        transaction.wallet_id = transactionRequest.walletID;
+        transaction.bankId = transactionRequest.bankId;
+        transaction.walletId = transactionRequest.walletId;
         transaction.type = transactionRequest.typeTransaction;
+<<<<<<< HEAD
         transaction.isSuccess =  status;
+=======
+        transaction.isSuccess =  isSuccess;
+>>>>>>> ace27344ce38f549019086d21bc36d70f9e8896b
 
         return await this.transactionRepository.create();
     }

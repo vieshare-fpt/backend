@@ -8,7 +8,7 @@ export class BankEntity {
     id: string;
 
     @Column({name: 'name', nullable: false})
-    bank_name: string;
+    name: string;
 
     @OneToMany(
         () => TransactionEntity,
