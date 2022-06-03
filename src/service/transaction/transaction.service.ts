@@ -29,7 +29,7 @@ export class TransactionService {
         transaction.bank_id = transactionRequest.bankID;
         transaction.wallet_id = transactionRequest.walletID;
         transaction.type = transactionRequest.typeTransaction;
-        transaction.isStatus =  status;
+        transaction.isSuccess =  status;
 
         return await this.transactionRepository.create();
     }

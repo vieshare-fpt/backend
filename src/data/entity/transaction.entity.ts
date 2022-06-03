@@ -41,6 +41,6 @@ export class TransactionEntity {
     type: TransactionEnum;
 
     @Column({ name: 'status'})
-    isStatus: boolean;
+    isSuccess: boolean;
 
 }

@@ -41,6 +41,7 @@ export class WalletService {
         const isCheck = await this.walletRepository.isCheck(user_id, amount, typeTransaction);
         if (!isCheck) {
             throw new BalanceNotEnough();
+             
         }
         return (await this.walletRepository.
             update({ id: user_id }, { balance: amount })).affected ? true : false;

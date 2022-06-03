@@ -12,7 +12,7 @@ export class BankEntity {
 
     @OneToMany(
         () => TransactionEntity,
-        (transaction) => transaction.bank_id,
+        (transaction) => transaction.bank,
     )
     transaction: Promise<TransactionEntity[]>;
 }
