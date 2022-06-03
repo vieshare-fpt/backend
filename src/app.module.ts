@@ -24,6 +24,13 @@ import { FollowModule } from '@service/follow/follow.module';
 import { FollowController } from '@api/follow.controller';
 import { HistoryModule } from '@service/history/history.module';
 import { HistoryController } from '@api/history.controller';
+import { PackageModule } from '@service/package/package.module';
+import { PackageController } from '@api/package.controller';
+import { Subscription } from 'rxjs';
+import { SubscriptionModule } from '@service/subcription/subscription.module';
+import { SubscriptionController } from '@api/subscription.controller';
+import { WalletModule } from '@service/wallet/wallet.module';
+import { WalletController } from '@api/wallet.controller';
 
 @Module({
   imports: [
@@ -51,6 +58,10 @@ import { HistoryController } from '@api/history.controller';
     CommentModule,
     FollowModule,
     HistoryModule,
+    PackageModule,
+    SubscriptionModule,
+    WalletModule,
+    WalletModule
 
   ],
   controllers: [
@@ -61,6 +72,9 @@ import { HistoryController } from '@api/history.controller';
     CommentController,
     FollowController,
     HistoryController,
+    PackageController,
+    SubscriptionController,
+    WalletController
 
   ],
   providers: [

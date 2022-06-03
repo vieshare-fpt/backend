@@ -1,6 +1,6 @@
 import { StatusPost } from "@constant/status-post.enum"
 import { TypePost } from "@constant/types-post.enum";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { UserEntity } from "@data/entity/user.entity";
 import { CommentEntity } from "./comment.entity";
 import { CategoryEntity } from "./category.entity";
@@ -15,7 +15,7 @@ export class PostEntity {
   title: string
 
   @Column({ name: 'categoryId' })
-  categoryId: string
+  categoryId: string;
 
   @ManyToOne(
     () => CategoryEntity, (categoryEntity) => categoryEntity.posts)
@@ -23,26 +23,26 @@ export class PostEntity {
   category: Promise<CategoryEntity>;
 
   @Column({ name: 'description', type: 'text' })
-  description: string
+  description: string;
 
   @Column({ name: 'content', type: 'text' })
-  content: string
+  content: string;
 
   @ManyToOne(() => UserEntity, (userEntity) => userEntity.posts)
   @JoinColumn({ name: 'authorId' })
   author: Promise<UserEntity>;
 
   @Column({ name: 'authorId' })
-  authorId: string
+  authorId: string;
 
-  @Column({ name: 'publishDate', type: 'bigint' })
-  publishDate: number
+  @CreateDateColumn({ name: 'publishDate'})
+  publishDate: Date;
 
-  @Column({ name: 'lastUpdated', type: 'bigint' })
-  lastUpdated: number
+  @UpdateDateColumn({ name: 'lastUpdated'})
+  lastUpdated: Date;
 
   @Column({ name: 'views', default: 0 })
-  views: number
+  views: number;
 
   @Column({ name: 'status', type: 'enum', enum: StatusPost, default: StatusPost.Publish, nullable: false })
   status: StatusPost;

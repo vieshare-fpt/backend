@@ -8,7 +8,7 @@ export class CommmentRepository extends Repository<CommentEntity>{
         comment.postId = postId;
         comment.userId = userId;
         comment.content = content;
-        comment.publishDate = new Date().getTime();
+        comment.publishDate = new Date();
         return await this.save(comment);
     }
 

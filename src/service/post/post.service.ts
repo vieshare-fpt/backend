@@ -63,7 +63,7 @@ export class PostService {
     postEntity.content = newPostRequest.content;
     postEntity.authorId = authorId;
     postEntity.description = newPostRequest.description;
-    postEntity.publishDate = new Date().getTime();
+    postEntity.publishDate = new Date();
     postEntity.lastUpdated = postEntity.publishDate;
     postEntity.views = 0;
     postEntity.type = newPostRequest.type;
@@ -99,7 +99,7 @@ export class PostService {
     postEntity.title = updatePostRequest.title;
     postEntity.categoryId = updatePostRequest.categoryId;
     postEntity.content = updatePostRequest.content;
-    postEntity.lastUpdated = new Date().getTime();
+    postEntity.lastUpdated = new Date();
     postEntity.type = updatePostRequest.type;
 
     return (await this.postRepository.update({ id: existedPost.id }, { ...existedPost, ...postEntity })).affected ? true : false

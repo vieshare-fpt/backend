@@ -29,8 +29,8 @@ export class HistoryEntity {
   @Column('postId')
   postId: string;
 
-  @Column({ name: 'lastDateRead', type: 'bigint' })
-  lastDateRead: number;
+  @CreateDateColumn({ name: 'lastDateRead'})
+  lastDateRead: Date;
 
 
 }

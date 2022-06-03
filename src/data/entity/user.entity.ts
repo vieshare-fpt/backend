@@ -14,6 +14,7 @@ import { HistoryEntity } from './history.entity';
 import { PostEntity } from './post.entity';
 import { FollowEntity } from './follow.entity';
 import { WalletEntity } from './wallet.entity';
+import { SubscriptionEntity } from './subscription.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -51,8 +52,6 @@ export class UserEntity {
   @Column({ nullable: true, default: false })
   isDefaultPassword: boolean;
 
-  @Column({ default: false })
-  isPremium: boolean;
 
   @OneToMany(() => TokenEntity, (token) => token.user)
   tokens: Promise<TokenEntity[]>;
@@ -86,5 +85,11 @@ export class UserEntity {
     (wallet) => wallet.user,
   )
   wallet: Promise<WalletEntity>;
- 
+
+  @OneToMany(
+    () => SubscriptionEntity,
+    (subscriptionEntity) => subscriptionEntity.user
+  )
+  subcription: Promise<SubscriptionEntity[]>
+
 }

@@ -7,40 +7,40 @@ import { WalletEntity } from "./wallet.entity";
 
 @Entity('transactions')
 export class TransactionEntity {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @ManyToOne(
-        () => WalletEntity,
-        (wallet) => wallet.transactions
+  @ManyToOne(
+    () => WalletEntity,
+    (wallet) => wallet.transactions
 
-    )
-    @JoinColumn({name: 'walletID'})
-    wallet: Promise<WalletEntity>;
-    @Column({name: 'walletID'})
-    wallet_id: string;
+  )
+  @JoinColumn({ name: 'walletId' })
+  wallet: Promise<WalletEntity>;
+  @Column({ name: 'walletId' })
+  walletId: string;
 
 
-    @PrimaryColumn({ name: 'date' })
-    date: Date;
+  @PrimaryColumn({ name: 'date', type: 'date' })
+  date: Date;
 
-    @Column({ name: 'amount', type: 'float' })
-    amount: number;
+  @Column({ name: 'amount', type: 'float' })
+  amount: number;
 
-    
-    @ManyToOne(
-        () => BankEntity,
-        (bank) => bank.transaction
-    )
-    @JoinColumn({name: 'bankID'})
-    bank: Promise<BankEntity>;
-    @Column({name: 'bankID'})
-    bank_id: string;
 
-    @Column({ name: 'typeTrans', type: 'enum', enum :TransactionEnum, nullable: false})
-    type: TransactionEnum;
+  @ManyToOne(
+    () => BankEntity,
+    (bank) => bank.transaction
+  )
+  @JoinColumn({ name: 'bankId' })
+  bank: Promise<BankEntity>;
+  @Column({ name: 'bankId' })
+  bankId: string;
 
-    @Column({ name: 'status'})
-    isStatus: boolean;
+  @Column({ name: 'typeTrans', type: 'enum', enum: TransactionEnum, nullable: false })
+  type: TransactionEnum;
+
+  @Column({ name: 'isSuccess' })
+  isSuccess: boolean;
 
 }

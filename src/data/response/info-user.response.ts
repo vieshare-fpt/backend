@@ -2,7 +2,7 @@ import { Role } from '@constant/role.enum';
 import { Gender } from '@constant/user-gender.enum';
 import { UserEntity } from '@data/entity/user.entity';
 
-export class UserResponse {
+export class InfoUserResponse {
   id: string;
 
   name: string;
@@ -11,30 +11,19 @@ export class UserResponse {
 
   gender: Gender;
 
-  phone: string;
-
-  email: string;
-
   roles: Role[];
 
   avatar: string;
 
-  isDefaultPassword: boolean;
 
-  isPremium: boolean
-
-  static fromUserEntity(user: UserEntity, isPremium: boolean): UserResponse {
-    const userResponse = new UserResponse();
+  static fromUserEntity(user: UserEntity): InfoUserResponse {
+    const userResponse = new InfoUserResponse();
     userResponse.id = user.id;
     userResponse.name = user.name;
     userResponse.dateOfBirth = user.dob;
     userResponse.gender = user.gender;
-    userResponse.phone = user.phone;
-    userResponse.email = user.email;
     userResponse.roles = user.roles;
     userResponse.avatar = user.avatar;
-    userResponse.isDefaultPassword = user.isDefaultPassword;
-    userResponse.isPremium = isPremium;
 
     return userResponse;
   }

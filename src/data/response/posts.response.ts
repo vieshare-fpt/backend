@@ -17,10 +17,10 @@ export class PostsResponse {
     authorId: string;
 
     @ApiProperty()
-    publishDate: number;
+    publishDate: Date;
 
     @ApiProperty()
-    lastUpdated: number | null;
+    lastUpdated: Date | null;
 
     @ApiProperty()
     views: number;
