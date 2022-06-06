@@ -23,8 +23,5 @@ export class WalletController {
     const walletReponse = await this.walletService.getWalletByUserId(currentUser.id);
     return walletReponse;
   }
-
-
-
-
+  
 }

@@ -31,28 +31,10 @@ export class WalletService {
     walletEntity.userId = userId;
     walletEntity.balance = 0;
 
-<<<<<<< HEAD
-    async updateWallet(
-        user_id: string,
-        amount: number,
-        typeTransaction: TransactionEnum,
-    ): Promise<boolean> {
-        const existedUser = await this.userRepository.findOne(user_id);
-        if (!existedUser) {
-            throw new UserNotExistedException();
-        }
-        const isCheck = await this.walletRepository.isCheck(user_id, amount, typeTransaction);
-        if (!isCheck) {
-            throw new BalanceNotEnough();
-             
-        }
-        return (await this.walletRepository.
-            update({ id: user_id }, { balance: amount })).affected ? true : false;
-=======
     return await this.walletRepository.save(walletEntity);
   }
 
-  //To do fix
+  //TODO fix
   async updateWallet(
     userId: string,
     amount: number,
@@ -65,10 +47,10 @@ export class WalletService {
     const isCheck = await this.walletRepository.isCheck(userId, amount, typeTransaction);
     if (!isCheck) {
       throw new BalanceNotEnoughException();
->>>>>>> ace27344ce38f549019086d21bc36d70f9e8896b
     }
+    const newBalance = await this.walletRepository.getNewBalance(userId, amount, typeTransaction);
     return (await this.walletRepository.
-      update({ id: userId }, { balance: amount })).affected ? true : false;
+      update({ id: userId }, { balance: newBalance })).affected ? true : false;
   }
 
 
