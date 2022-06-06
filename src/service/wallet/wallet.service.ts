@@ -44,7 +44,7 @@ export class WalletService {
     if (!userExisted) {
       throw new UserNotExistedException();
     }
-    const isCheck = await this.walletRepository.isCheck(userId, amount, typeTransaction);
+    const isCheck = await this.walletRepository.isCheckBalance(userId, amount, typeTransaction);
     if (!isCheck) {
       throw new BalanceNotEnoughException();
     }

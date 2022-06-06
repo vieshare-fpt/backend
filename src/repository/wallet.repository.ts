@@ -18,7 +18,7 @@ export class WalletRepository extends Repository<WalletEntity> {
     return balance;
   }
 
-  async isCheck(
+  async isCheckBalance(
     userId: string,
     amount: number,
     typeTrans: string,
