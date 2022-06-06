@@ -15,6 +15,7 @@ import { Roles } from "@decorator/role.decorator";
 import { PostNotExistedException } from "@exception/post/post-not-existed.exception";
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from "@nestjs/common";
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { BonusStatisticService } from "@service/bonusStatistic/bonusStatistic.service";
 import { HistoryService } from "@service/history/history.service";
 import { PostService } from "@service/post/post.service";
 import { SubscriptionService } from "@service/subcription/subscription.service";
@@ -27,7 +28,8 @@ export class PostController {
     private postService: PostService,
     private userSerice: UserService,
     private historyService: HistoryService,
-    private subscriptionService: SubscriptionService
+    private subscriptionService: SubscriptionService,
+    private bonusStatisticService: BonusStatisticService
 
   ) { }
 
@@ -119,6 +121,7 @@ export class PostController {
     const post = await this.postService.getPostById(postId)
     await this.historyService.saveHistoryForUsers(postId, user.id);
     await this.postService.updateViewsPost(postId);
+    await this.bonusStatisticService.makeBonusStatistic(postId);
     return HttpResponse.success(post);
   }
 

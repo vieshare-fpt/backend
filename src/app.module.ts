@@ -26,13 +26,17 @@ import { HistoryModule } from '@service/history/history.module';
 import { HistoryController } from '@api/history.controller';
 import { PackageModule } from '@service/package/package.module';
 import { PackageController } from '@api/package.controller';
-import { Subscription } from 'rxjs';
 import { SubscriptionModule } from '@service/subcription/subscription.module';
 import { SubscriptionController } from '@api/subscription.controller';
 import { WalletModule } from '@service/wallet/wallet.module';
 import { WalletController } from '@api/wallet.controller';
 import { VoteModule } from '@service/vote/vote.module';
 import { VoteController } from '@api/vote.controller';
+import { BonusFormulaModule } from '@service/bonusFormula/bonusFormula.module';
+import { BonusStatisticModule } from '@service/bonusStatistic/bonusStatistic.module';
+import { BonusFormulaController } from '@api/bonusFormula.controller';
+import { BonusStatisticController } from '@api/bonusStatistic.controller';
+
 
 @Module({
   imports: [
@@ -63,7 +67,9 @@ import { VoteController } from '@api/vote.controller';
     PackageModule,
     SubscriptionModule,
     WalletModule,
-    VoteModule
+    VoteModule,
+    BonusFormulaModule,
+    BonusStatisticModule
 
   ],
   controllers: [
@@ -77,7 +83,9 @@ import { VoteController } from '@api/vote.controller';
     PackageController,
     SubscriptionController,
     WalletController,
-    VoteController
+    VoteController,
+    BonusFormulaController,
+    BonusStatisticController
 
   ],
   providers: [

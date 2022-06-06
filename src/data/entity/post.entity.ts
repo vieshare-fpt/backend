@@ -6,6 +6,7 @@ import { CommentEntity } from "./comment.entity";
 import { CategoryEntity } from "./category.entity";
 import { HistoryEntity } from "./history.entity";
 import { VoteEntity } from "./vote.entity";
+import { BonusStatisticEntity } from "./bonus-statistic.entity";
 
 @Entity('posts')
 export class PostEntity {
@@ -68,4 +69,10 @@ export class PostEntity {
     (historyEntity) => historyEntity.post
   )
   history: Promise<HistoryEntity[]>;
+
+  @OneToMany(
+    () => BonusStatisticEntity,
+    (bonusStatisticEntity) => bonusStatisticEntity.post
+  )
+  bonusStatistics: Promise<BonusStatisticEntity[]>
 }
