@@ -21,9 +21,6 @@ import { CategoryNotExistedException } from "@exception/category/category-not-ex
 import { PostOrderBy } from "@constant/post-order-by.enum";
 import { Sort } from "@constant/sort.enum";
 import { HistoryRepository } from "@repository/history.repository";
-import { HistoryEntity } from "@data/entity/history.entity";
-import { CategoryEntity } from "@data/entity/category.entity";
-import { In, Not } from "typeorm";
 
 
 @Injectable()
