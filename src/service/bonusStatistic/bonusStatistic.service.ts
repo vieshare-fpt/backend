@@ -3,7 +3,7 @@ import { BonusStatisticStatus } from "@constant/bonus-statistic-status.enum";
 import { Sort } from "@constant/sort.enum";
 import { TypePost } from "@constant/types-post.enum";
 import { BonusStatisticEntity } from "@data/entity/bonus-statistic.entity";
-import { BonusHasWithdrawnBeforeException } from "@exception/bonusStatistic/Bonus-has-withdrawn-before.exception";
+import { BonusHasWithdrawnBeforeException } from "@exception/bonusStatistic/bonus-has-withdrawn-before.exception";
 import { BonusNotExistedException } from "@exception/bonusStatistic/bonus-statistic-not-existed.exception";
 import { NowCanNotWithdrawBonusException } from "@exception/bonusStatistic/now-can-not-withdraw-bonus.exception";
 import { PostNotExistedException } from "@exception/post/post-not-existed.exception";
