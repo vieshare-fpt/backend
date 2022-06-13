@@ -16,6 +16,9 @@ export class PostEntity {
   @Column({ name: 'title', type: 'nvarchar', length: 255 })
   title: string
 
+  @Column({ name: 'thumbnail', type: 'nvarchar', length: 255 })
+  thumbnail: string
+
   @Column({ name: 'categoryId' })
   categoryId: string;
 

@@ -21,6 +21,7 @@ import { CategoryNotExistedException } from "@exception/category/category-not-ex
 import { PostOrderBy } from "@constant/post-order-by.enum";
 import { Sort } from "@constant/sort.enum";
 import { HistoryRepository } from "@repository/history.repository";
+import { CommonService } from "@service/commom/common.service";
 
 
 @Injectable()
@@ -29,7 +30,8 @@ export class PostService {
     private postRepository: PostRepository,
     private userRepository: UserRepository,
     private cateRepostory: CategoryRepository,
-    private historyRepository: HistoryRepository
+    private historyRepository: HistoryRepository,
+    private commonService: CommonService<PostEntity | PostsResponse>
   ) { }
 
   async isAuthor(userId: string, postId): Promise<boolean> {
@@ -103,18 +105,20 @@ export class PostService {
   }
 
 
-  async updateViewsPost(id: string): Promise<boolean> {
-    const post = await this.postRepository.findOne({ id: id })
+  async updateViewsPost(postId: string): Promise<boolean> {
+    const post = await this.getPostById(postId);
     if (!post) {
       throw new PostNotExistedException();
     }
-    const updatePost = await this.postRepository.update(id, { views: post.views + 1 })
+    const updatePost = await this.postRepository.update({ id: postId }, { views: post.views + 1 })
     return updatePost.affected ? true : false;
   }
 
   async getFreePostsById(postId: string): Promise<PostEntity> {
     const post = await this.getPostById(postId);
-
+    if (!post) {
+      throw new PostNotExistedException();
+    }
     const isPremium = (post.type == TypePost.Premium)
     if (isPremium) {
       throw new UserNotPremiumException()
@@ -125,24 +129,31 @@ export class PostService {
 
   async getPostById(id: string): Promise<PostEntity> {
     const post = await this.postRepository.findOne({ id: id })
-    return post
+    return post;
   }
 
-  async countPosts(): Promise<number> {
-    return await this.postRepository.count();
-  }
 
   async getPosts(perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
     page = page ? page : 1;
     const postsResponse = await this.postRepository.getPosts(perPage * (page - 1), perPage)
-    const total = await this.countPosts();
-    return this.getPagingResponse(postsResponse, perPage, page, total)
+    const total = await this.postRepository.count();
+    return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
   }
 
   async isExisted(postId: string): Promise<boolean> {
     return (await this.postRepository.count({ where: { id: postId } })) > 0 ? true : false;
   }
 
+  async getRelatedPosts(postId: string, perPage: number, page: number) {
+    const post = await this.getPostById(postId);
+    if (!post) {
+      throw new PostNotExistedException();
+    }
+    page = page ? page : 1;
+    const relatedPostsResponse = await this.postRepository.getRelatedPosts(post, perPage * (page - 1), perPage);
+    const total = await this.postRepository.countRelatedPosts(post);
+    return this.commonService.getPagingResponse(relatedPostsResponse, perPage, page, total)
+  }
 
   async getPostsByAuthorId(
     authorId: string,
@@ -157,7 +168,7 @@ export class PostService {
     page = page | 1;
     const postsResponse = await this.postRepository.getPostsByAuthorId(authorId, perPage * (page - 1), perPage)
     const total = await this.postRepository.countPostsByAuthorId(authorId);
-    return this.getPagingResponse(postsResponse, perPage, page, total)
+    return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
 
   }
 
@@ -200,7 +211,7 @@ export class PostService {
       }
       const postsResponse = await this.postRepository.getPostsByAuthorIdAndOrderBy(author.id, orderBy, sort, perPage * (page - 1), perPage);
       const total = await this.postRepository.countPostsByAuthorIdAndOrderBy(author.id, orderBy, sort)
-      return this.getPagingResponse(postsResponse, perPage, page, total)
+      return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
 
     }
 
@@ -208,28 +219,16 @@ export class PostService {
     const postsResponse = await this.postRepository.getPostsOrderBy(orderBy, sort, perPage * (page - 1), perPage);
     const total = await this.postRepository.countPostsOrderBy(orderBy, sort);
 
-    return this.getPagingResponse(postsResponse, perPage, page, total)
+    return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
 
-
-  }
-
-  private getPagingResponse(postResponse: PostsResponse[], perPage: number, page: number, total: number): HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]> {
-    let totalPages = Math.ceil(total / perPage);
-
-    if (!perPage) {
-      const metaData = new PagingRepsone(page, total, total, 1);
-      return HttpPagingResponse.success(postResponse, metaData);
-    }
-    const metaData = new PagingRepsone(page, perPage, total, totalPages);
-    return HttpPagingResponse.success(postResponse, metaData);
 
   }
 
   async suggestForAnonymus(perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
     page = page ? page : 1;
     const postsResponse = await this.postRepository.getPostsRandom(perPage * (page - 1), perPage)
-    const total = await this.countPosts();
-    return this.getPagingResponse(postsResponse, perPage, page, total)
+    const total = await this.postRepository.count();
+    return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
   }
 
   async suggestForUser(userId: string, perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
@@ -251,7 +250,7 @@ export class PostService {
     if (postsResponse.length <= 10) {
       return await this.suggestForAnonymus(perPage, page)
     }
-    return this.getPagingResponse(postsResponse, perPage, page, total)
+    return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
   }
 
 
