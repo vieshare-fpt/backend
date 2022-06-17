@@ -36,6 +36,8 @@ import { BonusFormulaModule } from '@service/bonusFormula/bonusFormula.module';
 import { BonusStatisticModule } from '@service/bonusStatistic/bonusStatistic.module';
 import { BonusFormulaController } from '@api/bonusFormula.controller';
 import { BonusStatisticController } from '@api/bonusStatistic.controller';
+import { CoverLetterController } from '@api/coverLetter.controller';
+import { CoverLetterModule } from '@service/coverLetter/coverLetter.module';
 
 
 @Module({
@@ -69,7 +71,8 @@ import { BonusStatisticController } from '@api/bonusStatistic.controller';
     WalletModule,
     VoteModule,
     BonusFormulaModule,
-    BonusStatisticModule
+    BonusStatisticModule,
+    CoverLetterModule
 
   ],
   controllers: [
@@ -85,7 +88,8 @@ import { BonusStatisticController } from '@api/bonusStatistic.controller';
     WalletController,
     VoteController,
     BonusFormulaController,
-    BonusStatisticController
+    BonusStatisticController,
+    CoverLetterController
 
   ],
   providers: [

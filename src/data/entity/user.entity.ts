@@ -16,6 +16,7 @@ import { FollowEntity } from './follow.entity';
 import { WalletEntity } from './wallet.entity';
 import { SubscriptionEntity } from './subscription.entity';
 import { VoteEntity } from './vote.entity';
+import { CoverLetterEntity } from './cover-letter.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -99,4 +100,9 @@ export class UserEntity {
   )
   votes: Promise<VoteEntity[]>
 
+  @OneToMany(
+    () => CoverLetterEntity,
+    (coverLetterEntity) => coverLetterEntity.user
+  )
+  coverLetters: Promise<CoverLetterEntity[]>
 }

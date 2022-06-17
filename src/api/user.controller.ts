@@ -13,6 +13,9 @@ import { UpdatePassRequest } from '@data/request/update-pass.request';
 import { WalletService } from '@service/wallet/wallet.service';
 import { SubscriptionService } from '@service/subcription/subscription.service';
 import { InfoUserResponse } from '@data/response/info-user.response';
+import { Roles } from '@decorator/role.decorator';
+import { Role } from '@constant/role.enum';
+import { ChangeRoleUserRequest } from '@data/request/change-role-user.request';
 
 @ApiTags('User')
 @Controller('api/users')
@@ -38,9 +41,9 @@ export class UserController {
   @Get('/info/:id')
   @ApiParam({ name: 'id', type: 'string', required: true, example: 'ccff1be6-8db1-4d95-8022-41b62df5edb4' })
   async getInfoByUserId(
-    @Param('id') userId : string 
-  ):Promise<InfoUserResponse>{
-    const info =  await this.userService.getInfoByUserId(userId)
+    @Param('id') userId: string
+  ): Promise<InfoUserResponse> {
+    const info = await this.userService.getInfoByUserId(userId)
     return info;
   }
 
@@ -81,5 +84,15 @@ export class UserController {
     return HttpResponse.success();
   }
 
+  @ApiBearerAuth()
+  @Roles(Role.Admin)
+  @Patch('change-role')
+  async changeRole(
+    @Body() changeRoleUserRequest: ChangeRoleUserRequest
+  ) {
+    await this.userService.changeRoleUserRequest(changeRoleUserRequest);
+    return HttpResponse.success()
+
+  }
 
 }
