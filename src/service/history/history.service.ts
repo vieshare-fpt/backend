@@ -31,7 +31,6 @@ export class HistoryService {
     }
 
     const saveHistory = await this.historyRepository.saveHistory(post,user);
-    console.log('save : ',saveHistory)
     return saveHistory;
   }
 
