@@ -10,7 +10,7 @@ import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { BonusStatisticService } from "@service/bonusStatistic/bonusStatistic.service";
 
 @ApiTags('Bonus Statistic')
-@Controller('api/bonus-statistic')
+@Controller('api/bonus-statistics')
 export class BonusStatisticController {
   constructor(
     private bonusStatisticService: BonusStatisticService

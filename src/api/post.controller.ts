@@ -128,8 +128,11 @@ export class PostController {
       const saveHistory = await this.historyService.saveHistoryForUsers(postId, user.id);
       if (saveHistory) {
         await this.postService.updateViewsPost(postId);
+        if (isPostPremium) {
+          await this.bonusStatisticService.makeBonusStatistic(postId);
+        }
       }
-      return HttpResponse.success(post)
+      return HttpResponse.success(post);
     }
     throw new BadRequestException()
   }

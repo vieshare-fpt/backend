@@ -7,7 +7,7 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { SubscriptionService } from "@service/subcription/subscription.service";
 
 @ApiTags('Subcription')
-@Controller('api/subscription')
+@Controller('api/subscriptions')
 export class SubscriptionController {
   constructor(
     private subscriptionService: SubscriptionService
