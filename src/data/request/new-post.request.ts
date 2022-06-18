@@ -9,6 +9,10 @@ export class NewPostRequest {
 
     @ApiProperty()
     @IsNotEmpty()
+    thumnail : string
+
+    @ApiProperty()
+    @IsNotEmpty()
     @IsUUID()
     categoryId: string
 

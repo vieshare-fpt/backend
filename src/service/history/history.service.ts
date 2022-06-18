@@ -29,11 +29,10 @@ export class HistoryService {
     if (!user) {
       throw new UserNotExistedException();
     }
-    const history = new HistoryEntity();
-    history.userId = user.id;
-    history.postId = post.id;
-    history.lastDateRead = new Date();
-    return this.historyRepository.save(history)
+
+    const saveHistory = await this.historyRepository.saveHistory(post,user);
+    console.log('save : ',saveHistory)
+    return saveHistory;
   }
 
 

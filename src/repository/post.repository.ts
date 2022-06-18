@@ -1,10 +1,10 @@
-import { PostOrderBy } from "@constant/post-order-by.enum";
-import { Role } from "@constant/role.enum";
-import { Sort } from "@constant/sort.enum";
-import { PostEntity } from "@data/entity/post.entity";
-import { PostsResponse } from "@data/response/posts.response";
-import { EntityRepository, In, Not, Repository } from "typeorm";
-import { HistoryRepository } from "./history.repository";
+import { PostOrderBy } from '@constant/post-order-by.enum';
+import { Role } from '@constant/role.enum';
+import { Sort } from '@constant/sort.enum';
+import { PostEntity } from '@data/entity/post.entity';
+import { PostsResponse } from '@data/response/posts.response';
+import { EntityRepository, In, Not, Repository } from 'typeorm';
+import { HistoryRepository } from './history.repository';
 
 @EntityRepository(PostEntity)
 export class PostRepository extends Repository<PostEntity>{
@@ -43,7 +43,7 @@ export class PostRepository extends Repository<PostEntity>{
 
   async getPostsRandom(skip?: number, take?: number): Promise<PostsResponse[]> {
     const posts = await this.createQueryBuilder()
-      .orderBy("RAND()")
+      .orderBy('RAND()')
       .skip(skip || 0)
       .take(take || null)
       .getMany();
@@ -77,6 +77,31 @@ export class PostRepository extends Repository<PostEntity>{
 
       }
     })
+    return count;
+  }
+
+  async getRelatedPosts(post: PostEntity, skip?: number, take?: number): Promise<PostsResponse[]> {
+
+    const relatedPosts = await this.createQueryBuilder('posts')
+      .where('posts.categoryId = :categoryId', { categoryId: post.categoryId })
+      .andWhere('posts.id != :id', { id: post.id })
+      .orderBy('RAND()')
+      .addOrderBy('posts.views', 'DESC')
+      .skip(skip || 0)
+      .take(take || null)
+      .getMany();
+    const postsResponse = relatedPosts.map(({ content, ...postResponse }) => postResponse)
+    return postsResponse;
+  }
+
+
+  async countRelatedPosts(post: PostEntity): Promise<number> {
+
+    const count = await this.createQueryBuilder('posts')
+      .where('posts.categoryId = :categoryId', { categoryId: post.categoryId })
+      .andWhere('posts.id != :id', { id: post.id })
+      .getCount();
+
     return count;
   }
 
