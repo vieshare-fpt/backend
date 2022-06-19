@@ -8,7 +8,7 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { VoteService } from "@service/vote/vote.service";
 
 @ApiTags('Vote')
-@Controller('/api/vote')
+@Controller('/api/votes')
 export class VoteController {
   constructor(
     private voteService: VoteService

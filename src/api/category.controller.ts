@@ -15,7 +15,7 @@ import { Public } from "@decorator/public.decorator";
 
 
 @ApiTags('Category')
-@Controller('api/category')
+@Controller('api/categories')
 export class CategoryController {
     constructor(private categoryService: CategoryService) { }
 

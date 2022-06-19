@@ -12,7 +12,7 @@ import { CommentService } from "@service/comment/comment.service";
 import { UpdateResult } from "typeorm";
 
 @ApiTags('Comment')
-@Controller('api/comment')
+@Controller('api/comments')
 export class CommentController {
     constructor(
         private commentService: CommentService

@@ -14,7 +14,7 @@ import { BonusFormulaService } from "@service/bonusFormula/bonusFormula.service"
 
 
 @ApiTags('Bonus Forumla')
-@Controller('api/bonus-formula')
+@Controller('api/bonus-formulas')
 export class BonusFormulaController {
   constructor(
     private bonusFormulaService: BonusFormulaService

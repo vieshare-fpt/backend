@@ -1,5 +1,5 @@
 import { CryptStrategy } from '@service/auth/crypt.strategy';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { RegisterRequest } from '@data/request/register.request';
 import { UserEntity } from '@data/entity/user.entity';
 import { UserRepository } from '@repository/user.repository';
@@ -11,6 +11,8 @@ import { OldPasswordIncorrectException } from '@exception/user/old-password-not-
 import { UserNotExistedException } from '@exception/user/user-not-existed.exception';
 import { Gender } from '@constant/user-gender.enum';
 import { InfoUserResponse } from '@data/response/info-user.response';
+import { ChangeRoleUserRequest } from '@data/request/change-role-user.request';
+import { PositionApply } from '@constant/position-apply.enum';
 
 const MAX_RECOMMEND_USER = 15;
 
@@ -105,4 +107,20 @@ export class UserService {
     return existedUser.id;
   }
 
+  async changeRoleUserRequest(changeRoleUserRequest: ChangeRoleUserRequest) {
+    const userId = changeRoleUserRequest.userId;
+    const existedUser = await this.userRepository.findOne({ id: userId });
+    if (!existedUser) {
+      throw new UserNotExistedException();
+    }
+
+    const newRole = Role[changeRoleUserRequest.newRole];
+    if (!newRole) {
+      throw new BadRequestException()
+    }
+
+    const changeRole = await this.userRepository.update({ id: userId }, { roles: [newRole] })
+    return changeRole.affected ? true : false
+
+  }
 }
