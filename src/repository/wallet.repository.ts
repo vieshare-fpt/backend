@@ -18,6 +18,7 @@ export class WalletRepository extends Repository<WalletEntity> {
     return balance;
   }
 
+  //check balance with type of transaction
   async isCheckBalance(
     userId: string,
     amount: number,
@@ -37,4 +38,12 @@ export class WalletRepository extends Repository<WalletEntity> {
     }
     return balance + amount;
   }
+
+  async getWalletId(userId: string): 
+  Promise<string> {
+    const walletId = await (await this.findOne({userId: userId})).id;
+    
+    return walletId;
+  }
+
 }

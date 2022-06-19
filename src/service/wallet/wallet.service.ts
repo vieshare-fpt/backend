@@ -1,10 +1,12 @@
 
 import { TransactionEnum } from '@constant/type-transaction.enum';
 import { WalletEntity } from '@data/entity/wallet.entity';
+import { UpdateWalletRequest } from '@data/request/update-wallet.request';
 import { UserNotExistedException } from '@exception/user/user-not-existed.exception';
 import { BalanceNotEnoughException } from '@exception/wallet/balance-not-enough.exception';
 import { WalletAlreadyExistedException } from '@exception/wallet/wallet-already-existed.exception';
 import { Injectable } from '@nestjs/common';
+import { TransactionRepository } from '@repository/transaction.repository';
 import { UserRepository } from '@repository/user.repository';
 import { WalletRepository } from '@repository/wallet.repository';
 
@@ -13,6 +15,7 @@ export class WalletService {
   constructor(
     private walletRepository: WalletRepository,
     private userRepository: UserRepository,
+    private transactionRepository: TransactionRepository,
   ) { }
 
   async createWallet(
@@ -34,23 +37,32 @@ export class WalletService {
     return await this.walletRepository.save(walletEntity);
   }
 
-  //TODO fix
+    
   async updateWallet(
     userId: string,
-    amount: number,
-    typeTransaction: TransactionEnum,
+    updateWalletRequest: UpdateWalletRequest,
   ): Promise<boolean> {
     const userExisted = await this.userRepository.findOne(userId);
     if (!userExisted) {
       throw new UserNotExistedException();
     }
-    const isCheck = await this.walletRepository.isCheckBalance(userId, amount, typeTransaction);
+
+    const isCheck = await this.walletRepository.isCheckBalance(userId, updateWalletRequest.amount, updateWalletRequest.type);
     if (!isCheck) {
       throw new BalanceNotEnoughException();
     }
-    const newBalance = await this.walletRepository.getNewBalance(userId, amount, typeTransaction);
-    return (await this.walletRepository.
+
+
+    const newBalance = await this.walletRepository.getNewBalance(userId, updateWalletRequest.amount, updateWalletRequest.type);
+    const updateResult = (await this.walletRepository.
       update({ id: userId }, { balance: newBalance })).affected ? true : false;
+    
+    const walletId = await this.walletRepository.getWalletId(userId);
+    
+    const createTransaction = await this.transactionRepository.createTransaction(walletId, updateResult, updateWalletRequest);
+
+
+    return  updateResult;
   }
 
 
@@ -64,6 +76,5 @@ export class WalletService {
 
     return await this.walletRepository.findOne({ userId: userId });
   }
-
 
 }

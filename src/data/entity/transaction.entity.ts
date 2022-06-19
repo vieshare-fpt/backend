@@ -1,7 +1,6 @@
 import { TransactionEnum } from "@constant/type-transaction.enum";
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
-import { BankEntity } from "./bank.entity";
-import { UserEntity } from "./user.entity";
+import { BankEntity } from "./bank.entity";;
 import { WalletEntity } from "./wallet.entity";
 
 
