@@ -18,11 +18,32 @@ export class WalletRepository extends Repository<WalletEntity> {
     return balance;
   }
 
-  async isCheck(
+  //check balance with type of transaction
+  async isCheckBalance(
     userId: string,
     amount: number,
     typeTrans: string,
   ): Promise<boolean> {
     return TransactionEnum.Withdraw == typeTrans && amount <= await this.getBalanceByUserId(userId);
   }
+
+  async getNewBalance(
+    userId: string,
+    amount: number,
+    typeTrans: string,
+  ) : Promise<number> {
+    const balance = await this.getBalanceByUserId(userId);
+    if(TransactionEnum.Withdraw == typeTrans) {
+      return balance -  amount;
+    }
+    return balance + amount;
+  }
+
+  async getWalletId(userId: string): 
+  Promise<string> {
+    const walletId = await (await this.findOne({userId: userId})).id;
+    
+    return walletId;
+  }
+
 }

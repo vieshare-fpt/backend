@@ -37,7 +37,7 @@ export class AuthController {
   async login(
     @Body() request: LoginRequest,
     @Headers('User-Agent') agent: string,
-  ): Promise<HttpResponse<LoginResponse>> {
+  ): Promise<HttpResponse<LoginResponse>> { 
     const result = await this.authService.login(request, agent);
 
     return HttpResponse.success(result);
