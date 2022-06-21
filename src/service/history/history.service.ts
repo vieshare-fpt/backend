@@ -30,25 +30,20 @@ export class HistoryService {
       throw new UserNotExistedException();
     }
 
-    const saveHistory = await this.historyRepository.saveHistory(post,user);
+    const saveHistory = await this.historyRepository.saveHistory(post, user);
     return saveHistory;
   }
 
 
 
-  async getHistoryForUser(userId: string): Promise<HistoryEntity[]> {
+  async getHistoryForUser(userId: string, perPage: number, page: number): Promise<HistoryEntity[]> {
     const user = await this.userRepository.findOne({ id: userId });
     if (!user) {
       throw new UserNotExistedException();
     }
-    const history = await this.historyRepository.find({
-      where: {
-        userId: userId
-      },
-      order: {
-        lastDateRead: 'DESC'
-      }
-    })
+    page = page ? page : 1;
+    const history = await this.historyRepository.getAll({ userId: userId }, perPage * (page - 1), perPage)
+
     return history;
   }
 

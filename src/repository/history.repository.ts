@@ -1,11 +1,28 @@
 import { HistoryEntity } from "@data/entity/history.entity";
 import { PostEntity } from "@data/entity/post.entity";
 import { UserEntity } from "@data/entity/user.entity";
-import { EntityRepository, LessThan, MoreThan, Repository } from "typeorm";
+import { EntityRepository, FindConditions, LessThan, MoreThan, Repository } from "typeorm";
 
 
 @EntityRepository(HistoryEntity)
 export class HistoryRepository extends Repository<HistoryEntity>{
+
+  async getAll(where: FindConditions<HistoryEntity>, skip?: number, take?: number) {
+
+    const history = await this.find(
+      {
+        where: where,
+        order: {
+          lastDateRead: 'DESC'
+        },
+        relations: ['user', 'post'],
+        skip: skip || 0,
+        take: take || null
+      });
+    const postsResponse = this.formatHistoryResponse(history);
+    return postsResponse;
+  }
+
   async getCategoryReadMostByUserId(userId: string, withinWeek?: number) {
     if (!(await this.historyNotNullByUserId(userId))) return []
     withinWeek = withinWeek ? withinWeek : 1
@@ -85,4 +102,21 @@ export class HistoryRepository extends Repository<HistoryEntity>{
     }
     return null;
   }
+
+
+  private formatHistoryResponse(object: any) {
+    const postsResponse = object.map(({ content, authorId, categoryId, ...postResponse }) => {
+      this.changeNamePropertyObject(postResponse, '__user__', 'user');
+      this.changeNamePropertyObject(postResponse, '__post__', 'post');
+      delete postResponse['user']['password']
+      delete postResponse['post']['content']
+      return postResponse;
+    })
+    return postsResponse;
+  }
+  private changeNamePropertyObject(object: any, oldName: string, newname: string) {
+    object[newname] = object[oldName]
+    delete object[oldName]
+  }
+
 }
