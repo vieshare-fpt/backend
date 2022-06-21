@@ -1,30 +1,31 @@
 import { Injectable } from "@nestjs/common";
 import { CategoryRepository } from "@repository/category.repository";
 import { CategoryEntity } from "@data/entity/category.entity";
-import { CategoryExistedException } from "@exception/category/category-existed.exception";
-import { NewCategoryRequest } from "@data/request/new-category.request";
 import { CategoryNotExistedException } from "@exception/category/category-not-existed.exception";
 import { UpdateCategoryRequest } from "@data/request/update-category.request";
 import { HttpResponse } from "@common/http.response";
 import { CategoryResponse } from "@data/response/category.response";
+import { HttpPagingResponse } from "@common/http-paging.response";
+import { CommonService } from "@service/commom/common.service";
 
 
 @Injectable()
 export class CategoryService {
     constructor(
         private categoryRepository: CategoryRepository,
-    ) {}
+        private commonService: CommonService<CategoryResponse | CategoryEntity>
+    ) { }
 
-    async createCategory(
-        request: NewCategoryRequest,
-    ): Promise<CategoryEntity> {
-        if (!this.categoryRepository.isExist(request.name)) {
-            throw new CategoryExistedException();
-        }
-        const categoryEntity: CategoryEntity = new CategoryEntity();
-        categoryEntity.name = request.name;
-        return await this.categoryRepository.save(categoryEntity);
-    };
+    // async createCategory(
+    //     request: NewCategoryRequest,
+    // ): Promise<CategoryEntity> {
+    //     if (!this.categoryRepository.isExist(request.name)) {
+    //         throw new CategoryExistedException();
+    //     }
+    //     const categoryEntity: CategoryEntity = new CategoryEntity();
+    //     categoryEntity.name = request.name;
+    //     return await this.categoryRepository.save(categoryEntity);
+    // };
 
     async getCategoryById(
         id: string,
@@ -37,13 +38,12 @@ export class CategoryService {
     };
 
     async getListCategory(
-
-    ): Promise<CategoryResponse[]>{
-        const category = await this.categoryRepository.find({});
-        if (!category) {
-            throw new CategoryNotExistedException();
-        }
-        return category;
+        perPage: number, page: number
+    ): Promise<HttpResponse<CategoryResponse[]> | HttpPagingResponse<CategoryResponse[]>> {
+        page = page ? page : 1;
+        const category = await this.categoryRepository.getListCategory(perPage * (page - 1), perPage);
+        const total  = await this.categoryRepository.count();
+        return this.commonService.getPagingResponse(category, perPage, page, total);
     };
 
     async deleteCategory(
@@ -72,6 +72,6 @@ export class CategoryService {
         updateCateEntity.isDelete = request.isDelete;
 
         return await this.categoryRepository
-            .update({ id: request.id },{...existedCate,...updateCateEntity})
+            .update({ id: request.id }, { ...existedCate, ...updateCateEntity })
     }
 }
