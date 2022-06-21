@@ -9,7 +9,7 @@ export class NewPostRequest {
 
     @ApiProperty()
     @IsNotEmpty()
-    thumnail : string
+    thumbnail : string
 
     @ApiProperty()
     @IsNotEmpty()
