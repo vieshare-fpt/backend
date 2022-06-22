@@ -127,8 +127,8 @@ export class PostService {
     return post;
   }
 
-  async getPostById(id: string): Promise<PostEntity> {
-    const post = await this.postRepository.findOne({ id: id })
+  async getPostById(id: string): Promise<any> {
+    const post = await this.postRepository.getPost({ id: id })
     return post;
   }
 
