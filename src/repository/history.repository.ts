@@ -108,8 +108,10 @@ export class HistoryRepository extends Repository<HistoryEntity>{
     const postsResponse = object.map(({ content, authorId, categoryId, ...postResponse }) => {
       this.changeNamePropertyObject(postResponse, '__user__', 'user');
       this.changeNamePropertyObject(postResponse, '__post__', 'post');
-      delete postResponse['user']['password']
-      delete postResponse['post']['content']
+      delete postResponse['user']['password'];
+      delete postResponse['post']['content'];
+      delete postResponse['userId'];
+      delete postResponse['postId'];
       return postResponse;
     })
     return postsResponse;
