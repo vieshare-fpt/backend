@@ -14,7 +14,6 @@ import { StatusPost } from "@constant/status-post.enum";
 import { Role } from "@constant/role.enum";
 import { UserNotPremiumException } from "@exception/user/user-not-premium.exception";
 import { HttpResponse } from "@common/http.response";
-import { PagingRepsone } from "@data/response/paging.response";
 import { HttpPagingResponse } from "@common/http-paging.response";
 import { CategoryRepository } from "@repository/category.repository";
 import { CategoryNotExistedException } from "@exception/category/category-not-existed.exception";
@@ -34,7 +33,7 @@ export class PostService {
     private commonService: CommonService<PostEntity | PostsResponse>
   ) { }
 
-  async isAuthor(userId: string, postId): Promise<boolean> {
+  async isAuthor(userId: string, postId: string): Promise<boolean> {
     if (!userId || !postId) {
       return false
     }
@@ -59,6 +58,7 @@ export class PostService {
     const postEntity: PostEntity = new PostEntity();
     postEntity.title = newPostRequest.title;
     postEntity.categoryId = newPostRequest.categoryId;
+    postEntity.thumbnail = newPostRequest.thumbnail;
     postEntity.content = newPostRequest.content;
     postEntity.authorId = authorId;
     postEntity.description = newPostRequest.description;
@@ -135,7 +135,7 @@ export class PostService {
 
   async getPosts(perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
     page = page ? page : 1;
-    const postsResponse = await this.postRepository.getPosts(perPage * (page - 1), perPage)
+    const postsResponse = await this.postRepository.getPosts({}, perPage * (page - 1), perPage)
     const total = await this.postRepository.count();
     return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
   }
@@ -166,8 +166,8 @@ export class PostService {
     }
 
     page = page | 1;
-    const postsResponse = await this.postRepository.getPostsByAuthorId(authorId, perPage * (page - 1), perPage)
-    const total = await this.postRepository.countPostsByAuthorId(authorId);
+    const postsResponse = await this.postRepository.getPosts({ authorId: authorId }, perPage * (page - 1), perPage)
+    const total = await this.postRepository.countPosts({ authorId: authorId });
     return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
 
   }
@@ -209,15 +209,15 @@ export class PostService {
       if (!author) {
         throw new AuthorNotExistedException()
       }
-      const postsResponse = await this.postRepository.getPostsByAuthorIdAndOrderBy(author.id, orderBy, sort, perPage * (page - 1), perPage);
-      const total = await this.postRepository.countPostsByAuthorIdAndOrderBy(author.id, orderBy, sort)
+      const postsResponse = await this.postRepository.getPostsOrderBy({ authorId: author.id }, orderBy, sort, perPage * (page - 1), perPage);
+      const total = await this.postRepository.countPosts({ authorId: author.id })
       return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
 
     }
 
 
-    const postsResponse = await this.postRepository.getPostsOrderBy(orderBy, sort, perPage * (page - 1), perPage);
-    const total = await this.postRepository.countPostsOrderBy(orderBy, sort);
+    const postsResponse = await this.postRepository.getPostsOrderBy({}, orderBy, sort, perPage * (page - 1), perPage);
+    const total = await this.postRepository.countPosts({});
 
     return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
 

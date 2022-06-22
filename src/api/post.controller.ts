@@ -67,7 +67,7 @@ export class PostController {
   @ApiQuery({ name: 'author_id', type: 'string', example: 'ccff1be6-8db1-4d95-8022-41b62df5edb4', required: false })
   @ApiQuery({ name: 'per_page', type: 'number', example: 10, required: false })
   @ApiQuery({ name: 'page', type: 'number', example: 1, required: false })
-  async getAllPostTopViews(
+  async getAllPost(
     @Query('order_by') orderBy: PostOrderBy,
     @Query('sort') sort: Sort,
     @Query('author_id') authorId: string,

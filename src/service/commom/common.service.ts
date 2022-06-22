@@ -3,7 +3,7 @@ import { HttpResponse } from "@common/http.response";
 import { PagingRepsone } from "@data/response/paging.response";
 
 export class CommonService<T> {
-  public getPagingResponse(postResponse: T[], perPage: number, page: number, total: number): HttpResponse<T[]> | HttpPagingResponse<T[]> {
+  public getPagingResponse(postResponse: T[] | any, perPage: number, page: number, total: number): HttpResponse<T[]> | HttpPagingResponse<T[]> {
     let totalPages = Math.ceil(total / perPage);
 
     if (!perPage) {
