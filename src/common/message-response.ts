@@ -36,5 +36,6 @@ export const MessageResponse: IMessageResponse = {
   [StatusCode.POST_NOT_PREMIUM]: 'Post is note premium post.',
   [StatusCode.BONUS_NOT_EXISTED]: 'Bonus not existed.',
   [StatusCode.BONUS_HAS_WITHDRAWN_BEFORE]: 'Bonus has been withdrawn before.',
-  [StatusCode.NOW_CAN_NOT_WITHDRAW_BONUS]: "Now can't withdraw bonus."
+  [StatusCode.NOW_CAN_NOT_WITHDRAW_BONUS]: "Now can't withdraw bonus.",
+  [StatusCode.COVER_LETTER_NOT_EXISTED]: "Cover letter not existed."
 };
