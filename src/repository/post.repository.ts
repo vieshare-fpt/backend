@@ -2,7 +2,6 @@ import { PostOrderBy } from '@constant/post-order-by.enum';
 import { Sort } from '@constant/sort.enum';
 import { PostEntity } from '@data/entity/post.entity';
 import { PostsResponse } from '@data/response/posts.response';
-import { AppException } from '@exception/app.exception';
 import { EntityRepository, FindConditions, In, Not, Repository } from 'typeorm';
 
 @EntityRepository(PostEntity)
@@ -10,15 +9,11 @@ export class PostRepository extends Repository<PostEntity>{
   async getPosts(where: FindConditions<PostEntity>, skip?: number, take?: number): Promise<PostsResponse[] | any> {
     const posts = await this.find({
       where: where,
+      relations: ['author', 'category'],
       skip: skip || 0,
       take: take || null
     })
-    const postsResponse = posts.map(({ content, authorId, categoryId, ...postResponse }) => {
-      this.changeNamePropertyObject(postResponse, '__author__', 'author');
-      this.changeNamePropertyObject(postResponse, '__category__', 'category');
-      delete postResponse['author']['password']
-      return postResponse;
-    })
+    const postsResponse = this.formatPostsResponse(posts)
     return postsResponse;
   }
 
