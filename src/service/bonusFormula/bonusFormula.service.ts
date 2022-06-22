@@ -32,7 +32,7 @@ export class BonusFormulaService {
 
   async getAllBounsFormual(perPage: number, page: number, isActive?: Boolean) {
     page = page ? page : 1;
-    const bonusFormulasResponse = await this.bonusFormulaRepository.getPackges(perPage * (page - 1), perPage, isActive)
+    const bonusFormulasResponse = await this.bonusFormulaRepository.getBonusFormulas(perPage * (page - 1), perPage, isActive)
     const total = await this.bonusFormulaRepository.countIsActive(isActive);
 
     return this.commonService.getPagingResponse(bonusFormulasResponse, perPage, page, total)
@@ -50,7 +50,7 @@ export class BonusFormulaService {
     if (!orderBy) {
       throw new BadRequestException()
     }
-    const bonusFormulasResponse = await this.bonusFormulaRepository.getPackgesOrderBy(orderBy, sort, perPage * (page - 1), perPage, isActive);
+    const bonusFormulasResponse = await this.bonusFormulaRepository.getBonusFormulasOrderBy(orderBy, sort, perPage * (page - 1), perPage, isActive);
     const total = await this.bonusFormulaRepository.countIsActive(isActive);
     return this.commonService.getPagingResponse(bonusFormulasResponse, perPage, page, total)
   }

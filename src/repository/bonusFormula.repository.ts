@@ -16,7 +16,7 @@ export class BonusFormulaReposiotry extends Repository<BonusFormulaEntity> {
     })
 
   }
-  async getPackges(skip?: number, take?: number, isActive?: Boolean): Promise<BonusFormulaEntity[]> {
+  async getBonusFormulas(skip?: number, take?: number, isActive?: Boolean): Promise<BonusFormulaEntity[]> {
 
     const packagesResponse = await this.find(
       {
@@ -31,7 +31,7 @@ export class BonusFormulaReposiotry extends Repository<BonusFormulaEntity> {
     return packagesResponse;
   }
 
-  async getPackgesOrderBy(orderBy: BonusFormulaOrderBy, sort: Sort, skip?: number, take?: number, isActive?: Boolean): Promise<BonusFormulaEntity[]> {
+  async getBonusFormulasOrderBy(orderBy: BonusFormulaOrderBy, sort: Sort, skip?: number, take?: number, isActive?: Boolean): Promise<BonusFormulaEntity[]> {
     const packges = await this.find(
       {
         where: {
