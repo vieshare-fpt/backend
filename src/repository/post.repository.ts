@@ -2,10 +2,20 @@ import { PostOrderBy } from '@constant/post-order-by.enum';
 import { Sort } from '@constant/sort.enum';
 import { PostEntity } from '@data/entity/post.entity';
 import { PostsResponse } from '@data/response/posts.response';
-import { EntityRepository, FindConditions, In, Not, Repository } from 'typeorm';
+import { EntityRepository, FindCondition, FindConditions, In, Not, Repository } from 'typeorm';
 
 @EntityRepository(PostEntity)
 export class PostRepository extends Repository<PostEntity>{
+
+  async getPost(where: FindCondition<PostEntity>) {
+    const post = await this.findOne({
+      where: where,
+      relations: ['author', 'category']
+    })
+    const postResponse = this.formatPostResponse(post);
+    return postResponse;
+  }
+
   async getPosts(where: FindConditions<PostEntity>, skip?: number, take?: number): Promise<PostsResponse[] | any> {
     const posts = await this.find({
       where: where,
@@ -119,15 +129,23 @@ export class PostRepository extends Repository<PostEntity>{
     const postsResponse = object.map(({ content, authorId, categoryId, ...postResponse }) => {
       this.changeNamePropertyObject(postResponse, '__author__', 'author');
       this.changeNamePropertyObject(postResponse, '__category__', 'category');
-      delete postResponse['author']['password']
+      delete postResponse['author']['password'];
       return postResponse;
     })
     return postsResponse;
   }
-  private changeNamePropertyObject(object: any, oldName: string, newname: string) {
-    object[newname] = object[oldName]
-    delete object[oldName]
-    return true
+
+  private formatPostResponse(object: any) {
+    const { authorId, categoryId, ...postResponse } = object;
+    this.changeNamePropertyObject(postResponse, '__author__', 'author');
+    this.changeNamePropertyObject(postResponse, '__category__', 'category');
+    delete postResponse['author']['password'];
+    return postResponse;
+  }
+  private changeNamePropertyObject(object: any, oldName: string, newName: string) {
+    object[newName] = object[oldName];
+    delete object[oldName];
+    return object;
   }
 
 }

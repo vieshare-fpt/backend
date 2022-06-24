@@ -5,7 +5,7 @@ import { NewFormulaRequest } from "@data/request/new-formula.request";
 import { FormulaNotExistedException } from "@exception/bonusFormula/formula-not-existed.exception";
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { BonusFormulaReposiotry } from "@repository/bonusFormula.repository";
-import { CommonService } from "@service/commom/common.service";
+import { CommonService } from "@service/common/common.service";
 
 @Injectable()
 export class BonusFormulaService {
@@ -32,7 +32,7 @@ export class BonusFormulaService {
 
   async getAllBounsFormual(perPage: number, page: number, isActive?: Boolean) {
     page = page ? page : 1;
-    const bonusFormulasResponse = await this.bonusFormulaRepository.getPackges(perPage * (page - 1), perPage, isActive)
+    const bonusFormulasResponse = await this.bonusFormulaRepository.getBonusFormulas(perPage * (page - 1), perPage, isActive)
     const total = await this.bonusFormulaRepository.countIsActive(isActive);
 
     return this.commonService.getPagingResponse(bonusFormulasResponse, perPage, page, total)
@@ -50,7 +50,7 @@ export class BonusFormulaService {
     if (!orderBy) {
       throw new BadRequestException()
     }
-    const bonusFormulasResponse = await this.bonusFormulaRepository.getPackgesOrderBy(orderBy, sort, perPage * (page - 1), perPage, isActive);
+    const bonusFormulasResponse = await this.bonusFormulaRepository.getBonusFormulasOrderBy(orderBy, sort, perPage * (page - 1), perPage, isActive);
     const total = await this.bonusFormulaRepository.countIsActive(isActive);
     return this.commonService.getPagingResponse(bonusFormulasResponse, perPage, page, total)
   }

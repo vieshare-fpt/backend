@@ -8,7 +8,7 @@ import { UpdatePackageRequest } from "@data/request/update-package.request";
 import { PackageNotExistedException } from "@exception/package/package-not-existed.exception";
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { PackageRepository } from "@repository/package.repository";
-import { CommonService } from "@service/commom/common.service";
+import { CommonService } from "@service/common/common.service";
 import { type } from "os";
 
 @Injectable()

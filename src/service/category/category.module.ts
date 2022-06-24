@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { CategoryRepository } from "@repository/category.repository";
 import { PostRepository } from "@repository/post.repository";
-import { CommonService } from "@service/commom/common.service";
+import { CommonService } from "@service/common/common.service";
 import { CategoryService } from "./category.service";
 
 @Module({

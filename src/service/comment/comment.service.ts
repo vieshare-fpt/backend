@@ -16,69 +16,74 @@ import { UpdateResult } from "typeorm";
 
 @Injectable()
 export class CommentService {
-    constructor(
-        private commentRepository: CommmentRepository,
-        private userRepository: UserRepository,
-        private postRepository: PostRepository
-    ) { }
+  constructor(
+    private commentRepository: CommmentRepository,
+    private userRepository: UserRepository,
+    private postRepository: PostRepository
+  ) { }
 
-    async createComment(postId: string, userId: string, content: string) {
-        const userExsited = await this.userRepository.findOne(userId)
-        if (!userExsited) {
-            throw new UserNotExistedException()
-        }
-
-        const postExsited = await this.postRepository.findOne(postId)
-        if (!postExsited) {
-            throw new PostNotExistedException()
-        }
-
-        return await this.commentRepository.newComment(postExsited.id, userExsited.id, content)
+  async createComment(postId: string, userId: string, content: string) {
+    const userExsited = await this.userRepository.findOne(userId)
+    if (!userExsited) {
+      throw new UserNotExistedException()
     }
 
-    async getCommets(
-        paging: PagingRequest
-    ): Promise<HttpResponse<CommentEntity[]> | HttpPagingResponse<CommentEntity[]>> {
-        const page = paging.page | 1;
-        const perPage = paging.per_page;
-        const comments = await this.commentRepository.getComments(perPage * (page - 1), perPage)
-        const total = await this.commentRepository.countComments();
-        const totalPages = Math.ceil(total / perPage);
-        const metaData = new PagingRepsone(page, perPage, total, totalPages);
-        if (!perPage) {
-            return HttpResponse.success(comments);
-        }
-        return HttpPagingResponse.success(comments, metaData);
+    const postExsited = await this.postRepository.findOne(postId)
+    if (!postExsited) {
+      throw new PostNotExistedException()
     }
 
-    async getCommetsByPostId(
-        postId: string,
-        paging: PagingRequest
-    ): Promise<HttpResponse<CommentEntity[]> | HttpPagingResponse<CommentEntity[]>> {
-        const page = paging.page | 1;
-        const perPage = paging.per_page;
-        const comments = await this.commentRepository.getCommentsByPostId(postId, perPage * (page - 1), perPage)
-        const total = await this.commentRepository.countComments(postId);
-        const totalPages = Math.ceil(total / perPage);
-        const metaData = new PagingRepsone(page, perPage, total, totalPages);
-        if (!perPage) {
-            return HttpResponse.success(comments);
-        }
-        return HttpPagingResponse.success(comments, metaData);
+    return await this.commentRepository.newComment(postExsited.id, userExsited.id, content)
+  }
+
+  async getCommets(
+    paging: PagingRequest
+  ): Promise<HttpResponse<CommentEntity[]> | HttpPagingResponse<CommentEntity[]>> {
+    const page = paging.page | 1;
+    const perPage = paging.per_page;
+    const comments = await this.commentRepository.getComments({}, perPage * (page - 1), perPage)
+    const total = await this.commentRepository.countComments({});
+    const totalPages = Math.ceil(total / perPage);
+    const metaData = new PagingRepsone(page, perPage, total, totalPages);
+    if (!perPage) {
+      return HttpResponse.success(comments);
+    }
+    return HttpPagingResponse.success(comments, metaData);
+  }
+
+  async getCommetsByPostId(
+    postId: string,
+    paging: PagingRequest
+  ): Promise<HttpResponse<CommentEntity[]> | HttpPagingResponse<CommentEntity[]>> {
+    const page = paging.page | 1;
+    const perPage = paging.per_page;
+    const comments = await this.commentRepository.getComments(
+      {
+        postId: postId
+      },
+      perPage * (page - 1),
+      perPage)
+    const total = await this.commentRepository.countComments({ postId: postId });
+    const totalPages = Math.ceil(total / perPage);
+    const metaData = new PagingRepsone(page, perPage, total, totalPages);
+    if (!perPage) {
+      return HttpResponse.success(comments);
+    }
+    return HttpPagingResponse.success(comments, metaData);
+  }
+
+
+  async deleteComment(user: User, id: string): Promise<UpdateResult> {
+    const existedComment = await this.commentRepository.findOne(id);
+    if (!existedComment) {
+      throw new CommentNotExistedException();
     }
 
-
-    async deleteComment(user: User, id: string): Promise<UpdateResult> {
-        const existedComment = await this.commentRepository.findOne(id);
-        if (!existedComment) {
-            throw new CommentNotExistedException();
-        }
-
-        if (existedComment.userId !== user.id) {
-            throw new UserNotCommenterPostException();
-        }
-
-        return await this.commentRepository.update({ id: id }, { isDelete: true })
+    if (existedComment.userId !== user.id) {
+      throw new UserNotCommenterPostException();
     }
+
+    return await this.commentRepository.update({ id: id }, { isDelete: true })
+  }
 
 }

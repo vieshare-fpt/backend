@@ -2,11 +2,9 @@ import { HttpResponse } from "@common/http.response";
 import { User } from "@common/user";
 import { HistoryEntity } from "@data/entity/history.entity";
 import { PagingRequest } from "@data/request/paging.request";
-import { PostIdRequest } from "@data/request/postId.request";
 import { CurrentUser } from "@decorator/current-user.decorator";
-import { PublicPrivate } from "@decorator/public-private.decorator";
-import { Body, Controller, Get, Headers, HttpCode, HttpStatus, Post, Query } from "@nestjs/common";
-import { ApiBearerAuth, ApiHeader, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { Controller, Get, HttpCode, HttpStatus, Post, Query } from "@nestjs/common";
+import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { HistoryService } from "@service/history/history.service";
 
 @ApiTags('History')
