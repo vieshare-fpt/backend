@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { BonusFormulaReposiotry } from "@repository/bonusFormula.repository";
-import { CommonService } from "@service/commom/common.service";
+import { CommonService } from "@service/common/common.service";
 import { BonusFormulaService } from "./bonusFormula.service";
 
 @Module(

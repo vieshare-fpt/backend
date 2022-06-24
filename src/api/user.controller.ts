@@ -54,7 +54,7 @@ export class UserController {
   ): Promise<HttpResponse<UserResponse>> {
     const userEntity = await this.userService.getUserByUserId(user.id);
     const isPremium = await this.subscriptionService.checkUserIsPremium(user.id);
-    const userResponse = UserResponse.fromUserEntity(userEntity, isPremium);
+    const userResponse = UserResponse.formatUserEntity(userEntity, isPremium);
 
 
     return HttpResponse.success(userResponse);
@@ -65,12 +65,9 @@ export class UserController {
   async updateInfo(
     @CurrentUser() user: User,
     @Body() newInfo: UpdateInfoRequest,
-  ): Promise<HttpResponse<UserResponse>> {
-    const userEntity = await this.userService.updateInfo(user.id, newInfo);
-    const isPremium = await this.subscriptionService.checkUserIsPremium(user.id);
-    const userResponse = UserResponse.fromUserEntity(userEntity, isPremium);
-
-    return HttpResponse.success(userResponse);
+  ): Promise<HttpResponse<Boolean>> {
+    const updateInfo = await this.userService.updateInfo(user.id, newInfo);
+    return HttpResponse.success(updateInfo);
   }
 
   @ApiBearerAuth()

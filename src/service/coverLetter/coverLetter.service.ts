@@ -8,7 +8,7 @@ import { UserNotExistedException } from "@exception/user/user-not-existed.except
 import { Injectable } from "@nestjs/common";
 import { CoverLetterRepository } from "@repository/coverLetter.repository";
 import { UserRepository } from "@repository/user.repository";
-import { CommonService } from "@service/commom/common.service";
+import { CommonService } from "@service/common/common.service";
 import { UserService } from "@service/user/user.service";
 import { Not } from "typeorm";
 

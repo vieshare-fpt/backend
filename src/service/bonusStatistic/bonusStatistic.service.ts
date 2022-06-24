@@ -17,7 +17,7 @@ import { PostRepository } from "@repository/post.repository";
 import { UserRepository } from "@repository/user.repository";
 import { WalletRepository } from "@repository/wallet.repository";
 import { BonusFormulaService } from "@service/bonusFormula/bonusFormula.service";
-import { CommonService } from "@service/commom/common.service";
+import { CommonService } from "@service/common/common.service";
 
 
 @Injectable()

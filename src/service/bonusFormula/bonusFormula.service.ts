@@ -5,7 +5,7 @@ import { NewFormulaRequest } from "@data/request/new-formula.request";
 import { FormulaNotExistedException } from "@exception/bonusFormula/formula-not-existed.exception";
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { BonusFormulaReposiotry } from "@repository/bonusFormula.repository";
-import { CommonService } from "@service/commom/common.service";
+import { CommonService } from "@service/common/common.service";
 
 @Injectable()
 export class BonusFormulaService {

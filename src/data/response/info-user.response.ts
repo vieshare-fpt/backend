@@ -16,7 +16,7 @@ export class InfoUserResponse {
   avatar: string;
 
 
-  static fromUserEntity(user: UserEntity): InfoUserResponse {
+  static formatEntity(user: UserEntity): InfoUserResponse {
     const userResponse = new InfoUserResponse();
     userResponse.id = user.id;
     userResponse.name = user.name;

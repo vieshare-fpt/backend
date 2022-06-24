@@ -23,7 +23,7 @@ export class UserResponse {
 
   isPremium: boolean
 
-  static fromUserEntity(user: UserEntity, isPremium: boolean): UserResponse {
+  static formatUserEntity(user: UserEntity, isPremium: boolean): UserResponse {
     const userResponse = new UserResponse();
     userResponse.id = user.id;
     userResponse.name = user.name;

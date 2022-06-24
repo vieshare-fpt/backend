@@ -6,7 +6,7 @@ import { UpdateCategoryRequest } from "@data/request/update-category.request";
 import { HttpResponse } from "@common/http.response";
 import { CategoryResponse } from "@data/response/category.response";
 import { HttpPagingResponse } from "@common/http-paging.response";
-import { CommonService } from "@service/commom/common.service";
+import { CommonService } from "@service/common/common.service";
 
 
 @Injectable()

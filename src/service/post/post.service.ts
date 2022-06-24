@@ -20,7 +20,7 @@ import { CategoryNotExistedException } from "@exception/category/category-not-ex
 import { PostOrderBy } from "@constant/post-order-by.enum";
 import { Sort } from "@constant/sort.enum";
 import { HistoryRepository } from "@repository/history.repository";
-import { CommonService } from "@service/commom/common.service";
+import { CommonService } from "@service/common/common.service";
 
 
 @Injectable()

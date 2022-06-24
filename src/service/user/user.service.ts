@@ -57,7 +57,7 @@ export class UserService {
 
   async getInfoByUserId(userId: string): Promise<InfoUserResponse> {
     const userEntity = await this.getUserByUserId(userId);
-    const infoUserResponse = InfoUserResponse.fromUserEntity(userEntity);
+    const infoUserResponse = InfoUserResponse.formatEntity(userEntity);
 
     return infoUserResponse
   }
@@ -65,15 +65,8 @@ export class UserService {
   async updateInfo(
     userId: string,
     newInfo: UpdateInfoRequest,
-  ): Promise<UserEntity> {
-    return this.userRepository
-      .createQueryBuilder()
-      .update()
-      .set({ ...newInfo })
-      .where('id = :userId', { userId })
-      .returning('*')
-      .execute()
-      .then((res) => res.raw[0]);
+  ): Promise<boolean> {
+    return (await this.userRepository.update({ id: userId }, { ...newInfo })).affected ? true : false;
   }
 
   async updatePassword(
