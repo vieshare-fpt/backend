@@ -187,7 +187,7 @@ export class PostService {
   }
 
 
-  async getPostOrderBy(orderBy: PostOrderBy, sort: Sort, authorId: string, perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
+  async getPostOrderBy(orderBy: PostOrderBy, sort: Sort, authorId: string, categoryId: string, perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
     sort = sort && Sort[sort.toLocaleUpperCase()] ? Sort[sort] : Sort.ASC;
     page = page ? page : 1;
 
@@ -209,8 +209,18 @@ export class PostService {
       if (!author) {
         throw new AuthorNotExistedException()
       }
-      const postsResponse = await this.postRepository.getPostsOrderBy({ authorId: author.id }, orderBy, sort, perPage * (page - 1), perPage);
-      const total = await this.postRepository.countPosts({ authorId: author.id })
+
+    }
+    if(categoryId){
+    const category = await this.cateRepostory.findOne({ where: { id: categoryId } });
+      if (!category) {
+        throw new CategoryNotExistedException();
+      }
+    }
+    if (authorId || categoryId) {
+      const where = authorId && categoryId ? { authorId, categoryId } : authorId ? { authorId } : categoryId ? { authorId } : {};
+      const postsResponse = await this.postRepository.getPostsOrderBy(where, orderBy, sort, perPage * (page - 1), perPage);
+      const total = await this.postRepository.countPosts(where)
       return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
 
     }
