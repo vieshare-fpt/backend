@@ -65,15 +65,17 @@ export class PostController {
   @ApiQuery({ name: 'order_by', type: 'enum', enum: PostOrderBy, example: PostOrderBy.views, required: false })
   @ApiQuery({ name: 'sort', type: 'enum', enum: Sort, example: Sort.DESC, required: false })
   @ApiQuery({ name: 'author_id', type: 'string', example: 'ccff1be6-8db1-4d95-8022-41b62df5edb4', required: false })
+  @ApiQuery({ name: 'category_id', type: 'string', example: 'ccff1be6-8db1-4d95-8022-41b62df5edb4', required: false })
   @ApiQuery({ name: 'per_page', type: 'number', example: 10, required: false })
   @ApiQuery({ name: 'page', type: 'number', example: 1, required: false })
   async getAllPost(
     @Query('order_by') orderBy: PostOrderBy,
     @Query('sort') sort: Sort,
     @Query('author_id') authorId: string,
+    @Query('category_id') categoryId: string,
     @Query() paging: PagingRequest
   ): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
-    const postsResponse = await this.postService.getPostOrderBy(orderBy, sort, authorId, paging.per_page, paging.page);
+    const postsResponse = await this.postService.getPostOrderBy(orderBy, sort, authorId, categoryId, paging.per_page, paging.page);
     return postsResponse;
   }
 
