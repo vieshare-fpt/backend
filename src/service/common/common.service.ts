@@ -14,5 +14,12 @@ export class CommonService<T> {
     return HttpPagingResponse.success(postResponse, metaData);
 
   }
+  async removeUndefined(obj: any) {
+    return Object.keys(obj).reduce((acc, key) => {
+      const _acc = acc;
+      if (obj[key] !== undefined) _acc[key] = obj[key];
+      return _acc;
+    }, {})
+  }
 }
 
