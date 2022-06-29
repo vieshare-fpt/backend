@@ -30,7 +30,7 @@ export class PostService {
     private userRepository: UserRepository,
     private cateRepostory: CategoryRepository,
     private historyRepository: HistoryRepository,
-    private commonService: CommonService<PostEntity | PostsResponse>
+    private commonService: CommonService<PostEntity | PostsResponse | any>
   ) { }
 
   async isAuthor(userId: string, postId: string): Promise<boolean> {
@@ -211,20 +211,20 @@ export class PostService {
       }
 
     }
-    if(categoryId){
-    const category = await this.cateRepostory.findOne({ where: { id: categoryId } });
+    if (categoryId) {
+      const category = await this.cateRepostory.findOne({ where: { id: categoryId } });
       if (!category) {
         throw new CategoryNotExistedException();
       }
     }
     if (authorId || categoryId) {
-      const where = authorId && categoryId ? { authorId, categoryId } : authorId ? { authorId } : categoryId ? { authorId } : {};
+
+      const where = await this.commonService.removeUndefined({ authorId, categoryId });
       const postsResponse = await this.postRepository.getPostsOrderBy(where, orderBy, sort, perPage * (page - 1), perPage);
-      const total = await this.postRepository.countPosts(where)
+      const total = await this.postRepository.countPosts(where);
       return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
 
     }
-
 
     const postsResponse = await this.postRepository.getPostsOrderBy({}, orderBy, sort, perPage * (page - 1), perPage);
     const total = await this.postRepository.countPosts({});

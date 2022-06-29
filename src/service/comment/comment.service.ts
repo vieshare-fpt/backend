@@ -86,4 +86,6 @@ export class CommentService {
     return await this.commentRepository.update({ id: id }, { isDelete: true })
   }
 
+  
+
 }
