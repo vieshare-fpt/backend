@@ -29,12 +29,11 @@ export class PostRepository extends Repository<PostEntity>{
 
 
   async getPostsOrderBy(where: FindConditions<PostEntity>, orderBy: PostOrderBy, sort: Sort, skip?: number, take?: number): Promise<PostsResponse[] | any> {
+    const order = orderBy ? {[orderBy]: sort} : {};
     const posts = await this.find(
       {
         where: where,
-        order: {
-          [orderBy]: sort
-        },
+        order: order,
         relations: ['author', 'category'],
         skip: skip || 0,
         take: take || null
