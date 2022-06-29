@@ -191,18 +191,7 @@ export class PostService {
     sort = sort && Sort[sort.toLocaleUpperCase()] ? Sort[sort] : Sort.ASC;
     page = page ? page : 1;
 
-    if (!orderBy && authorId) {
-      return this.getPostsByAuthorId(authorId, perPage, page);
-    }
-
-    if (!orderBy) {
-      return this.getPosts(perPage, page);
-    }
-
     orderBy = PostOrderBy[orderBy];
-    if (!orderBy) {
-      throw new BadRequestException()
-    }
 
     if (authorId) {
       const author = await this.userRepository.findOne({ where: { id: authorId } });
