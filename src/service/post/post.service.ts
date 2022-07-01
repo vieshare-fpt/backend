@@ -114,18 +114,6 @@ export class PostService {
     return updatePost.affected ? true : false;
   }
 
-  async getFreePostsById(postId: string): Promise<PostEntity> {
-    const post = await this.getPostById(postId);
-    if (!post) {
-      throw new PostNotExistedException();
-    }
-    const isPremium = (post.type == TypePost.Premium)
-    if (isPremium) {
-      throw new UserNotPremiumException()
-    }
-
-    return post;
-  }
 
   async getPostById(id: string): Promise<any> {
     const post = await this.postRepository.getPost({ id: id })
@@ -133,13 +121,7 @@ export class PostService {
   }
 
 
-  async getPosts(perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
-    page = page ? page : 1;
-    const postsResponse = await this.postRepository.getPosts({}, perPage * (page - 1), perPage)
-    const total = await this.postRepository.count();
-    return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
-  }
-
+  
   async isExisted(postId: string): Promise<boolean> {
     return (await this.postRepository.count({ where: { id: postId } })) > 0 ? true : false;
   }
@@ -155,22 +137,7 @@ export class PostService {
     return this.commonService.getPagingResponse(relatedPostsResponse, perPage, page, total)
   }
 
-  async getPostsByAuthorId(
-    authorId: string,
-    perPage: number,
-    page: number
-  ): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
-    const author = await this.userRepository.findOne({ where: { id: authorId } });
-    if (!author) {
-      throw new UserNotExistedException()
-    }
 
-    page = page | 1;
-    const postsResponse = await this.postRepository.getPosts({ authorId: authorId }, perPage * (page - 1), perPage)
-    const total = await this.postRepository.countPosts({ authorId: authorId });
-    return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
-
-  }
 
 
   async deletePost(user: User, id: string): Promise<any> {
