@@ -68,7 +68,12 @@ export class UserService {
   ): Promise<boolean> {
     return (await this.userRepository.update({ id: userId }, { ...newInfo })).affected ? true : false;
   }
-
+  async updateAvatar(
+    userId: string,
+    newAvatar: string,
+  ): Promise<boolean> {
+    return (await this.userRepository.update({ id: userId }, { avatar: newAvatar })).affected ? true : false;
+  }
   async updatePassword(
     userId: string,
     request: UpdatePassRequest,
