@@ -16,6 +16,7 @@ import { InfoUserResponse } from '@data/response/info-user.response';
 import { Roles } from '@decorator/role.decorator';
 import { Role } from '@constant/role.enum';
 import { ChangeRoleUserRequest } from '@data/request/change-role-user.request';
+import { UpdateAvatarRequest } from '@data/request/update-avatar.request';
 
 @ApiTags('User')
 @Controller('api/users')
@@ -67,6 +68,16 @@ export class UserController {
     @Body() newInfo: UpdateInfoRequest,
   ): Promise<HttpResponse<Boolean>> {
     const updateInfo = await this.userService.updateInfo(user.id, newInfo);
+    return HttpResponse.success(updateInfo);
+  }
+
+  @ApiBearerAuth()
+  @Patch('avatar')
+  async updateAvatar(
+    @CurrentUser() user: User,
+    @Body() newAvatar: UpdateAvatarRequest,
+  ): Promise<HttpResponse<Boolean>> {
+    const updateInfo = await this.userService.updateAvatar(user.id, newAvatar.avatar);
     return HttpResponse.success(updateInfo);
   }
 
