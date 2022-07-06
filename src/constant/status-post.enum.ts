@@ -3,5 +3,6 @@ export enum StatusPost {
   Private = 'Private',
   Draft = 'Draft',
   Pending = 'Pending',
-  Delete = 'Delete'
+  Delete = 'Delete',
+  All = 'All'
 }
