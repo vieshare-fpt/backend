@@ -95,7 +95,19 @@ export class PostController {
     return await this.postService.suggestForUser(user.id, paging.per_page, paging.page)
   }
 
-
+  @PublicPrivate()
+  @Get('search')
+  @HttpCode(HttpStatus.OK)
+  @ApiQuery({ name: 'key', type: 'string', example: 'keyword', required: true })
+  @ApiQuery({ name: 'per_page', type: 'number', example: 10, required: false })
+  @ApiQuery({ name: 'page', type: 'number', example: 1, required: false })
+  async searchPost(
+    @Query('key') key: string,
+    @Query() paging: PagingRequest
+  ): Promise<any> {
+    const postsResponse = await this.postService.searchPost(key, paging.per_page, paging.page);
+    return postsResponse;
+  }
 
   @ApiBearerAuth()
   @PublicPrivate()

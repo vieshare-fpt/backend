@@ -1,5 +1,5 @@
 import { CommentEntity } from "@data/entity/comment.entity";
-import { EntityRepository, FindCondition, Repository } from "typeorm";
+import { EntityRepository, FindCondition, OrderByCondition, Repository } from "typeorm";
 
 @EntityRepository(CommentEntity)
 export class CommmentRepository extends Repository<CommentEntity>{
@@ -12,16 +12,18 @@ export class CommmentRepository extends Repository<CommentEntity>{
     return await this.save(comment);
   }
 
-  async getComments(where: FindCondition<CommentEntity>, skip?: number, take?: number): Promise<CommentEntity[]> {
+  async getComments(where: FindCondition<CommentEntity>, order: OrderByCondition, skip?: number, take?: number): Promise<CommentEntity[]> {
     const comments = await this.find(
       {
         where: where,
+        order: order,
         relations: ['user', 'post'],
         skip: skip || 0,
         take: take || null
       })
     const commentsResponse = this.formatCommentsResponse(comments);
     return commentsResponse;
+
   }
 
   async isCommenter(userId: string, commentId: string): Promise<Boolean> {
@@ -34,14 +36,14 @@ export class CommmentRepository extends Repository<CommentEntity>{
 
 
   private formatCommentsResponse(object: any) {
-    const postsResponse = object.map(({ content, authorId, categoryId, ...postResponse }) => {
-      this.changeNamePropertyObject(postResponse, '__user__', 'user');
-      this.changeNamePropertyObject(postResponse, '__post__', 'post');
-      delete postResponse['user']['password'];
-      delete postResponse['post']['content'];
-      delete postResponse['userId'];
-      delete postResponse['postId'];
-      return postResponse;
+    const postsResponse = object.map(({ ...commentResponse }) => {
+      this.changeNamePropertyObject(commentResponse, '__user__', 'user');
+      this.changeNamePropertyObject(commentResponse, '__post__', 'post');
+      delete commentResponse['user']['password'];
+      delete commentResponse['post']['content'];
+      delete commentResponse['userId'];
+      delete commentResponse['postId'];
+      return commentResponse;
     })
     return postsResponse;
   }

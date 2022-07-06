@@ -27,9 +27,16 @@ export class PostRepository extends Repository<PostEntity>{
     return postsResponse;
   }
 
+  async searchPost(key: string, skip?: number, take?: number): Promise<PostsResponse[] | any> {
+    const posts = await this.createQueryBuilder("post")
+      .where("post.title like :key", { key: `%${key}%` })
+      .getMany();
+    return posts;
+  }
+
 
   async getPostsOrderBy(where: FindConditions<PostEntity>, orderBy: PostOrderBy, sort: Sort, skip?: number, take?: number): Promise<PostsResponse[] | any> {
-    const order = orderBy ? {[orderBy]: sort} : {};
+    const order = orderBy ? { [orderBy]: sort } : {};
     const posts = await this.find(
       {
         where: where,
