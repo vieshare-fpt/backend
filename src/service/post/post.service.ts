@@ -120,8 +120,14 @@ export class PostService {
     return post;
   }
 
+  async searchPost(key: string, perPage: number, page: number) {
+    page = page ? page : 1;
+    const post = await this.postRepository.searchPost(key, perPage * (page - 1), perPage)
+    return post;
+  }
 
-  
+
+
   async isExisted(postId: string): Promise<boolean> {
     return (await this.postRepository.count({ where: { id: postId } })) > 0 ? true : false;
   }
