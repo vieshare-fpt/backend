@@ -1,5 +1,6 @@
 import { PostOrderBy } from '@constant/post-order-by.enum';
 import { Sort } from '@constant/sort.enum';
+import { StatusPost } from '@constant/status-post.enum';
 import { PostEntity } from '@data/entity/post.entity';
 import { PostsResponse } from '@data/response/posts.response';
 import { EntityRepository, FindCondition, FindConditions, In, Not, Repository } from 'typeorm';
@@ -54,6 +55,7 @@ export class PostRepository extends Repository<PostEntity>{
     const posts = await this.createQueryBuilder('posts')
       .innerJoinAndSelect('posts.author', 'author')
       .innerJoinAndSelect('posts.category', 'category')
+      .where('posts.status = :status', { status: StatusPost.Publish })
       .orderBy('RAND()')
       .skip(skip || 0)
       .take(take || null)
@@ -67,7 +69,7 @@ export class PostRepository extends Repository<PostEntity>{
       where: {
         categoryId: In(listCategoryIdReaded),
         id: Not(In(listPostsIdReaded)),
-
+        status: StatusPost.Publish
       },
       relations: ['author', 'category'],
       order: {
@@ -86,7 +88,7 @@ export class PostRepository extends Repository<PostEntity>{
       where: {
         categoryId: In(listCategoryIdReaded),
         id: Not(In(listPostsIdReaded)),
-
+        status: StatusPost.Publish
       }
     })
     return count;

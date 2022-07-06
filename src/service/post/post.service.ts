@@ -160,14 +160,14 @@ export class PostService {
   }
 
 
-  async getPostOrderBy(orderBy: PostOrderBy, sort: Sort, authorId: string, categoryId: string, perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
+  async getPostOrderBy(status: StatusPost, orderBy: PostOrderBy, sort: Sort, authorId: string, categoryId: string, perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
     sort = sort && Sort[sort.toLocaleUpperCase()] ? Sort[sort] : Sort.ASC;
     page = page ? page : 1;
-
+    status = status == StatusPost.All ? undefined : status ;
     orderBy = PostOrderBy[orderBy];
 
     if (authorId) {
-      const author = await this.userRepository.findOne({ where: { id: authorId } });
+      const author = await this.userRepository.findOne({ where: { id: authorId, } });
       if (!author) {
         throw new AuthorNotExistedException()
       }
@@ -179,20 +179,12 @@ export class PostService {
         throw new CategoryNotExistedException();
       }
     }
-    if (authorId || categoryId) {
 
-      const where = await this.commonService.removeUndefined({ authorId, categoryId });
-      const postsResponse = await this.postRepository.getPostsOrderBy(where, orderBy, sort, perPage * (page - 1), perPage);
-      const total = await this.postRepository.countPosts(where);
-      return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
 
-    }
-
-    const postsResponse = await this.postRepository.getPostsOrderBy({}, orderBy, sort, perPage * (page - 1), perPage);
-    const total = await this.postRepository.countPosts({});
-
+    const where = await this.commonService.removeUndefined({ authorId, categoryId, status });
+    const postsResponse = await this.postRepository.getPostsOrderBy(where, orderBy, sort, perPage * (page - 1), perPage);
+    const total = await this.postRepository.countPosts(where);
     return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
-
 
   }
 

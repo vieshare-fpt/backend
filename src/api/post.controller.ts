@@ -4,6 +4,7 @@ import { User } from "@common/user";
 import { PostOrderBy } from "@constant/post-order-by.enum";
 import { Role } from "@constant/role.enum";
 import { Sort } from "@constant/sort.enum";
+import { StatusPost } from "@constant/status-post.enum";
 import { TypePost } from "@constant/types-post.enum";
 import { PostEntity } from "@data/entity/post.entity";
 import { NewPostRequest } from "@data/request/new-post.request";
@@ -62,6 +63,7 @@ export class PostController {
   @PublicPrivate()
   @Get('')
   @HttpCode(HttpStatus.OK)
+  @ApiQuery({ name: 'status', type: 'enum', enum: StatusPost, example: StatusPost.Publish, required: false })
   @ApiQuery({ name: 'order_by', type: 'enum', enum: PostOrderBy, example: PostOrderBy.views, required: false })
   @ApiQuery({ name: 'sort', type: 'enum', enum: Sort, example: Sort.DESC, required: false })
   @ApiQuery({ name: 'author_id', type: 'string', example: 'ccff1be6-8db1-4d95-8022-41b62df5edb4', required: false })
@@ -69,13 +71,14 @@ export class PostController {
   @ApiQuery({ name: 'per_page', type: 'number', example: 10, required: false })
   @ApiQuery({ name: 'page', type: 'number', example: 1, required: false })
   async getAllPost(
+    @Query('status') status: StatusPost,
     @Query('order_by') orderBy: PostOrderBy,
     @Query('sort') sort: Sort,
     @Query('author_id') authorId: string,
     @Query('category_id') categoryId: string,
     @Query() paging: PagingRequest
   ): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
-    const postsResponse = await this.postService.getPostOrderBy(orderBy, sort, authorId, categoryId, paging.per_page, paging.page);
+    const postsResponse = await this.postService.getPostOrderBy(status,orderBy, sort, authorId, categoryId, paging.per_page, paging.page);
     return postsResponse;
   }
 
