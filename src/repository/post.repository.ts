@@ -95,23 +95,26 @@ export class PostRepository extends Repository<PostEntity>{
   }
 
   async getRelatedPosts(post: PostEntity, skip?: number, take?: number): Promise<PostsResponse[] | any> {
+    const cateId = (await post.category).id;
     const relatedPosts = await this.createQueryBuilder('posts')
       .innerJoinAndSelect('posts.author', 'author')
       .innerJoinAndSelect('posts.category', 'category')
-      .where('posts.categoryId = :categoryId', { categoryId: post.categoryId })
+      .where('posts.categoryId = :categoryId', { categoryId: cateId })
       .andWhere('posts.id != :id', { id: post.id })
       .orderBy('RAND()')
       .skip(skip || 0)
       .take(take || null)
       .getMany();
+
     const postsResponse = this.formatPostsResponse(relatedPosts)
     return postsResponse;
   }
 
 
   async countRelatedPosts(post: PostEntity): Promise<number> {
+    const cateId = (await post.category).id;
     const count = await this.createQueryBuilder('posts')
-      .where('posts.categoryId = :categoryId', { categoryId: post.categoryId })
+      .where('posts.categoryId = :categoryId', { categoryId: cateId})
       .andWhere('posts.id != :id', { id: post.id })
       .getCount();
 
