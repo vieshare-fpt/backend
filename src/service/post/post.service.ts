@@ -134,6 +134,7 @@ export class PostService {
 
   async getRelatedPosts(postId: string, perPage: number, page: number) {
     const post = await this.getPostById(postId);
+
     if (!post) {
       throw new PostNotExistedException();
     }
