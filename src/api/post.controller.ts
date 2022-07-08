@@ -121,12 +121,13 @@ export class PostController {
     @CurrentUser() user: User,
     @Param('id') postId: string
   ): Promise<HttpResponse<PostEntity>> {
-    const post = await this.postService.getPostById(postId)
+    const post = await this.postService.getPostById(postId);
     const userExsited = user?.id ? await this.userSerice.getUserByUserId(user.id) : null;
     const isAdmin = userExsited ? userExsited.roles.includes(Role.Admin) : false;
     const isAuthor = userExsited ? await this.postService.isAuthor(user.id, postId) : false;
     const isUserPremium = userExsited ? await this.subscriptionService.checkUserIsPremium(userExsited.id) : false;
-    if (!post) {
+    console.log('post : ',post.status)
+    if (!post || (post.status != StatusPost.Publish && !isAuthor)) {
       throw new PostNotExistedException()
     }
 
