@@ -29,10 +29,16 @@ export class PostRepository extends Repository<PostEntity>{
   }
 
   async searchPost(key: string, skip?: number, take?: number): Promise<PostsResponse[] | any> {
-    const posts = await this.createQueryBuilder("post")
-      .where("post.title like :key", { key: `%${key}%` })
+    const posts = await this.createQueryBuilder("posts")
+      .innerJoinAndSelect('posts.author', 'author')
+      .innerJoinAndSelect('posts.category', 'category')
+      .where('posts.status = :status', { status: StatusPost.Publish })
+      .where("posts.title like :key", { key: `%${key}%` })
+      .orWhere("author.name like :key", { key: `%${key}%` })
+      .where('posts.status = :status', { status: StatusPost.Publish })
       .getMany();
-    return posts;
+    const postsResponse = this.formatPostsResponse(posts)
+    return postsResponse;
   }
 
 
@@ -101,6 +107,7 @@ export class PostRepository extends Repository<PostEntity>{
       .innerJoinAndSelect('posts.category', 'category')
       .where('posts.categoryId = :categoryId', { categoryId: cateId })
       .andWhere('posts.id != :id', { id: post.id })
+      .andWhere('posts.status = :status', { status: StatusPost.Publish })
       .orderBy('RAND()')
       .skip(skip || 0)
       .take(take || null)
@@ -114,8 +121,9 @@ export class PostRepository extends Repository<PostEntity>{
   async countRelatedPosts(post: PostEntity): Promise<number> {
     const cateId = (await post.category).id;
     const count = await this.createQueryBuilder('posts')
-      .where('posts.categoryId = :categoryId', { categoryId: cateId})
+      .where('posts.categoryId = :categoryId', { categoryId: cateId })
       .andWhere('posts.id != :id', { id: post.id })
+      .andWhere('posts.status = :status', { status: StatusPost.Publish })
       .getCount();
 
     return count;
