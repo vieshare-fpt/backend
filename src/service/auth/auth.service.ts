@@ -23,6 +23,7 @@ import { RegisterRequest } from '@data/request/register.request';
 import { LogoutRequest } from '@data/request/logout.request';
 import { google } from 'googleapis';
 import { LoginWithGoogleRequest } from '@data/request/login-with-google.request';
+import { WalletService } from '@service/wallet/wallet.service';
 const { OAuth2 } = google.auth;
 
 @Injectable()
@@ -37,6 +38,7 @@ export class AuthService {
     private userRepository: UserRepository,
     private tokenRepository: TokenRepository,
     private configService: ConfigService,
+    private walletService: WalletService
   ) {
     this.googleConfig = configService.get<GoogleConfig>(GOOGLE_CONFIG);
     this.googleClient = new OAuth2(
@@ -141,6 +143,9 @@ export class AuthService {
         this.payload2RegisterRequest(payload),
         true,
       );
+      if (newUser) {
+        await this.walletService.createWallet(newUser.id);
+      }
 
       return await this.issueTokens(newUser, agent);
     } catch (error) {

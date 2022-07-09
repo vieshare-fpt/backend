@@ -143,7 +143,6 @@ export class PostController {
     }
 
     if ((isPostPremium && isUserPremium) || !isPostPremium) {
-      console.log('146')
       const saveHistory = await this.historyService.saveHistoryForUsers(postId, user.id);
       if (saveHistory) {
         await this.postService.updateViewsPost(postId);

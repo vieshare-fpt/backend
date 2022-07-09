@@ -10,6 +10,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserRepository } from '@repository/user.repository';
 import { TokenRepository } from '@repository/token.repository';
 import { UserService } from '@service/user/user.service';
+import { WalletService } from '@service/wallet/wallet.service';
+import { WalletRepository } from '@repository/wallet.repository';
+import { TransactionRepository } from '@repository/transaction.repository';
+
 
 @Module({
   imports: [
@@ -20,7 +24,7 @@ import { UserService } from '@service/user/user.service';
         configService.get<JwtConfig>(JWT_PATH_CONFIG),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([UserRepository, TokenRepository]),
+    TypeOrmModule.forFeature([UserRepository, TokenRepository,WalletRepository,TransactionRepository])
   ],
   providers: [
     AuthService,
@@ -28,6 +32,8 @@ import { UserService } from '@service/user/user.service';
     ConfigService,
     CryptStrategy,
     UserService,
+    WalletService,
+    
   ],
   exports: [AuthService, CryptStrategy],
 })
