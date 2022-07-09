@@ -90,9 +90,9 @@ export class HistoryRepository extends Repository<HistoryEntity>{
 
     const minimumMinutes = (post.content.split(' ').length - 1) / 250; // 250 word / 1 minuste
     const dateNeed = new Date(oldDate.getTime() + minimumMinutes * 60000);
-    const compareDate = nowDate.getTime() < dateNeed.getTime();
+    const compareDate = nowDate > dateNeed;
 
-    if (!history && compareDate) {
+    if (compareDate) {
       const newHistory = await this.save({
         postId: post.id,
         userId: user.id,
