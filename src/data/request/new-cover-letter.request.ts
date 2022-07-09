@@ -11,6 +11,7 @@ export class NewCoverLetterRequest {
     @IsNotEmpty()
     content : string
 
+    @ApiProperty()
     @IsNotEmpty()
     @IsString()
     positionApply: PositionApply;
