@@ -4,6 +4,7 @@ import { CoverLetterEntity } from "@data/entity/cover-letter.entity";
 import { ChangeRoleUserRequest } from "@data/request/change-role-user.request";
 import { NewCoverLetterRequest } from "@data/request/new-cover-letter.request";
 import { CoverLetterNotExistedException } from "@exception/coverLetter/cover-letter-not-existed.exception";
+import { PreviousCoverLetterNotProcessedException } from "@exception/coverLetter/previous-cover-letter-not-processed.exception";
 import { UserNotExistedException } from "@exception/user/user-not-existed.exception";
 import { Injectable } from "@nestjs/common";
 import { CoverLetterRepository } from "@repository/coverLetter.repository";
@@ -26,11 +27,24 @@ export class CoverLetterService {
     if (!existedUser) {
       throw new UserNotExistedException();
     }
+
     const coverLetter = new CoverLetterEntity()
     coverLetter.userId = userId;
     coverLetter.title = newCoverLetterRequest.title;
     coverLetter.content = newCoverLetterRequest.content;
     coverLetter.positionApply = newCoverLetterRequest.positionApply;
+
+    const currentCoverLetter = await this.coverLetterRepository.findOne({
+      where: {
+        userId: existedUser.id,
+        status: StatusCoverLetter.Pending,
+        positionApply: coverLetter.positionApply
+      }
+    })
+
+    if(currentCoverLetter){
+      throw new PreviousCoverLetterNotProcessedException();
+    }
 
     const saveCoverLetter = await this.coverLetterRepository.save(coverLetter);
     return saveCoverLetter;
