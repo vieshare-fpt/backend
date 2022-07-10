@@ -15,13 +15,25 @@ export class VoteController {
   ) { }
 
   @Public()
-  @Get('/post/:id')
+  @Get('/average/post/:id')
   @HttpCode(HttpStatus.OK)
   async getVoteByPostId(
     @Param('id') postId: string
   ) {
     return await this.voteService.getVoteByPostId(postId);
   }
+
+
+  @ApiBearerAuth()
+  @Get('/post/:id')
+  @HttpCode(HttpStatus.OK)
+  async getVotePostByUserId(
+    @CurrentUser() user: User,
+    @Param('id') postId: string
+  ) {
+    return await this.voteService.getVotePostByUserId(user.id, postId);
+  }
+
 
   @ApiBearerAuth()
   @Post()
@@ -35,4 +47,6 @@ export class VoteController {
     }
     const saveVote = await this.voteService.saveVote(user.id, voteRequest);
   }
+
+  
 }

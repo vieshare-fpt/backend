@@ -9,7 +9,7 @@ import { PostRepository } from "@repository/post.repository";
 import { SubscriptionRepository } from "@repository/subscription.repository";
 import { UserRepository } from "@repository/user.repository";
 import { VoteRepository } from "@repository/vote.repository";
-import { Type } from "class-transformer";
+
 
 @Injectable()
 export class VoteService {
@@ -20,7 +20,7 @@ export class VoteService {
     private subscriptionRepository: SubscriptionRepository
   ) { }
   async getVoteByPostId(postId: string) {
-    return await this.voteRepository.getAverageVoteByUserId(postId);
+    return await this.voteRepository.getAverageVoteByPostId(postId);
   }
 
   async saveVote(userId: string, voteRequest: VoteRequest) {
@@ -49,5 +49,9 @@ export class VoteService {
     }
 
     return await (await this.voteRepository.update({ id: voteExisted.id }, { point: voteRequest.point })).raw[0];
+  }
+
+  async getVotePostByUserId(userId: string, postId: string) {
+    return await this.voteRepository.getVoteByPostIdAndUserId(userId, postId);
   }
 }
