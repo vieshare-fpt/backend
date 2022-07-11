@@ -20,7 +20,9 @@ export class VoteService {
     private subscriptionRepository: SubscriptionRepository
   ) { }
   async getVoteByPostId(postId: string) {
-    return await this.voteRepository.getAverageVoteByPostId(postId);
+    const voteResponse = await this.voteRepository.getAverageVoteByPostId(postId);
+    
+    return voteResponse;
   }
 
   async saveVote(userId: string, voteRequest: VoteRequest) {
