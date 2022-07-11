@@ -161,12 +161,19 @@ export class PostService {
   }
 
 
-  async getPostOrderBy(status: StatusPost, orderBy: PostOrderBy, sort: Sort, authorId: string, categoryId: string, perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
+  async getPostOrderBy(userId: string, status: StatusPost, orderBy: PostOrderBy, sort: Sort, authorId: string, categoryId: string, perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
     sort = sort && Sort[sort.toLocaleUpperCase()] ? Sort[sort] : Sort.ASC;
     page = page ? page : 1;
-    status = status == StatusPost.All ? undefined : status ;
+    status = status == StatusPost.All ? undefined : status;
     orderBy = PostOrderBy[orderBy];
-
+    const userExsited = await this.userRepository.findOne({ where: { id: userId } });
+    let isWriter = false;
+    if (userExsited) {
+      isWriter = userExsited.roles.includes(Role.Writer) ? true : false;
+    }
+    if (isWriter) {
+      authorId = userExsited.id;
+    }
     if (authorId) {
       const author = await this.userRepository.findOne({ where: { id: authorId, } });
       if (!author) {

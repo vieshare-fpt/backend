@@ -61,6 +61,7 @@ export class PostController {
   }
 
   @PublicPrivate()
+  @ApiBearerAuth()
   @Get('')
   @HttpCode(HttpStatus.OK)
   @ApiQuery({ name: 'status', type: 'enum', enum: StatusPost, example: StatusPost.Publish, required: false })
@@ -71,6 +72,7 @@ export class PostController {
   @ApiQuery({ name: 'per_page', type: 'number', example: 10, required: false })
   @ApiQuery({ name: 'page', type: 'number', example: 1, required: false })
   async getAllPost(
+    @CurrentUser() user: User,
     @Query('status') status: StatusPost,
     @Query('order_by') orderBy: PostOrderBy,
     @Query('sort') sort: Sort,
@@ -78,7 +80,8 @@ export class PostController {
     @Query('category_id') categoryId: string,
     @Query() paging: PagingRequest
   ): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
-    const postsResponse = await this.postService.getPostOrderBy(status,orderBy, sort, authorId, categoryId, paging.per_page, paging.page);
+    const userId = user?.id;
+    const postsResponse = await this.postService.getPostOrderBy(userId, status, orderBy, sort, authorId, categoryId, paging.per_page, paging.page);
     return postsResponse;
   }
 
@@ -124,9 +127,9 @@ export class PostController {
     const post = await this.postService.getPostById(postId);
     const userExsited = user?.id ? await this.userSerice.getUserByUserId(user.id) : null;
     const isAdmin = userExsited ? userExsited.roles.includes(Role.Admin) : false;
+    const isSensor = userExsited ? userExsited.roles.includes(Role.Censor) : false;
     const isAuthor = userExsited ? await this.postService.isAuthor(user.id, postId) : false;
     const isUserPremium = userExsited ? await this.subscriptionService.checkUserIsPremium(userExsited.id) : false;
-    console.log('post : ',post.status)
     if (!post || (post.status != StatusPost.Publish && !isAuthor)) {
       throw new PostNotExistedException()
     }
@@ -138,7 +141,7 @@ export class PostController {
       throw new UserNotPremiumException()
     }
 
-    if ((!isPostPremium && !userExsited) || isAuthor || isAdmin) {
+    if ((!isPostPremium && !userExsited) || isAuthor || isAdmin || isSensor) {
       return HttpResponse.success(post)
     }
 
