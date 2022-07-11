@@ -11,7 +11,7 @@ import { UserNotCommenterPostException } from "@exception/comment/user-not-comme
 import { PostNotExistedException } from "@exception/post/post-not-existed.exception";
 import { UserNotExistedException } from "@exception/user/user-not-existed.exception";
 import { Injectable } from "@nestjs/common";
-import { CommmentRepository } from "@repository/comment.repository";
+import { CommentRepository } from "@repository/comment.repository";
 import { PostRepository } from "@repository/post.repository";
 import { UserRepository } from "@repository/user.repository";
 import { CommonService } from "@service/common/common.service";
@@ -20,7 +20,7 @@ import { UpdateResult } from "typeorm";
 @Injectable()
 export class CommentService {
   constructor(
-    private commentRepository: CommmentRepository,
+    private commentRepository: CommentRepository,
     private userRepository: UserRepository,
     private postRepository: PostRepository,
     private commonService: CommonService<CommentEntity | any>

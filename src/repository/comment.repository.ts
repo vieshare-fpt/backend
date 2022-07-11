@@ -2,7 +2,7 @@ import { CommentEntity } from "@data/entity/comment.entity";
 import { EntityRepository, FindCondition, OrderByCondition, Repository } from "typeorm";
 
 @EntityRepository(CommentEntity)
-export class CommmentRepository extends Repository<CommentEntity>{
+export class CommentRepository extends Repository<CommentEntity>{
   async newComment(postId: string, userId: string, content: string) {
     const comment: CommentEntity = new CommentEntity();
     comment.postId = postId;
