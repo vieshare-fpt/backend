@@ -13,6 +13,10 @@ import { UserService } from '@service/user/user.service';
 import { WalletService } from '@service/wallet/wallet.service';
 import { WalletRepository } from '@repository/wallet.repository';
 import { TransactionRepository } from '@repository/transaction.repository';
+import { CommonService } from '@service/common/common.service';
+import { SubscriptionService } from '@service/subcription/subscription.service';
+import { SubscriptionRepository } from '@repository/subscription.repository';
+import { PackageRepository } from '@repository/package.repository';
 
 
 @Module({
@@ -24,7 +28,7 @@ import { TransactionRepository } from '@repository/transaction.repository';
         configService.get<JwtConfig>(JWT_PATH_CONFIG),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([UserRepository, TokenRepository,WalletRepository,TransactionRepository])
+    TypeOrmModule.forFeature([UserRepository, TokenRepository,WalletRepository,TransactionRepository,SubscriptionRepository,PackageRepository])
   ],
   providers: [
     AuthService,
@@ -33,7 +37,8 @@ import { TransactionRepository } from '@repository/transaction.repository';
     CryptStrategy,
     UserService,
     WalletService,
-    
+    CommonService,
+    SubscriptionService
   ],
   exports: [AuthService, CryptStrategy],
 })

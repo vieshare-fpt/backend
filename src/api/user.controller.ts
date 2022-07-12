@@ -1,7 +1,7 @@
 import { HttpResponse } from '@common/http.response';
 import { Public } from '@decorator/public.decorator';
-import { Body, Controller, Get, Post, Patch, Query, Param } from '@nestjs/common';
-import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Post, Patch, Query, Param, HttpCode, HttpStatus } from '@nestjs/common';
+import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { RegisterRequest } from '@data/request/register.request';
 import { RegisterResponse } from '@data/response/register.response';
 import { UserService } from '@service/user/user.service';
@@ -17,6 +17,11 @@ import { Roles } from '@decorator/role.decorator';
 import { Role } from '@constant/role.enum';
 import { ChangeRoleUserRequest } from '@data/request/change-role-user.request';
 import { UpdateAvatarRequest } from '@data/request/update-avatar.request';
+import { HttpPagingResponse } from '@common/http-paging.response';
+import { PagingRequest } from '@data/request/paging.request';
+import { Sort } from '@constant/sort.enum';
+import { UserOrderBy } from '@constant/user-order-by.enum';
+import { UpdateUserRequest } from '@data/request/update-user.request';
 
 @ApiTags('User')
 @Controller('api/users')
@@ -39,6 +44,32 @@ export class UserController {
     return HttpResponse.success(new RegisterResponse(userEntity.id));
   }
 
+
+  @ApiBearerAuth()
+  @Roles(Role.Admin)
+  @Get('')
+  @HttpCode(HttpStatus.OK)
+  @ApiQuery({ name: 'isDelete', type: 'boolean', example: false, required: false })
+  @ApiQuery({ name: 'order_by', type: 'enum', enum: UserOrderBy, example: UserOrderBy.dob, required: false })
+  @ApiQuery({ name: 'sort', type: 'enum', enum: Sort, example: Sort.DESC, required: false })
+  @ApiQuery({ name: 'roles', type: 'enum', enum: Role, example: Role.User, required: false })
+  @ApiQuery({ name: 'per_page', type: 'number', example: 10, required: false })
+  @ApiQuery({ name: 'page', type: 'number', example: 1, required: false })
+  async getAllUser(
+    @Query('isDelete') isDelete: string,
+    @Query('order_by') orderBy: UserOrderBy,
+    @Query('sort') sort: Sort,
+    @Query('roles') roles: Role,
+    @Query() paging: PagingRequest
+  ): Promise<HttpResponse<UserResponse[]> | HttpPagingResponse<UserResponse[]>> {
+
+    const usersResponse = await this.userService.getListsUsers(orderBy, sort, roles, isDelete, paging.per_page, paging.page)
+
+    return usersResponse;
+  }
+
+
+  @Public()
   @Get('/info/:id')
   @ApiParam({ name: 'id', type: 'string', required: true, example: 'ccff1be6-8db1-4d95-8022-41b62df5edb4' })
   async getInfoByUserId(
@@ -68,6 +99,18 @@ export class UserController {
     @Body() newInfo: UpdateInfoRequest,
   ): Promise<HttpResponse<Boolean>> {
     const updateInfo = await this.userService.updateInfo(user.id, newInfo);
+    return HttpResponse.success(updateInfo);
+  }
+
+  @Roles(Role.Admin)
+  @ApiBearerAuth()
+  @Patch('/:id')
+  @ApiParam({ name: 'id', type: 'string', required: true, example: 'ccff1be6-8db1-4d95-8022-41b62df5edb4' })
+  async updateUser(
+    @Param('id') userId: string,
+    @Body() updateUser: UpdateUserRequest,
+  ): Promise<HttpResponse<Boolean>> {
+    const updateInfo = await this.userService.updateUser(userId, updateUser);
     return HttpResponse.success(updateInfo);
   }
 

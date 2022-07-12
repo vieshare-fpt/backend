@@ -13,6 +13,12 @@ import { Gender } from '@constant/user-gender.enum';
 import { InfoUserResponse } from '@data/response/info-user.response';
 import { ChangeRoleUserRequest } from '@data/request/change-role-user.request';
 import { PositionApply } from '@constant/position-apply.enum';
+import { UserOrderBy } from '@constant/user-order-by.enum';
+import { Sort } from '@constant/sort.enum';
+import { UserResponse } from '@data/response/user.response';
+import { CommonService } from '@service/common/common.service';
+import { SubscriptionService } from '@service/subcription/subscription.service';
+import { UpdateUserRequest } from '@data/request/update-user.request';
 
 const MAX_RECOMMEND_USER = 15;
 
@@ -21,6 +27,8 @@ export class UserService {
   constructor(
     private userRepository: UserRepository,
     private cryptStrategy: CryptStrategy,
+    private commonService: CommonService<UserEntity | UserResponse | any>,
+    private subscriptionService: SubscriptionService
   ) { }
 
   async createUser(
@@ -46,6 +54,23 @@ export class UserService {
 
     return await this.userRepository.save(userEntity);
   }
+  async getListsUsers(orderBy: UserOrderBy, sort: Sort, roles: Role, isdelete: string, perPage: number, page: number) {
+    sort = sort && Sort[sort.toLocaleUpperCase()] ? Sort[sort] : Sort.ASC;
+    page = page ? page : 1;
+    const isDelete = isdelete == 'true' ? true : false;
+    orderBy = UserOrderBy[orderBy];
+    const where = await this.commonService.removeUndefined({ isDelete, roles });
+
+    const users = await this.userRepository.getUsersOrderBy(where, orderBy, sort, perPage * (page - 1), perPage);
+    const total = await this.userRepository.countUsers(where);
+    const usersResponse = await Promise.all(users.map(async (user: UserEntity) => {
+      const isPremium = await this.subscriptionService.checkUserIsPremium(user.id);
+      return UserResponse.formatUserEntity(user, isPremium);
+    }))
+
+    return this.commonService.getPagingResponse(usersResponse, perPage, page, total)
+
+  }
 
   async getUserByUserId(userId: string): Promise<UserEntity> {
     return await this.userRepository.findOne({ id: userId });
@@ -68,6 +93,14 @@ export class UserService {
   ): Promise<boolean> {
     return (await this.userRepository.update({ id: userId }, { ...newInfo })).affected ? true : false;
   }
+
+  async updateUser(
+    userId: string,
+    updateUser: UpdateUserRequest,
+  ): Promise<boolean> {
+    return (await this.userRepository.update({ id: userId }, { ...updateUser })).affected ? true : false;
+  }
+
   async updateAvatar(
     userId: string,
     newAvatar: string,

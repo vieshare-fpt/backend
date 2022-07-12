@@ -1,3 +1,4 @@
+import { TypePost } from "@constant/types-post.enum";
 import { CommentEntity } from "@data/entity/comment.entity";
 import { EntityRepository, FindCondition, OrderByCondition, Repository } from "typeorm";
 
@@ -51,5 +52,14 @@ export class CommentRepository extends Repository<CommentEntity>{
     object[newname] = object[oldName];
     delete object[oldName];
     return true;
+  }
+
+  async sumComments(typePost: TypePost) {
+    const { count } = await this.createQueryBuilder("comments")
+      .leftJoinAndSelect('comments.post', 'posts')
+      .where('posts.type = :typePost', { typePost })
+      .select("COUNT(comments.id)", "count")
+      .getRawOne();
+    return parseInt(count);
   }
 }

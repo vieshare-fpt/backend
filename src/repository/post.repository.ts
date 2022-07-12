@@ -1,6 +1,7 @@
 import { PostOrderBy } from '@constant/post-order-by.enum';
 import { Sort } from '@constant/sort.enum';
 import { StatusPost } from '@constant/status-post.enum';
+import { TypePost } from '@constant/types-post.enum';
 import { PostEntity } from '@data/entity/post.entity';
 import { PostsResponse } from '@data/response/posts.response';
 import { EntityRepository, FindCondition, FindConditions, In, Not, Repository } from 'typeorm';
@@ -87,6 +88,22 @@ export class PostRepository extends Repository<PostEntity>{
     const postsResponse = this.formatPostsResponse(posts)
     return postsResponse;
 
+  }
+
+  async sumViews(typePost: TypePost) {
+    const {sum} = await this.createQueryBuilder("posts")
+      .where("posts.type = :typePost", { typePost })
+      .select("SUM(posts.views)", "sum")
+      .getRawOne();
+    return parseInt(sum);
+  }
+ 
+  async sumPosts(typePost: TypePost) {
+    const {count} = await this.createQueryBuilder("posts")
+      .where("posts.type = :typePost", { typePost })
+      .select("COUNT(posts.id)", "count")
+      .getRawOne();
+    return parseInt(count);
   }
 
   async countSuggestPosts(listCategoryIdReaded: string[], listPostsIdReaded: string[]): Promise<number> {

@@ -1,26 +1,29 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { TotalByPostResponse } from "./total-by-post.response";
+import { TotalByUserResponse } from "./total-by-user.response";
+
 
 export class AdminTotalResponse {
-    @ApiProperty()
-    views: number;
+  @ApiProperty()
+  views: TotalByPostResponse;
 
-    @ApiProperty()
-    comments: number;
+  @ApiProperty()
+  comments: TotalByPostResponse;
 
-    @ApiProperty()
-    posts: number;
+  @ApiProperty()
+  posts: TotalByPostResponse;
 
-    @ApiProperty()
-    incomes: number;
+  @ApiProperty()
+  incomes: number;
 
-    @ApiProperty()
-    users: number
+  @ApiProperty()
+  users: TotalByUserResponse
 
-    constructor(views: number, comments: number,posts : number, incomes: number,users: number) {
-        this.views = views;
-        this.comments = comments;
-        this.posts = posts;
-        this.incomes = incomes;
-        this.users = users;
-    }
+  constructor(views: TotalByPostResponse, comments: TotalByPostResponse, posts: TotalByPostResponse, incomes: number, users: TotalByUserResponse) {
+    this.views = views;
+    this.comments = comments;
+    this.posts = posts;
+    this.incomes = incomes;
+    this.users = users;
+  }
 }

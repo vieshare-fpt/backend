@@ -4,15 +4,19 @@ import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { CategoryRepository } from "@repository/category.repository";
 import { HistoryRepository } from "@repository/history.repository";
+import { PackageRepository } from "@repository/package.repository";
 import { PostRepository } from "@repository/post.repository";
+import { SubscriptionRepository } from "@repository/subscription.repository";
 import { UserRepository } from "@repository/user.repository";
+import { WalletRepository } from "@repository/wallet.repository";
 import { CommonService } from "@service/common/common.service";
+import { SubscriptionService } from "@service/subcription/subscription.service";
 import { UserService } from "@service/user/user.service";
 import { PostService } from "./post.service";
 
 @Module({
-    imports: [TypeOrmModule.forFeature([UserRepository, PostRepository,CategoryRepository,HistoryRepository])],
-    providers: [CryptStrategy,PostService, UserService, CommonService],
+    imports: [TypeOrmModule.forFeature([UserRepository, PostRepository,CategoryRepository,HistoryRepository,SubscriptionRepository,PackageRepository,WalletRepository])],
+    providers: [CryptStrategy,PostService, UserService,SubscriptionService, CommonService],
     exports: [PostService]
 })
 export class PostModule { }
