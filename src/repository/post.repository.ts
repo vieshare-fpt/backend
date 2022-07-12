@@ -91,19 +91,19 @@ export class PostRepository extends Repository<PostEntity>{
   }
 
   async sumViews(typePost: TypePost) {
-    const {sum} = await this.createQueryBuilder("posts")
+    const { sum } = await this.createQueryBuilder("posts")
       .where("posts.type = :typePost", { typePost })
       .select("SUM(posts.views)", "sum")
       .getRawOne();
-    return parseInt(sum);
+    return parseInt(sum ? sum : 0);
   }
- 
+
   async sumPosts(typePost: TypePost) {
-    const {count} = await this.createQueryBuilder("posts")
+    const { count } = await this.createQueryBuilder("posts")
       .where("posts.type = :typePost", { typePost })
       .select("COUNT(posts.id)", "count")
       .getRawOne();
-    return parseInt(count);
+    return parseInt(count ? count : 0);
   }
 
   async countSuggestPosts(listCategoryIdReaded: string[], listPostsIdReaded: string[]): Promise<number> {

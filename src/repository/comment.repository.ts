@@ -60,6 +60,6 @@ export class CommentRepository extends Repository<CommentEntity>{
       .where('posts.type = :typePost', { typePost })
       .select("COUNT(comments.id)", "count")
       .getRawOne();
-    return parseInt(count);
+    return parseInt(count ? count : 0);
   }
 }

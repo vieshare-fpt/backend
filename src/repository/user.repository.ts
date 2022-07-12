@@ -25,7 +25,7 @@ export class UserRepository extends Repository<UserEntity> {
       .where("users.roles IN (:role)", { role: role })
       .select("COUNT(users.id)", "count")
       .getRawOne();
-    return parseInt(count);
+    return parseInt(count ? count : 0);
   }
 
   async getUsersOrderBy(where: FindConditions<UserEntity>, orderBy: UserOrderBy, sort: Sort, skip?: number, take?: number): Promise<UserResponse[] | any> {

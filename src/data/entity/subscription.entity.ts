@@ -21,6 +21,7 @@ export class SubscriptionEntity {
     () => PackageEntity,
     (packageEntity) => packageEntity.packages
   )
+  
   @JoinColumn({ name: 'packageId' })
   package: Promise<PackageEntity>
   @Column({ name: 'packageId' })

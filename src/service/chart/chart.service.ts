@@ -8,6 +8,7 @@ import { BonusStatisticReposiotry } from "@repository/bonusStatistic.repository"
 import { CommentRepository } from "@repository/comment.repository";
 import { HistoryRepository } from "@repository/history.repository";
 import { PostRepository } from "@repository/post.repository";
+import { SubscriptionRepository } from "@repository/subscription.repository";
 import { UserRepository } from "@repository/user.repository";
 
 
@@ -19,6 +20,7 @@ export class ChartService {
     private commentRepository: CommentRepository,
     private postRepository: PostRepository,
     private userRepository: UserRepository,
+    private subscriptionRepository: SubscriptionRepository,
     private bonusStatisticReposiotry: BonusStatisticReposiotry
   ) { }
   async getAdminTotal(): Promise<AdminTotalResponse> {
@@ -34,7 +36,8 @@ export class ChartService {
     const totalPostsPremium = await this.postRepository.sumPosts(TypePost.Premium);
     const totalPosts = new TotalByPostResponse(totalPostsFree, totalPostsPremium);
 
-    const income = 1234;
+    ;
+    const income = await this.subscriptionRepository.sumIncome();
 
     const totalUserFree = 12;
     const totaUserPremium = 2;

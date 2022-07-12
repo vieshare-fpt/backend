@@ -1,5 +1,7 @@
 import { HttpResponse } from "@common/http.response";
+import { User } from "@common/user";
 import { Role } from "@constant/role.enum";
+import { CurrentUser } from "@decorator/current-user.decorator";
 import { Public } from "@decorator/public.decorator";
 import { Roles } from "@decorator/role.decorator";
 import { Controller, Get, HttpCode, HttpStatus } from "@nestjs/common";
@@ -15,13 +17,16 @@ export class ChartController {
   ) { }
 
   @Public()
-  // @ApiBearerAuth()
-  // @Roles(Role.Admin)
-  @Get('admin/total')
+  @ApiBearerAuth()
+  @Roles(Role.Admin, Role.Writer)
+  @Get('total')
   @HttpCode(HttpStatus.OK)
   async activationTheFormula(
+    @CurrentUser() user: User,
   ): Promise<HttpResponse<any>> {
-    const totalResponse = await this.chartService.getAdminTotal();
-    return HttpResponse.success(totalResponse);
+    if (user.roles.includes(Role.Admin)) {
+      const totalResponse = await this.chartService.getAdminTotal();
+      return HttpResponse.success(totalResponse);
+    }
   }
 }
