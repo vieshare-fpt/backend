@@ -17,4 +17,12 @@ export class UserRepository extends Repository<UserEntity> {
     });
   }
 
+  async sumUsers(role: Role) {
+    const { count } = await this.createQueryBuilder("users")
+      .where("users.roles IN (:role)", { role: role })
+      .select("COUNT(users.id)", "count")
+      .getRawOne();
+    return parseInt(count);
+  }
+
 }
