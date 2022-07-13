@@ -77,10 +77,16 @@ export class ChartService {
       return statisticViewsFormat;
     }
 
-    if(chartName == ChartName.Posts){
+    if (chartName == ChartName.Posts) {
       const statisticPosts = await this.postRepository.statisticPosts(dateFrom, dateTo, timeFrame);
       const statisticPostsFormat = this.formatSatisticPostsReponse(statisticPosts, dateFrom, dateTo, timeFrame, chartName);
       return statisticPostsFormat;
+    }
+
+    if (chartName == ChartName.Comments) {
+      const statisticComments = await this.commentRepository.statisticComments(dateFrom, dateTo, timeFrame);
+      const statisticCommentsFormat = this.formatSatisticCommentsReponse(statisticComments, dateFrom, dateTo, timeFrame, chartName);
+      return statisticCommentsFormat;
     }
 
   }
@@ -164,6 +170,50 @@ export class ChartService {
         }
         if (statisticPost.type == TypePost.Premium) {
           dataFormat[1].data[indexDate] = parseInt(statisticPost.posts);
+        }
+
+        dataFormat[2].data[indexDate] = parseInt(dataFormat[0].data[indexDate] + dataFormat[1].data[indexDate]);
+
+      }
+    }
+    return this.commonService.getChartResponse(dataFormat, date, chartName);
+  }
+
+  private formatSatisticCommentsReponse(statisticComments: any, dateFrom: string, dateTo: string, timeFrame: TimeFrame, chartName: ChartName) {
+    const date = this.commonService.getDaysArrayFormat(dateFrom, dateTo, timeFrame)
+    let free = [], premium = [], total = [];
+    for (let index = 0; index < date.length; index++) {
+      free.push(0);
+      premium.push(0);
+      total.push(0);
+
+    }
+    const dataFormat = [
+      {
+        name: 'free',
+        data: free
+      },
+      {
+        name: 'premium',
+        data: premium
+      },
+      {
+        name: 'total',
+        data: total
+      }
+    ]
+
+
+    for (let i = 0; i < statisticComments.length; i++) {
+      const statisticComment = statisticComments[i];
+
+      const indexDate = date.findIndex(element => element == statisticComment.date);
+      if (indexDate >= 0) {
+        if (statisticComment.type == TypePost.Free) {
+          dataFormat[0].data[indexDate] = parseInt(statisticComment.comments);
+        }
+        if (statisticComment.type == TypePost.Premium) {
+          dataFormat[1].data[indexDate] = parseInt(statisticComment.comments);
         }
 
         dataFormat[2].data[indexDate] = parseInt(dataFormat[0].data[indexDate] + dataFormat[1].data[indexDate]);

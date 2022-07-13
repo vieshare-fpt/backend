@@ -1,3 +1,4 @@
+import { TimeFrame } from "@constant/time-frame.enum";
 import { TypePost } from "@constant/types-post.enum";
 import { CommentEntity } from "@data/entity/comment.entity";
 import { EntityRepository, FindCondition, OrderByCondition, Repository } from "typeorm";
@@ -61,5 +62,30 @@ export class CommentRepository extends Repository<CommentEntity>{
       .select("COUNT(comments.id)", "count")
       .getRawOne();
     return parseInt(count ? count : 0);
+  }
+
+  async statisticComments(from: string, to: string, timeFrame: TimeFrame) {
+    let group = "";
+    if (timeFrame == TimeFrame.OneDay) {
+      group = "DATE_FORMAT(comments.publishDate, '%Y-%m-%d')";
+    }
+    if (timeFrame == TimeFrame.OneMonth) {
+      group = "DATE_FORMAT(comments.publishDate, '%Y-%m')";
+    }
+    if (timeFrame == TimeFrame.OneYear) {
+      group = "DATE_FORMAT(comments.publishDate, '%Y')";
+    }
+    const statisticComments = await this.createQueryBuilder('comments')
+      .where('comments.publishDate >= :from', { from })
+      .andWhere('comments.publishDate <= :to', { to })
+      .leftJoinAndSelect('comments.post', 'post')
+      .select(group, 'date')
+      .addSelect('post.type', 'type')
+      .addSelect('COUNT(*)', 'comments')
+      .groupBy(group)
+      .addGroupBy('post.type')
+      .getRawMany();
+
+    return statisticComments;
   }
 }

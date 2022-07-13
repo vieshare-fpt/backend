@@ -31,9 +31,9 @@ export class ChartController {
     }
   }
 
-  @Public()
-  // @ApiBearerAuth()
-  // @HttpCode(HttpStatus.OK)
+
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
   @Get('')
   @ApiQuery({ name: 'chart_name', type: 'enum', enum: ChartName, example: ChartName.Views, required: true })
   @ApiQuery({ name: 'time_frame', type: 'enum', enum: TimeFrame, example: TimeFrame.OneDay, required: true })
@@ -47,10 +47,10 @@ export class ChartController {
     @Query('chart_name') chartName: ChartName,
     @Query('time_frame') timeFrame: TimeFrame,
   ) {
-    // if (user.roles.includes(Role.Admin)) {
-    const chartViewsResponse = await this.chartService.chart(from, to, timeFrame, chartName);
-    return chartViewsResponse;
-    // }
+    if (user.roles.includes(Role.Admin)) {
+      const chartViewsResponse = await this.chartService.chart(from, to, timeFrame, chartName);
+      return chartViewsResponse;
+    }
 
 
   }
