@@ -1,6 +1,7 @@
 import { PostOrderBy } from '@constant/post-order-by.enum';
 import { Sort } from '@constant/sort.enum';
 import { StatusPost } from '@constant/status-post.enum';
+import { TimeFrame } from '@constant/time-frame.enum';
 import { TypePost } from '@constant/types-post.enum';
 import { PostEntity } from '@data/entity/post.entity';
 import { PostsResponse } from '@data/response/posts.response';
@@ -184,4 +185,28 @@ export class PostRepository extends Repository<PostEntity>{
     return object;
   }
 
+
+  async statisticPosts(from: string, to: string, timeFrame: TimeFrame) {
+    let group = "";
+    if (timeFrame == TimeFrame.OneDay) {
+      group = "DATE_FORMAT(publishDate, '%Y-%m-%d')";
+    }
+    if (timeFrame == TimeFrame.OneMonth) {
+      group = "DATE_FORMAT(publishDate, '%Y-%m')";
+    }
+    if (timeFrame == TimeFrame.OneYear) {
+      group = "DATE_FORMAT(publishDate, '%Y')";
+    }
+    const statisticPosts = await this.createQueryBuilder('posts')
+      .where('posts.publishDate >= :from', { from })
+      .andWhere('posts.publishDate <= :to', { to })
+      .select(group, 'date')
+      .addSelect('posts.type', 'type')
+      .addSelect('COUNT(*)', 'posts')
+      .groupBy(group)
+      .addGroupBy('posts.type')
+      .getRawMany();
+
+    return statisticPosts;
+  }
 }

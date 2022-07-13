@@ -134,7 +134,7 @@ export class HistoryRepository extends Repository<HistoryEntity>{
     if (timeFrame == TimeFrame.OneDay) {
       group = "DATE_FORMAT(lastDateRead, '%Y-%m-%d')";
     }
-    if (timeFrame == TimeFrame.OneMonth || timeFrame == TimeFrame.ThreeMonth) {
+    if (timeFrame == TimeFrame.OneMonth) {
       group = "DATE_FORMAT(lastDateRead, '%Y-%m')";
     }
     if (timeFrame == TimeFrame.OneYear) {

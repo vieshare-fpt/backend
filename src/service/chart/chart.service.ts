@@ -1,3 +1,4 @@
+import { ChartName } from "@constant/chart-name.enum";
 import { Role } from "@constant/role.enum";
 import { TimeFrame } from "@constant/time-frame.enum";
 import { TypePost } from "@constant/types-post.enum";
@@ -53,26 +54,38 @@ export class ChartService {
   }
 
 
-  async chartViews(from: string, to: string, timeFrame: TimeFrame): Promise<any> {
+  async chart(from: string, to: string, timeFrame: TimeFrame, chartName: ChartName): Promise<any> {
     if ((new Date(from)).toString() == 'Invalid Date' || (new Date(from)).toString() == 'Invalid Date') {
       throw new DateInvalidException()
     }
     let dateFrom = '', dateTo = '';
     if (timeFrame == TimeFrame.OneDay) {
       dateFrom = new Date(from).toISOString().slice(0, 19).replace('T', ' ');
-      dateTo = (new Date(new Date(to).setHours(30, 59, 59))).toISOString().slice(0, 19).replace('T', ' ');
+      dateTo = (new Date(new Date(to).setHours(23 + 7, 59, 59))).toISOString().slice(0, 19).replace('T', ' ');
+    }
+    if (timeFrame == TimeFrame.OneMonth) {
+      dateFrom = new Date(new Date(from).getFullYear(), new Date(from).getMonth(), 1, 7, 0, 0).toISOString().slice(0, 19).replace('T', ' ');
+      dateTo = new Date(new Date(to).getFullYear(), new Date(to).getMonth() + 1, 0, 23 + 7, 59, 59).toISOString().slice(0, 19).replace('T', ' ');
+    }
+    if (timeFrame == TimeFrame.OneYear) {
+      dateFrom = new Date(new Date(from).getFullYear(), 0, 1, 7, 0, 0).toISOString().slice(0, 19).replace('T', ' ');
+      dateTo = new Date(new Date(to).getFullYear(), 11, 31, 23 + 7, 59, 59).toISOString().slice(0, 19).replace('T', ' ');
+    }
+    if (chartName == ChartName.Views) {
+      const statisticViews = await this.historyRepository.statisticViews(dateFrom, dateTo, timeFrame);
+      const statisticViewsFormat = this.formatSatisticViewsReponse(statisticViews, dateFrom, dateTo, timeFrame, chartName);
+      return statisticViewsFormat;
     }
 
+    if(chartName == ChartName.Posts){
+      const statisticPosts = await this.postRepository.statisticPosts(dateFrom, dateTo, timeFrame);
+      const statisticPostsFormat = this.formatSatisticPostsReponse(statisticPosts, dateFrom, dateTo, timeFrame, chartName);
+      return statisticPostsFormat;
+    }
 
-
-    const statisticViews = await this.historyRepository.statisticViews(dateFrom, dateTo, timeFrame);
-
-    const dataFormat = this.formatSatisticViewsReponse(statisticViews, dateFrom, dateTo, timeFrame);
-
-    return dataFormat
   }
 
-  formatSatisticViewsReponse(statisticViews: any, dateFrom: string, dateTo: string, timeFrame: TimeFrame) {
+  private formatSatisticViewsReponse(statisticViews: any, dateFrom: string, dateTo: string, timeFrame: TimeFrame, chartName: ChartName) {
     const date = this.commonService.getDaysArrayFormat(dateFrom, dateTo, timeFrame)
     let free = [], premium = [], total = [];
     for (let index = 0; index < date.length; index++) {
@@ -97,7 +110,6 @@ export class ChartService {
     ]
 
 
-
     for (let i = 0; i < statisticViews.length; i++) {
       const statisticView = statisticViews[i];
 
@@ -114,7 +126,51 @@ export class ChartService {
 
       }
     }
-    return this.commonService.getChartResponse(dataFormat, date);
+    return this.commonService.getChartResponse(dataFormat, date, chartName);
+  }
+
+  private formatSatisticPostsReponse(statisticPosts: any, dateFrom: string, dateTo: string, timeFrame: TimeFrame, chartName: ChartName) {
+    const date = this.commonService.getDaysArrayFormat(dateFrom, dateTo, timeFrame)
+    let free = [], premium = [], total = [];
+    for (let index = 0; index < date.length; index++) {
+      free.push(0);
+      premium.push(0);
+      total.push(0);
+
+    }
+    const dataFormat = [
+      {
+        name: 'free',
+        data: free
+      },
+      {
+        name: 'premium',
+        data: premium
+      },
+      {
+        name: 'total',
+        data: total
+      }
+    ]
+
+
+    for (let i = 0; i < statisticPosts.length; i++) {
+      const statisticPost = statisticPosts[i];
+
+      const indexDate = date.findIndex(element => element == statisticPost.date);
+      if (indexDate >= 0) {
+        if (statisticPost.type == TypePost.Free) {
+          dataFormat[0].data[indexDate] = parseInt(statisticPost.posts);
+        }
+        if (statisticPost.type == TypePost.Premium) {
+          dataFormat[1].data[indexDate] = parseInt(statisticPost.posts);
+        }
+
+        dataFormat[2].data[indexDate] = parseInt(dataFormat[0].data[indexDate] + dataFormat[1].data[indexDate]);
+
+      }
+    }
+    return this.commonService.getChartResponse(dataFormat, date, chartName);
   }
 
 }
