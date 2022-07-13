@@ -9,7 +9,7 @@ export class HttpChartResponse<T> {
     @ApiProperty()
     message: string;
 
-    labels: Array<string>;
+    labels: Array<any>;
 
     data: T;
 
@@ -17,7 +17,7 @@ export class HttpChartResponse<T> {
         return new HttpChartResponseBuilder<T>();
     }
 
-    static success<T>(data?: T, labels?: Array<string>): HttpChartResponse<T> {
+    static success<T>(data?: T, labels?: Array<any>): HttpChartResponse<T> {
         return this.build<T>()
             .withStatusCode(StatusCode.OK)
             .withMessage(MessageResponse[StatusCode.OK])
@@ -32,7 +32,7 @@ export class HttpChartResponseBuilder<T>  {
 
     private statusCode: StatusCode;
     private message: string;
-    private labels: Array<string>;
+    private labels: Array<any>;
     private data: T;
 
     withStatusCode(statusCode: StatusCode): HttpChartResponseBuilder<T> {
@@ -51,7 +51,7 @@ export class HttpChartResponseBuilder<T>  {
     }
 
 
-    withLabels(labels: Array<string>): HttpChartResponseBuilder<T> {
+    withLabels(labels: Array<any>): HttpChartResponseBuilder<T> {
         this.labels = labels;
         return this;
     }

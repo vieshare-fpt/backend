@@ -1,6 +1,7 @@
 import { HttpChartResponse } from "@common/http-chart.response";
 import { HttpPagingResponse } from "@common/http-paging.response";
 import { HttpResponse } from "@common/http.response";
+import { TimeFrame } from "@constant/time-frame.enum";
 import { PagingRepsone } from "@data/response/paging.response";
 
 export class CommonService<T> {
@@ -38,7 +39,7 @@ export class CommonService<T> {
     return arr;
   }
 
-  getDaysArrayFormat(start: string, end: string) {
+  getDaysArrayFormat(start: string, end: string, timeFrame: TimeFrame) {
     let dateStart = new Date(start);
     dateStart = new Date(dateStart.setDate(dateStart.getDate() + 1));
     let dateEnd = new Date(end);

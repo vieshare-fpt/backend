@@ -1,3 +1,4 @@
+import { TimeFrame } from "@constant/time-frame.enum";
 import { TypePost } from "@constant/types-post.enum";
 import { HistoryEntity } from "@data/entity/history.entity";
 import { PostEntity } from "@data/entity/post.entity";
@@ -128,15 +129,25 @@ export class HistoryRepository extends Repository<HistoryEntity>{
   }
 
 
-  async statisticViews(from: string, to: string) {
+  async statisticViews(from: string, to: string, timeFrame: TimeFrame) {
+    let group = "";
+    if (timeFrame == TimeFrame.OneDay) {
+      group = "DATE_FORMAT(lastDateRead, '%Y-%m-%d')";
+    }
+    if (timeFrame == TimeFrame.OneMonth || timeFrame == TimeFrame.ThreeMonth) {
+      group = "DATE_FORMAT(lastDateRead, '%Y-%m')";
+    }
+    if (timeFrame == TimeFrame.OneYear) {
+      group = "DATE_FORMAT(lastDateRead, '%Y')";
+    }
     const statisticViews = await this.createQueryBuilder('history')
       .where('history.lastDateRead >= :from', { from })
       .andWhere('history.lastDateRead <= :to', { to })
       .leftJoinAndSelect('history.post', 'post')
-      .select("DATE_FORMAT(lastDateRead, '%Y-%m-%d')",'date')
-      .addSelect('post.postType','type')
+      .select(group, 'date')
+      .addSelect('post.postType', 'type')
       .addSelect('COUNT(*)', 'views')
-      .groupBy("DATE_FORMAT(lastDateRead, '%Y-%m-%d')")
+      .groupBy(group)
       .addGroupBy('post.postType')
       .getRawMany();
 

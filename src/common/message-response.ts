@@ -38,5 +38,6 @@ export const MessageResponse: IMessageResponse = {
   [StatusCode.BONUS_HAS_WITHDRAWN_BEFORE]: 'Bonus has been withdrawn before.',
   [StatusCode.NOW_CAN_NOT_WITHDRAW_BONUS]: "Now can't withdraw bonus.",
   [StatusCode.COVER_LETTER_NOT_EXISTED]: "Cover letter not existed.",
-  [StatusCode.PREVIOUS_COVER_LETTER_NOT_PROCESSED]: 'The previous cover letter has not been processed.'
+  [StatusCode.PREVIOUS_COVER_LETTER_NOT_PROCESSED]: 'The previous cover letter has not been processed.',
+  [StatusCode.DATE_INVALID]: 'Date Invalid.'
 };
