@@ -10,6 +10,7 @@ import { HistoryRepository } from "@repository/history.repository";
 import { PostRepository } from "@repository/post.repository";
 import { SubscriptionRepository } from "@repository/subscription.repository";
 import { UserRepository } from "@repository/user.repository";
+import { LessThanOrEqual, MoreThanOrEqual } from "typeorm";
 
 
 
@@ -36,7 +37,6 @@ export class ChartService {
     const totalPostsPremium = await this.postRepository.sumPosts(TypePost.Premium);
     const totalPosts = new TotalByPostResponse(totalPostsFree, totalPostsPremium);
 
-    ;
     const income = await this.subscriptionRepository.sumIncome();
 
     const totalUserFree = 12;
@@ -47,4 +47,19 @@ export class ChartService {
 
     return new AdminTotalResponse(totalViews, totalComments, totalPosts, income, totalUsers);
   }
+
+
+  async chartViews(from: string, to: string): Promise<any> {
+    const dateFrom = new Date(from).toISOString().slice(0, 19).replace('T', ' ');
+    const dateTo = new Date(to).toISOString().slice(0, 19).replace('T', ' ');
+    console.log(dateFrom)
+    console.log(dateTo)
+    const views = await this.historyRepository.createQueryBuilder('history')
+      .where('history.lastDateRead <= :dateTo', { dateTo })
+      .andWhere('history.lastDateRead >= :dateFrom', { dateFrom })
+      .getRawMany()
+    console.log(views)
+
+  }
+
 }
