@@ -6,6 +6,7 @@ import { HistoryRepository } from "@repository/history.repository";
 import { PostRepository } from "@repository/post.repository";
 import { SubscriptionRepository } from "@repository/subscription.repository";
 import { UserRepository } from "@repository/user.repository";
+import { CommonService } from "@service/common/common.service";
 import { ChartService } from "./chart.service";
 
 
@@ -19,7 +20,7 @@ import { ChartService } from "./chart.service";
       BonusStatisticReposiotry,
       SubscriptionRepository
     ])],
-    providers: [ChartService],
+    providers: [ChartService,CommonService],
     exports: [ChartService]
   }
 )

@@ -29,18 +29,23 @@ export class ChartController {
     }
   }
 
-  @Public()
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
   @Get('views')
   @ApiQuery({ name: 'from', type: 'date', example: '2022-06-31', required: false })
-  @ApiQuery({ name: 'to', type: 'date', example: '2022-06-01', required: false })
+  @ApiQuery({ name: 'to', type: 'date', example: '2022-07-31', required: false })
 
   @HttpCode(HttpStatus.OK)
   async chartViews(
+    @CurrentUser() user: User,
     @Query('from') from: string,
     @Query('to') to: string,
   ) {
-    const chartViewsResponse = await this.chartService.chartViews(from,to);
-    return HttpResponse.success(chartViewsResponse);
-    
+    if (user.roles.includes(Role.Admin)) {
+      const chartViewsResponse = await this.chartService.chartViews(from, to);
+      return chartViewsResponse;
+    }
+
+
   }
 }

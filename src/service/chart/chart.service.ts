@@ -10,6 +10,7 @@ import { HistoryRepository } from "@repository/history.repository";
 import { PostRepository } from "@repository/post.repository";
 import { SubscriptionRepository } from "@repository/subscription.repository";
 import { UserRepository } from "@repository/user.repository";
+import { CommonService } from "@service/common/common.service";
 import { LessThanOrEqual, MoreThanOrEqual } from "typeorm";
 
 
@@ -22,7 +23,8 @@ export class ChartService {
     private postRepository: PostRepository,
     private userRepository: UserRepository,
     private subscriptionRepository: SubscriptionRepository,
-    private bonusStatisticReposiotry: BonusStatisticReposiotry
+    private bonusStatisticReposiotry: BonusStatisticReposiotry,
+    private commonService: CommonService<any>
   ) { }
   async getAdminTotal(): Promise<AdminTotalResponse> {
     const totalViewsFree = await this.postRepository.sumViews(TypePost.Free);
@@ -51,15 +53,36 @@ export class ChartService {
 
   async chartViews(from: string, to: string): Promise<any> {
     const dateFrom = new Date(from).toISOString().slice(0, 19).replace('T', ' ');
-    const dateTo = new Date(to).toISOString().slice(0, 19).replace('T', ' ');
-    console.log(dateFrom)
-    console.log(dateTo)
-    const views = await this.historyRepository.createQueryBuilder('history')
-      .where('history.lastDateRead <= :dateTo', { dateTo })
-      .andWhere('history.lastDateRead >= :dateFrom', { dateFrom })
-      .getRawMany()
-    console.log(views)
+    const dateTo = (new Date(new Date(to).setHours(30, 59, 59))).toISOString().slice(0, 19).replace('T', ' ');
+    const statisticViews = await this.historyRepository.statisticViews(dateFrom, dateTo);
+    const dataFormat = this.formatSatisticViewsReponse(statisticViews, dateFrom, dateTo);
+    return dataFormat
+  }
 
+  formatSatisticViewsReponse(statisticViews: any, dateFrom: string, dateTo: string) {
+    const date = this.commonService.getDaysArrayFormat(dateFrom, dateTo)
+    const dataFormat = date.map(element => {
+      return {
+        label: element,
+        data: {
+          free: 0,
+          premium: 0,
+          total: 0,
+        }
+      }
+    })
+
+    for (let i = 0; i < statisticViews.length; i++) {
+      const statisticView = statisticViews[i];
+      const indexDate = dataFormat.findIndex(element => element.label == statisticView.date);
+      if (indexDate >= 0) {
+        dataFormat[indexDate].data[`${(statisticView.type).toLowerCase()}`] = parseInt(statisticView.views);
+        dataFormat[indexDate].data.total = dataFormat[indexDate].data.free + dataFormat[indexDate].data.premium;
+      }
+    }
+    return this.commonService.getChartResponse(dataFormat,date);
   }
 
 }
+
+

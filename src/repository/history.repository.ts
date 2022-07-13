@@ -1,3 +1,4 @@
+import { TypePost } from "@constant/types-post.enum";
 import { HistoryEntity } from "@data/entity/history.entity";
 import { PostEntity } from "@data/entity/post.entity";
 import { UserEntity } from "@data/entity/user.entity";
@@ -124,6 +125,22 @@ export class HistoryRepository extends Repository<HistoryEntity>{
   private changeNamePropertyObject(object: any, oldName: string, newname: string) {
     object[newname] = object[oldName]
     delete object[oldName]
+  }
+
+
+  async statisticViews(from: string, to: string) {
+    const statisticViews = await this.createQueryBuilder('history')
+      .where('history.lastDateRead >= :from', { from })
+      .andWhere('history.lastDateRead <= :to', { to })
+      .leftJoinAndSelect('history.post', 'post')
+      .select("DATE_FORMAT(lastDateRead, '%Y-%m-%d')",'date')
+      .addSelect('post.postType','type')
+      .addSelect('COUNT(*)', 'views')
+      .groupBy("DATE_FORMAT(lastDateRead, '%Y-%m-%d')")
+      .addGroupBy('post.postType')
+      .getRawMany();
+
+    return statisticViews;
   }
 
 }
