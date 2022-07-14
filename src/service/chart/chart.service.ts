@@ -46,12 +46,11 @@ export class ChartService {
 
     const income = await this.subscriptionRepository.sumIncome();
 
-    const totalUserFree = 12;
-    const totaUserPremium = 2;
-    const totalAdminsFree = await this.userRepository.sumUsers(Role.Admin);
-    const totalSensorFree = await this.userRepository.sumUsers(Role.Censor);
-    const totalUsers = new TotalByUserResponse(totalUserFree, totaUserPremium, totalAdminsFree, totalSensorFree);
-
+    const totalUser = await this.userRepository.sumUsers(Role.User);
+    const totalWriter = await this.userRepository.sumUsers(Role.Writer);
+    const totalAdmin = await this.userRepository.sumUsers(Role.Admin);
+    const totalSensor = await this.userRepository.sumUsers(Role.Censor);
+    const totalUsers = new TotalByUserResponse(totalUser, totalWriter, totalAdmin, totalSensor);
     return new AdminTotalResponse(totalViews, totalComments, totalPosts, income, totalUsers);
   }
 
