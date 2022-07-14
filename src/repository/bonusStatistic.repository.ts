@@ -85,13 +85,6 @@ export class BonusStatisticReposiotry extends Repository<BonusStatisticEntity> {
       .addGroupBy('posts.type')
       .getRawMany();
 
-
-    // const { sum } = await this.createQueryBuilder("bonusStatistics")
-    //   .leftJoinAndSelect('bonusStatistics.post', 'posts')
-    //   .leftJoinAndSelect('bonusStatistics.bonusFormula', 'bonusFormulas')
-    //   .andWhere('posts.author = :userId', { userId })
-    //   .select("SUM(bonusFormulas.bonusPerView * posts.views)", "sum")
-    //   .getRawOne();
     return statisticComments;
   }
 }
