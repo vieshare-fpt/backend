@@ -80,8 +80,8 @@ export class CommentRepository extends Repository<CommentEntity>{
       .andWhere('comments.publishDate <= :to', { to })
       .leftJoinAndSelect('comments.post', 'post')
       .select(group, 'date')
-      .addSelect('post.type', 'type')
-      .addSelect('COUNT(*)', 'comments')
+      .addSelect('post.type', 'name')
+      .addSelect('COUNT(*)', 'value')
       .groupBy(group)
       .addGroupBy('post.type')
       .getRawMany();

@@ -1,3 +1,4 @@
+import { TimeFrame } from "@constant/time-frame.enum";
 import { SubscriptionEntity } from "@data/entity/subscription.entity";
 import { EntityRepository, Repository } from "typeorm";
 
@@ -22,4 +23,52 @@ export class SubscriptionRepository extends Repository<SubscriptionEntity>{
     return parseInt(sum);
   }
 
+  async statisticPackages(from: string, to: string, timeFrame: TimeFrame) {
+    let group = "";
+    if (timeFrame == TimeFrame.OneDay) {
+      group = "DATE_FORMAT(date, '%Y-%m-%d')";
+    }
+    if (timeFrame == TimeFrame.OneMonth) {
+      group = "DATE_FORMAT(date, '%Y-%m')";
+    }
+    if (timeFrame == TimeFrame.OneYear) {
+      group = "DATE_FORMAT(date, '%Y')";
+    }
+    const statisticCounts = await this.createQueryBuilder('subscriptions')
+      .where('subscriptions.date >= :from', { from })
+      .andWhere('subscriptions.date <= :to', { to })
+      .leftJoinAndSelect('subscriptions.package', 'package')
+      .select(group, 'date')
+      .addSelect('package.name', 'name')
+      .addSelect('COUNT(*)', 'value')
+      .groupBy(group)
+      .addGroupBy('package.name')
+      .getRawMany();
+
+    return statisticCounts;
+  }
+  async statisticIncomes(from: string, to: string, timeFrame: TimeFrame) {
+    let group = "";
+    if (timeFrame == TimeFrame.OneDay) {
+      group = "DATE_FORMAT(date, '%Y-%m-%d')";
+    }
+    if (timeFrame == TimeFrame.OneMonth) {
+      group = "DATE_FORMAT(date, '%Y-%m')";
+    }
+    if (timeFrame == TimeFrame.OneYear) {
+      group = "DATE_FORMAT(date, '%Y')";
+    }
+    const statisticCounts = await this.createQueryBuilder('subscriptions')
+      .where('subscriptions.date >= :from', { from })
+      .andWhere('subscriptions.date <= :to', { to })
+      .leftJoinAndSelect('subscriptions.package', 'package')
+      .select(group, 'date')
+      .addSelect('package.name', 'name')
+      .addSelect('SUM(package.price)', 'value')
+      .groupBy(group)
+      .addGroupBy('package.name')
+      .getRawMany();
+
+    return statisticCounts;
+  }
 }

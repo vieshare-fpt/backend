@@ -6,10 +6,11 @@ import { AdminTotalResponse } from "@data/response/admin-total.response";
 import { TotalByPostResponse } from "@data/response/total-by-post.response";
 import { TotalByUserResponse } from "@data/response/total-by-user.response";
 import { DateInvalidException } from "@exception/chart/date-invalid.exception";
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { BonusStatisticReposiotry } from "@repository/bonusStatistic.repository";
 import { CommentRepository } from "@repository/comment.repository";
 import { HistoryRepository } from "@repository/history.repository";
+import { PackageRepository } from "@repository/package.repository";
 import { PostRepository } from "@repository/post.repository";
 import { SubscriptionRepository } from "@repository/subscription.repository";
 import { UserRepository } from "@repository/user.repository";
@@ -27,6 +28,7 @@ export class ChartService {
     private userRepository: UserRepository,
     private subscriptionRepository: SubscriptionRepository,
     private bonusStatisticReposiotry: BonusStatisticReposiotry,
+    private packageRepository: PackageRepository,
     private commonService: CommonService<any>
   ) { }
   async getAdminTotal(): Promise<AdminTotalResponse> {
@@ -54,7 +56,7 @@ export class ChartService {
   }
 
 
-  async chart(from: string, to: string, timeFrame: TimeFrame, chartName: ChartName): Promise<any> {
+  async chartForAdmin(from: string, to: string, timeFrame: TimeFrame, chartName: ChartName): Promise<any> {
     if ((new Date(from)).toString() == 'Invalid Date' || (new Date(from)).toString() == 'Invalid Date') {
       throw new DateInvalidException()
     }
@@ -71,63 +73,75 @@ export class ChartService {
       dateFrom = new Date(new Date(from).getFullYear(), 0, 1, 7, 0, 0).toISOString().slice(0, 19).replace('T', ' ');
       dateTo = new Date(new Date(to).getFullYear(), 11, 31, 23 + 7, 59, 59).toISOString().slice(0, 19).replace('T', ' ');
     }
+    let statistic = null;
+    let listDataName = null;
+
     if (chartName == ChartName.Views) {
-      const statisticViews = await this.historyRepository.statisticViews(dateFrom, dateTo, timeFrame);
-      const statisticViewsFormat = this.formatSatisticViewsReponse(statisticViews, dateFrom, dateTo, timeFrame, chartName);
-      return statisticViewsFormat;
+      statistic = await this.historyRepository.statisticViews(dateFrom, dateTo, timeFrame);
+      listDataName = await this.getArrayNameInStatistic(statistic, [TypePost.Free, TypePost.Premium]);
     }
 
     if (chartName == ChartName.Posts) {
-      const statisticPosts = await this.postRepository.statisticPosts(dateFrom, dateTo, timeFrame);
-      const statisticPostsFormat = this.formatSatisticPostsReponse(statisticPosts, dateFrom, dateTo, timeFrame, chartName);
-      return statisticPostsFormat;
+      statistic = await this.postRepository.statisticPosts(dateFrom, dateTo, timeFrame);
+      listDataName = await this.getArrayNameInStatistic(statistic, [TypePost.Free, TypePost.Premium]);
     }
 
     if (chartName == ChartName.Comments) {
-      const statisticComments = await this.commentRepository.statisticComments(dateFrom, dateTo, timeFrame);
-      const statisticCommentsFormat = this.formatSatisticCommentsReponse(statisticComments, dateFrom, dateTo, timeFrame, chartName);
-      return statisticCommentsFormat;
+      statistic = await this.commentRepository.statisticComments(dateFrom, dateTo, timeFrame);
+      listDataName = await this.getArrayNameInStatistic(statistic, [TypePost.Free, TypePost.Premium]);
     }
 
+    if (chartName == ChartName.Packages) {
+      statistic = await this.subscriptionRepository.statisticPackages(dateFrom, dateTo, timeFrame);
+      const packages = (await this.packageRepository.getPackges()).map(element => element.name);
+      listDataName = await this.getArrayNameInStatistic(statistic, packages);
+    }
+
+    if (chartName == ChartName.Incomes) {
+      statistic = await this.subscriptionRepository.statisticIncomes(dateFrom, dateTo, timeFrame);
+      const packages = (await this.packageRepository.getPackges()).map(element => element.name);
+      listDataName = await this.getArrayNameInStatistic(statistic, packages);
+    }
+
+    if (chartName == null || listDataName == null) {
+      throw new BadRequestException()
+    }
+    const statisticIncomesFormat = await this.formatStatisticResponse(statistic, listDataName, dateFrom, dateTo, timeFrame, chartName);
+    return statisticIncomesFormat;
   }
 
-  private formatSatisticViewsReponse(statisticViews: any, dateFrom: string, dateTo: string, timeFrame: TimeFrame, chartName: ChartName) {
-    const date = this.commonService.getDaysArrayFormat(dateFrom, dateTo, timeFrame)
-    let free = [], premium = [], total = [];
-    for (let index = 0; index < date.length; index++) {
-      free.push(0);
-      premium.push(0);
-      total.push(0);
 
+
+  private formatSatisticFreePremiumReponse(statisticViews: any, dateFrom: string, dateTo: string, timeFrame: TimeFrame, chartName: ChartName) {
+    const date = this.commonService.getDaysArrayFormat(dateFrom, dateTo, timeFrame)
+    const arrZero = [];
+    for (let index = 0; index < date.length; index++) {
+      arrZero.push(0);
     }
     const dataFormat = [
       {
         name: 'free',
-        data: free
+        data: [...arrZero]
       },
       {
         name: 'premium',
-        data: premium
+        data: [...arrZero]
       },
       {
         name: 'total',
-        data: total
+        data: [...arrZero]
       }
     ]
-
-
     for (let i = 0; i < statisticViews.length; i++) {
       const statisticView = statisticViews[i];
-
       const indexDate = date.findIndex(element => element == statisticView.date);
       if (indexDate >= 0) {
         if (statisticView.type == TypePost.Free) {
-          dataFormat[0].data[indexDate] = parseInt(statisticView.views);
+          dataFormat[0].data[indexDate] = parseInt(statisticView.value);
         }
         if (statisticView.type == TypePost.Premium) {
-          dataFormat[1].data[indexDate] = parseInt(statisticView.views);
+          dataFormat[1].data[indexDate] = parseInt(statisticView.value);
         }
-
         dataFormat[2].data[indexDate] = parseInt(dataFormat[0].data[indexDate] + dataFormat[1].data[indexDate]);
 
       }
@@ -135,94 +149,53 @@ export class ChartService {
     return this.commonService.getChartResponse(dataFormat, date, chartName);
   }
 
-  private formatSatisticPostsReponse(statisticPosts: any, dateFrom: string, dateTo: string, timeFrame: TimeFrame, chartName: ChartName) {
-    const date = this.commonService.getDaysArrayFormat(dateFrom, dateTo, timeFrame)
-    let free = [], premium = [], total = [];
+  private async getArrayNameInStatistic(statisticPackages: any, initArr: any) {
+
+    const arr = [];
+    initArr.forEach((element: any) => {
+      const index = statisticPackages.findIndex((e: any) => e.name == element);
+      if (index >= 0) arr.push(element);
+    })
+    return arr;
+  }
+
+  private async formatStatisticResponse(statisticPackages: any, listDataName: any, dateFrom: string, dateTo: string, timeFrame: TimeFrame, chartName: ChartName) {
+    const date = this.commonService.getDaysArrayFormat(dateFrom, dateTo, timeFrame);
+
+
+    const arrZero = [];
     for (let index = 0; index < date.length; index++) {
-      free.push(0);
-      premium.push(0);
-      total.push(0);
+      arrZero.push(0);
 
     }
-    const dataFormat = [
-      {
-        name: 'free',
-        data: free
-      },
-      {
-        name: 'premium',
-        data: premium
-      },
-      {
-        name: 'total',
-        data: total
-      }
-    ]
+    let dataFormat = [];
+    listDataName.forEach(element => {
+      dataFormat.push({
+        name: element,
+        data: [...arrZero]
+      })
+    })
+    dataFormat.push({
+      name: 'total',
+      data: [...arrZero]
+    })
+    const lastIndex = dataFormat.length - 1;
+
+    for (let i = 0; i < statisticPackages.length; i++) {
+      const statisticPackage = statisticPackages[i];
+
+      const indexDate = date.findIndex(element => element == statisticPackage.date);
+      if (indexDate < 0) continue;
+      const indexName = dataFormat.findIndex(element => element.name == statisticPackage.name);
+      if (indexName < 0) continue;
+      dataFormat[indexName].data[indexDate] = parseInt(statisticPackage.value);
+
+      dataFormat[lastIndex].data[indexDate] += dataFormat[indexName].data[indexDate];
 
 
-    for (let i = 0; i < statisticPosts.length; i++) {
-      const statisticPost = statisticPosts[i];
-
-      const indexDate = date.findIndex(element => element == statisticPost.date);
-      if (indexDate >= 0) {
-        if (statisticPost.type == TypePost.Free) {
-          dataFormat[0].data[indexDate] = parseInt(statisticPost.posts);
-        }
-        if (statisticPost.type == TypePost.Premium) {
-          dataFormat[1].data[indexDate] = parseInt(statisticPost.posts);
-        }
-
-        dataFormat[2].data[indexDate] = parseInt(dataFormat[0].data[indexDate] + dataFormat[1].data[indexDate]);
-
-      }
     }
     return this.commonService.getChartResponse(dataFormat, date, chartName);
   }
-
-  private formatSatisticCommentsReponse(statisticComments: any, dateFrom: string, dateTo: string, timeFrame: TimeFrame, chartName: ChartName) {
-    const date = this.commonService.getDaysArrayFormat(dateFrom, dateTo, timeFrame)
-    let free = [], premium = [], total = [];
-    for (let index = 0; index < date.length; index++) {
-      free.push(0);
-      premium.push(0);
-      total.push(0);
-
-    }
-    const dataFormat = [
-      {
-        name: 'free',
-        data: free
-      },
-      {
-        name: 'premium',
-        data: premium
-      },
-      {
-        name: 'total',
-        data: total
-      }
-    ]
-
-
-    for (let i = 0; i < statisticComments.length; i++) {
-      const statisticComment = statisticComments[i];
-
-      const indexDate = date.findIndex(element => element == statisticComment.date);
-      if (indexDate >= 0) {
-        if (statisticComment.type == TypePost.Free) {
-          dataFormat[0].data[indexDate] = parseInt(statisticComment.comments);
-        }
-        if (statisticComment.type == TypePost.Premium) {
-          dataFormat[1].data[indexDate] = parseInt(statisticComment.comments);
-        }
-
-        dataFormat[2].data[indexDate] = parseInt(dataFormat[0].data[indexDate] + dataFormat[1].data[indexDate]);
-
-      }
-    }
-    return this.commonService.getChartResponse(dataFormat, date, chartName);
-  }
-
 }
 
 

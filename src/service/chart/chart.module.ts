@@ -3,6 +3,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { BonusStatisticReposiotry } from "@repository/bonusStatistic.repository";
 import { CommentRepository } from "@repository/comment.repository";
 import { HistoryRepository } from "@repository/history.repository";
+import { PackageRepository } from "@repository/package.repository";
 import { PostRepository } from "@repository/post.repository";
 import { SubscriptionRepository } from "@repository/subscription.repository";
 import { UserRepository } from "@repository/user.repository";
@@ -18,7 +19,8 @@ import { ChartService } from "./chart.service";
       PostRepository,
       UserRepository,
       BonusStatisticReposiotry,
-      SubscriptionRepository
+      SubscriptionRepository,
+      PackageRepository
     ])],
     providers: [ChartService,CommonService],
     exports: [ChartService]

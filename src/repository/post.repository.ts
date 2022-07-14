@@ -201,8 +201,8 @@ export class PostRepository extends Repository<PostEntity>{
       .where('posts.publishDate >= :from', { from })
       .andWhere('posts.publishDate <= :to', { to })
       .select(group, 'date')
-      .addSelect('posts.type', 'type')
-      .addSelect('COUNT(*)', 'posts')
+      .addSelect('posts.type', 'name')
+      .addSelect('COUNT(*)', 'value')
       .groupBy(group)
       .addGroupBy('posts.type')
       .getRawMany();

@@ -31,7 +31,7 @@ export class ChartController {
     }
   }
 
-
+  @Public()
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @Get('')
@@ -48,10 +48,8 @@ export class ChartController {
     @Query('time_frame') timeFrame: TimeFrame,
   ) {
     if (user.roles.includes(Role.Admin)) {
-      const chartViewsResponse = await this.chartService.chart(from, to, timeFrame, chartName);
+      const chartViewsResponse = await this.chartService.chartForAdmin(from, to, timeFrame, chartName);
       return chartViewsResponse;
     }
-
-
   }
 }

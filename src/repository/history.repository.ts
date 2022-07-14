@@ -145,8 +145,8 @@ export class HistoryRepository extends Repository<HistoryEntity>{
       .andWhere('history.lastDateRead <= :to', { to })
       .leftJoinAndSelect('history.post', 'post')
       .select(group, 'date')
-      .addSelect('post.postType', 'type')
-      .addSelect('COUNT(*)', 'views')
+      .addSelect('post.postType', 'name')
+      .addSelect('COUNT(*)', 'value')
       .groupBy(group)
       .addGroupBy('post.postType')
       .getRawMany();
