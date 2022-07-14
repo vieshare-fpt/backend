@@ -24,7 +24,7 @@ export class WalletController {
     @CurrentUser() currentUser: User,
   ): Promise<WalletEntity> {
     const walletReponse = await this.walletService.getWalletByUserId(currentUser.id);
-    return walletReponse;
+    return HttpResponse.success(walletReponse);
   }
   
 
