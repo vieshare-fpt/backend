@@ -23,6 +23,8 @@ export class UserResponse {
 
   isPremium: boolean
 
+  idDelete: boolean;
+
   static formatUserEntity(user: UserEntity, isPremium: boolean): UserResponse {
     const userResponse = new UserResponse();
     userResponse.id = user.id;
@@ -35,6 +37,7 @@ export class UserResponse {
     userResponse.avatar = user.avatar;
     userResponse.isDefaultPassword = user.isDefaultPassword;
     userResponse.isPremium = isPremium;
+    userResponse.idDelete = user.isDelete;
 
     return userResponse;
   }
