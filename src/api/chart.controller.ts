@@ -36,7 +36,7 @@ export class ChartController {
     throw new BadRequestException();
   }
 
-  @Public()
+
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @Get('')
@@ -52,9 +52,15 @@ export class ChartController {
     @Query('chart_name') chartName: ChartName,
     @Query('time_frame') timeFrame: TimeFrame,
   ) {
+
     if (user.roles.includes(Role.Admin)) {
-      const chartViewsResponse = await this.chartService.chartForAdmin(from, to, timeFrame, chartName);
-      return chartViewsResponse;
+      const chartResponse = await this.chartService.chartForAdmin(from, to, timeFrame, chartName);
+      return chartResponse;
     }
+    if (user.roles.includes(Role.Writer)) {
+      const chartResponse = await this.chartService.chartForWriter(user.id, from, to, timeFrame, chartName);
+      return chartResponse;
+    }
+    throw new BadRequestException();
   }
 }

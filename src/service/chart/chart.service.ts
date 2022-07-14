@@ -31,7 +31,7 @@ export class ChartService {
     private subscriptionRepository: SubscriptionRepository,
     private bonusStatisticReposiotry: BonusStatisticReposiotry,
     private packageRepository: PackageRepository,
-    private followRepository : FollowRepository,
+    private followRepository: FollowRepository,
     private commonService: CommonService<any>
   ) { }
   async getAdminTotal(): Promise<AdminTotalResponse> {
@@ -74,10 +74,10 @@ export class ChartService {
     const totalPosts = new TotalByPostResponse(totalPostsFree, totalPostsPremium);
 
     const totalIncomes = await this.bonusStatisticReposiotry.sumBonusByUserId(userId);
-    
-    const totalFollows =  await this.followRepository.sumFollowsByUserId(userId);
 
-    return new WriterTotalResponse(totalViews,totalViews,totalPosts,totalIncomes,totalFollows)
+    const totalFollows = await this.followRepository.sumFollowsByUserId(userId);
+
+    return new WriterTotalResponse(totalViews, totalViews, totalPosts, totalIncomes, totalFollows)
 
   }
 
@@ -136,44 +136,60 @@ export class ChartService {
     return statisticIncomesFormat;
   }
 
-
-
-  private formatSatisticFreePremiumReponse(statisticViews: any, dateFrom: string, dateTo: string, timeFrame: TimeFrame, chartName: ChartName) {
-    const date = this.commonService.getDaysArrayFormat(dateFrom, dateTo, timeFrame)
-    const arrZero = [];
-    for (let index = 0; index < date.length; index++) {
-      arrZero.push(0);
+  async chartForWriter(userId: string, from: string, to: string, timeFrame: TimeFrame, chartName: ChartName): Promise<any> {
+    if ((new Date(from)).toString() == 'Invalid Date' || (new Date(from)).toString() == 'Invalid Date') {
+      throw new DateInvalidException()
     }
-    const dataFormat = [
-      {
-        name: 'free',
-        data: [...arrZero]
-      },
-      {
-        name: 'premium',
-        data: [...arrZero]
-      },
-      {
-        name: 'total',
-        data: [...arrZero]
-      }
-    ]
-    for (let i = 0; i < statisticViews.length; i++) {
-      const statisticView = statisticViews[i];
-      const indexDate = date.findIndex(element => element == statisticView.date);
-      if (indexDate >= 0) {
-        if (statisticView.type == TypePost.Free) {
-          dataFormat[0].data[indexDate] = parseInt(statisticView.value);
-        }
-        if (statisticView.type == TypePost.Premium) {
-          dataFormat[1].data[indexDate] = parseInt(statisticView.value);
-        }
-        dataFormat[2].data[indexDate] = parseInt(dataFormat[0].data[indexDate] + dataFormat[1].data[indexDate]);
-
-      }
+    let dateFrom = '', dateTo = '';
+    if (timeFrame == TimeFrame.OneDay) {
+      dateFrom = new Date(from).toISOString().slice(0, 19).replace('T', ' ');
+      dateTo = (new Date(new Date(to).setHours(23 + 7, 59, 59))).toISOString().slice(0, 19).replace('T', ' ');
     }
-    return this.commonService.getChartResponse(dataFormat, date, chartName);
+    if (timeFrame == TimeFrame.OneMonth) {
+      dateFrom = new Date(new Date(from).getFullYear(), new Date(from).getMonth(), 1, 7, 0, 0).toISOString().slice(0, 19).replace('T', ' ');
+      dateTo = new Date(new Date(to).getFullYear(), new Date(to).getMonth() + 1, 0, 23 + 7, 59, 59).toISOString().slice(0, 19).replace('T', ' ');
+    }
+    if (timeFrame == TimeFrame.OneYear) {
+      dateFrom = new Date(new Date(from).getFullYear(), 0, 1, 7, 0, 0).toISOString().slice(0, 19).replace('T', ' ');
+      dateTo = new Date(new Date(to).getFullYear(), 11, 31, 23 + 7, 59, 59).toISOString().slice(0, 19).replace('T', ' ');
+    }
+    let statistic = null;
+    let listDataName = null;
+
+    if (chartName == ChartName.Views) {
+      statistic = await this.historyRepository.statisticViewsByWriterId(userId, dateFrom, dateTo, timeFrame);
+      listDataName = await this.getArrayNameInStatistic(statistic, [TypePost.Free, TypePost.Premium]);
+    }
+
+    if (chartName == ChartName.Posts) {
+      statistic = await this.postRepository.statisticPostsByWriterId(userId, dateFrom, dateTo, timeFrame);
+      listDataName = await this.getArrayNameInStatistic(statistic, [TypePost.Free, TypePost.Premium]);
+    }
+
+    if (chartName == ChartName.Comments) {
+      statistic = await this.commentRepository.statisticCommentsByWriterId(userId, dateFrom, dateTo, timeFrame);
+      listDataName = await this.getArrayNameInStatistic(statistic, [TypePost.Free, TypePost.Premium]);
+    }
+
+    if (chartName == ChartName.Incomes) {
+      statistic = await this.bonusStatisticReposiotry.statisticBounsByWriterId(userId, dateFrom, dateTo, timeFrame);
+      listDataName = await this.getArrayNameInStatistic(statistic, [TypePost.Free, TypePost.Premium]);
+    }
+
+    if (chartName == ChartName.Follows) {
+      statistic = await this.followRepository.statisticFollowsByWriterId(userId, dateFrom, dateTo, timeFrame);
+      listDataName = await this.getArrayNameInStatistic(statistic, [Role.User, Role.Writer, Role.Censor, Role.Admin]);
+    }
+
+    if (chartName == null || listDataName == null) {
+      throw new BadRequestException()
+    }
+    const statisticIncomesFormat = await this.formatStatisticResponse(statistic, listDataName, dateFrom, dateTo, timeFrame, chartName);
+    return statisticIncomesFormat;
   }
+
+
+
 
   private async getArrayNameInStatistic(statisticPackages: any, initArr: any) {
 

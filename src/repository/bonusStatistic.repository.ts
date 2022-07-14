@@ -1,5 +1,6 @@
 import { BonusStatisticOrderBy } from "@constant/bonus-statistic-order-by.enum";
 import { Sort } from "@constant/sort.enum";
+import { TimeFrame } from "@constant/time-frame.enum";
 import { BonusFormulaEntity } from "@data/entity/bonus-formula.entity";
 import { BonusStatisticEntity } from "@data/entity/bonus-statistic.entity";
 import { EntityRepository, In, Repository } from "typeorm";
@@ -58,5 +59,39 @@ export class BonusStatisticReposiotry extends Repository<BonusStatisticEntity> {
       .orderBy(`bounus-statistics.${orderBy}`, sort)
       .getRawMany()
     return bonusResponse;
+  }
+
+  async statisticBounsByWriterId(authorId: string, from: string, to: string, timeFrame: TimeFrame) {
+    let group = "";
+    if (timeFrame == TimeFrame.OneDay) {
+      group = "DATE_FORMAT(bonusStatistics.from, '%Y-%m-%d')";
+    }
+    if (timeFrame == TimeFrame.OneMonth) {
+      group = "DATE_FORMAT(bonusStatistics.from, '%Y-%m')";
+    }
+    if (timeFrame == TimeFrame.OneYear) {
+      group = "DATE_FORMAT(bonusStatistics.from, '%Y')";
+    }
+    const statisticComments = await this.createQueryBuilder('bonusStatistics')
+      .where('bonusStatistics.from >= :from', { from })
+      .andWhere('bonusStatistics.from <= :to', { to })
+      .leftJoinAndSelect('bonusStatistics.post', 'posts')
+      .leftJoinAndSelect('bonusStatistics.bonusFormula', 'bonusFormulas')
+      .andWhere('posts.author = :authorId', { authorId })
+      .select(group, 'date')
+      .addSelect('posts.type', 'name')
+      .addSelect("SUM(bonusFormulas.bonusPerView * posts.views)", "value")
+      .groupBy(group)
+      .addGroupBy('posts.type')
+      .getRawMany();
+
+
+    // const { sum } = await this.createQueryBuilder("bonusStatistics")
+    //   .leftJoinAndSelect('bonusStatistics.post', 'posts')
+    //   .leftJoinAndSelect('bonusStatistics.bonusFormula', 'bonusFormulas')
+    //   .andWhere('posts.author = :userId', { userId })
+    //   .select("SUM(bonusFormulas.bonusPerView * posts.views)", "sum")
+    //   .getRawOne();
+    return statisticComments;
   }
 }

@@ -154,4 +154,30 @@ export class HistoryRepository extends Repository<HistoryEntity>{
     return statisticViews;
   }
 
+  async statisticViewsByWriterId(authorId: string, from: string, to: string, timeFrame: TimeFrame) {
+    let group = "";
+    if (timeFrame == TimeFrame.OneDay) {
+      group = "DATE_FORMAT(lastDateRead, '%Y-%m-%d')";
+    }
+    if (timeFrame == TimeFrame.OneMonth) {
+      group = "DATE_FORMAT(lastDateRead, '%Y-%m')";
+    }
+    if (timeFrame == TimeFrame.OneYear) {
+      group = "DATE_FORMAT(lastDateRead, '%Y')";
+    }
+    const statisticViews = await this.createQueryBuilder('history')
+      .where('history.lastDateRead >= :from', { from })
+      .andWhere('history.lastDateRead <= :to', { to })
+      .leftJoinAndSelect('history.post', 'post')
+      .andWhere('post.authorId = :authorId', { authorId })
+      .select(group, 'date')
+      .addSelect('post.postType', 'name')
+      .addSelect('COUNT(*)', 'value')
+      .groupBy(group)
+      .addGroupBy('post.postType')
+      .getRawMany();
+
+    return statisticViews;
+  }
+
 }

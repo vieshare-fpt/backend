@@ -119,7 +119,7 @@ export class PostRepository extends Repository<PostEntity>{
   async sumPostsByUserId(userId: string, typePost: TypePost) {
     const { count } = await this.createQueryBuilder("posts")
       .where("posts.type = :typePost", { typePost })
-      .andWhere('posts.authorId = :userId',{userId})
+      .andWhere('posts.authorId = :userId', { userId })
       .select("COUNT(posts.id)", "count")
       .getRawOne();
     return parseInt(count ? count : 0);
@@ -218,6 +218,31 @@ export class PostRepository extends Repository<PostEntity>{
     const statisticPosts = await this.createQueryBuilder('posts')
       .where('posts.publishDate >= :from', { from })
       .andWhere('posts.publishDate <= :to', { to })
+      .select(group, 'date')
+      .addSelect('posts.type', 'name')
+      .addSelect('COUNT(*)', 'value')
+      .groupBy(group)
+      .addGroupBy('posts.type')
+      .getRawMany();
+
+    return statisticPosts;
+  }
+
+  async statisticPostsByWriterId(authorId: string, from: string, to: string, timeFrame: TimeFrame) {
+    let group = "";
+    if (timeFrame == TimeFrame.OneDay) {
+      group = "DATE_FORMAT(publishDate, '%Y-%m-%d')";
+    }
+    if (timeFrame == TimeFrame.OneMonth) {
+      group = "DATE_FORMAT(publishDate, '%Y-%m')";
+    }
+    if (timeFrame == TimeFrame.OneYear) {
+      group = "DATE_FORMAT(publishDate, '%Y')";
+    }
+    const statisticPosts = await this.createQueryBuilder('posts')
+      .where('posts.publishDate >= :from', { from })
+      .andWhere('posts.publishDate <= :to', { to })
+      .andWhere('posts.authorId = :authorId', { authorId })
       .select(group, 'date')
       .addSelect('posts.type', 'name')
       .addSelect('COUNT(*)', 'value')
