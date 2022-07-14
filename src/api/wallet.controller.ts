@@ -22,9 +22,9 @@ export class WalletController {
   @Get('info')
   async createWallet(
     @CurrentUser() currentUser: User,
-  ): Promise<WalletEntity> {
+  ): Promise<HttpResponse<WalletEntity>> {
     const walletReponse = await this.walletService.getWalletByUserId(currentUser.id);
-    return walletReponse;
+    return HttpResponse.success(walletReponse);
   }
   
 

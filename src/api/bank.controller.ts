@@ -13,8 +13,8 @@ import { BankService } from "@service/bank/bank.service";
 export class BankController {
     constructor (
         private bankService: BankService,
-    ){}
-
+        ){}
+        
     @Public()
     @Get('')
     @HttpCode(HttpStatus.OK)
