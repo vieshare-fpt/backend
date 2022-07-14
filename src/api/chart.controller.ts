@@ -5,8 +5,7 @@ import { Role } from "@constant/role.enum";
 import { TimeFrame } from "@constant/time-frame.enum";
 import { CurrentUser } from "@decorator/current-user.decorator";
 import { Public } from "@decorator/public.decorator";
-import { Roles } from "@decorator/role.decorator";
-import { Controller, Get, HttpCode, HttpStatus, Query } from "@nestjs/common";
+import { BadRequestException, Controller, Get, HttpCode, HttpStatus, Query } from "@nestjs/common";
 import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { ChartService } from "@service/chart/chart.service";
 
@@ -25,10 +24,16 @@ export class ChartController {
   async getTotal(
     @CurrentUser() user: User,
   ): Promise<HttpResponse<any>> {
+
     if (user.roles.includes(Role.Admin)) {
-    const totalResponse = await this.chartService.getAdminTotal();
-    return HttpResponse.success(totalResponse);
+      const totalResponse = await this.chartService.getAdminTotal();
+      return HttpResponse.success(totalResponse);
     }
+    if (user.roles.includes(Role.Writer)) {
+      const totalResponse = await this.chartService.getWriterTotal(user.id);
+      return HttpResponse.success(totalResponse);
+    }
+    throw new BadRequestException();
   }
 
   @Public()

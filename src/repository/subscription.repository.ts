@@ -15,6 +15,15 @@ export class SubscriptionRepository extends Repository<SubscriptionEntity>{
     return subsciption ? true : false
   }
 
+  async countPremiumUser() {
+    const subsciption = await this.createQueryBuilder('subscriptions')
+      .leftJoin('packages', 'packages', 'subscriptions.packageId= packages.id')
+      .where('DATE(NOW()) <= DATE_ADD(subscriptions.date , INTERVAL packages.expiresAfterNumberOfDays DAY)')
+      .groupBy('userId')
+      .getCount();
+    return subsciption;
+  }
+
   async sumIncome() {
     const { sum } = await this.createQueryBuilder("subscriptions")
       .leftJoin('packages', 'packages', 'subscriptions.packageId= packages.id')

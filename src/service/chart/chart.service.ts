@@ -5,10 +5,12 @@ import { TypePost } from "@constant/types-post.enum";
 import { AdminTotalResponse } from "@data/response/admin-total.response";
 import { TotalByPostResponse } from "@data/response/total-by-post.response";
 import { TotalByUserResponse } from "@data/response/total-by-user.response";
+import { WriterTotalResponse } from "@data/response/writer-total.response";
 import { DateInvalidException } from "@exception/chart/date-invalid.exception";
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { BonusStatisticReposiotry } from "@repository/bonusStatistic.repository";
 import { CommentRepository } from "@repository/comment.repository";
+import { FollowRepository } from "@repository/follow.repository";
 import { HistoryRepository } from "@repository/history.repository";
 import { PackageRepository } from "@repository/package.repository";
 import { PostRepository } from "@repository/post.repository";
@@ -29,6 +31,7 @@ export class ChartService {
     private subscriptionRepository: SubscriptionRepository,
     private bonusStatisticReposiotry: BonusStatisticReposiotry,
     private packageRepository: PackageRepository,
+    private followRepository : FollowRepository,
     private commonService: CommonService<any>
   ) { }
   async getAdminTotal(): Promise<AdminTotalResponse> {
@@ -47,13 +50,35 @@ export class ChartService {
     const income = await this.subscriptionRepository.sumIncome();
 
 
-    const totalUserFree = 12;
-    const totalUerPremium = 3;
+    const totalUser = await this.userRepository.sumUsers(Role.User);;
+    const totalUserPremium = await this.subscriptionRepository.countPremiumUser();
+    const totalUserFree = totalUser - totalUserPremium;
     const totalWriter = await this.userRepository.sumUsers(Role.Writer);
     const totalAdmin = await this.userRepository.sumUsers(Role.Admin);
     const totalSensor = await this.userRepository.sumUsers(Role.Censor);
-    const totalUsers = new TotalByUserResponse(totalUserFree, totalUerPremium, totalWriter, totalAdmin, totalSensor);
+    const totalUsers = new TotalByUserResponse(totalUserFree, totalUserPremium, totalWriter, totalAdmin, totalSensor);
     return new AdminTotalResponse(totalViews, totalComments, totalPosts, income, totalUsers);
+  }
+
+  async getWriterTotal(userId: string): Promise<any> {
+    const totalViewsFree = await this.postRepository.sumViewsByUserId(userId, TypePost.Free);
+    const totalViewsPremium = await this.postRepository.sumViewsByUserId(userId, TypePost.Premium);
+    const totalViews = new TotalByPostResponse(totalViewsFree, totalViewsPremium);
+
+    const totalCommentsFree = await this.commentRepository.sumCommentsByUserId(userId, TypePost.Free);
+    const totalCommentsPremium = await this.commentRepository.sumCommentsByUserId(userId, TypePost.Premium);
+    const totalComments = new TotalByPostResponse(totalCommentsFree, totalCommentsPremium);
+
+    const totalPostsFree = await this.postRepository.sumPostsByUserId(userId, TypePost.Free);
+    const totalPostsPremium = await this.postRepository.sumPostsByUserId(userId, TypePost.Premium);
+    const totalPosts = new TotalByPostResponse(totalPostsFree, totalPostsPremium);
+
+    const totalIncomes = await this.bonusStatisticReposiotry.sumBonusByUserId(userId);
+    
+    const totalFollows =  await this.followRepository.sumFollowsByUserId(userId);
+
+    return new WriterTotalResponse(totalViews,totalViews,totalPosts,totalIncomes,totalFollows)
+
   }
 
 

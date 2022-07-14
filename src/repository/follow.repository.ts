@@ -26,4 +26,12 @@ export class FollowRepository extends Repository<FollowEntity>{
         const currentUser = await this.findOne(userID);
         if(currentUser) return false;
     }
+
+    async sumFollowsByUserId(userId: string) {
+      const { count } = await this.createQueryBuilder("follows")
+        .where('follows.followID = :userId', { userId })
+        .select("COUNT(*)", "count")
+        .getRawOne();
+      return parseInt(count ? count : 0);
+    }
 }

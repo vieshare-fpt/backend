@@ -64,6 +64,16 @@ export class CommentRepository extends Repository<CommentEntity>{
     return parseInt(count ? count : 0);
   }
 
+  async sumCommentsByUserId(userId: string, typePost: TypePost) {
+    const { count } = await this.createQueryBuilder("comments")
+      .leftJoinAndSelect('comments.post', 'posts')
+      .where('posts.type = :typePost', { typePost })
+      .andWhere('posts.author = :userId', { userId })
+      .select("COUNT(comments.id)", "count")
+      .getRawOne();
+    return parseInt(count ? count : 0);
+  }
+
   async statisticComments(from: string, to: string, timeFrame: TimeFrame) {
     let group = "";
     if (timeFrame == TimeFrame.OneDay) {
