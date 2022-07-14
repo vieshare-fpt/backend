@@ -6,7 +6,10 @@ export class TotalByUserResponse {
   total: number;
 
   @ApiProperty()
-  user: number;
+  userFree: number;
+
+  @ApiProperty()
+  userPremium: number;
 
   @ApiProperty()
   writer: number;
@@ -18,11 +21,12 @@ export class TotalByUserResponse {
   sensor: number;
 
 
-  constructor(user: number, writer: number, admin: number, sensor: number) {
-    this.user = user;
+  constructor(userFree: number, userPremium: number, writer: number, admin: number, sensor: number) {
+    this.userFree = userFree;
+    this.userPremium = userPremium;
     this.writer = writer;
     this.admin = admin;
     this.sensor = sensor;
-    this.total = user + writer + admin + sensor;
+    this.total = userFree + userPremium + writer + admin + sensor;
   }
 }

@@ -26,8 +26,8 @@ export class ChartController {
     @CurrentUser() user: User,
   ): Promise<HttpResponse<any>> {
     if (user.roles.includes(Role.Admin)) {
-      const totalResponse = await this.chartService.getAdminTotal();
-      return HttpResponse.success(totalResponse);
+    const totalResponse = await this.chartService.getAdminTotal();
+    return HttpResponse.success(totalResponse);
     }
   }
 
