@@ -10,21 +10,21 @@ export class FollowEntity {
   @ManyToOne(
     () => UserEntity,
     (userEntity) => userEntity.user)
-  @JoinColumn({ name: 'userID' })
+  @JoinColumn({ name: 'userId' })
   user: Promise<UserEntity>;
-  @Column({ name: 'userID', type: 'uuid', nullable: false })
-  user_id: string;
+  @Column({ name: 'userId', type: 'uuid', nullable: false })
+  userId: string;
 
 
   @ManyToOne(
     () => UserEntity,
     (userEntity) => userEntity.follow)
-  @JoinColumn({ name: 'followID' })
+  @JoinColumn({ name: 'followId' })
   follow: Promise<FollowEntity>
-  @Column({ name: 'followID', type: 'uuid', nullable: false })
-  follower_id: string;
+  @Column({ name: 'followId', type: 'uuid', nullable: false })
+  followerId: string;
 
-  @CreateDateColumn({ name: 'dateFollowed', nullable: false})
-  follow_at: Date;
+  @CreateDateColumn({ name: 'dateFollowed', nullable: false })
+  followAt: Date;
 
 }
