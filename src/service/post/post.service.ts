@@ -21,6 +21,7 @@ import { PostOrderBy } from "@constant/post-order-by.enum";
 import { Sort } from "@constant/sort.enum";
 import { HistoryRepository } from "@repository/history.repository";
 import { CommonService } from "@service/common/common.service";
+import { FollowRepository } from "@repository/follow.repository";
 
 
 @Injectable()
@@ -30,6 +31,7 @@ export class PostService {
     private userRepository: UserRepository,
     private cateRepostory: CategoryRepository,
     private historyRepository: HistoryRepository,
+    private followRepository: FollowRepository,
     private commonService: CommonService<PostEntity | PostsResponse | any>
   ) { }
 
@@ -210,15 +212,17 @@ export class PostService {
     }
 
     const postsIdReadedByUserId = await this.historyRepository.getPostsIdReadedByUserId(userId);
-    const listPostsIdReaded = postsIdReadedByUserId.map(item => item.postId)
+    const listPostsIdReaded = postsIdReadedByUserId.map((item: any) => item.postId)
     if (postsIdReadedByUserId.length == 0) {
       return await this.suggestForAnonymus(perPage, page)
     }
     const categoryReadMostByUserId = await this.historyRepository.getCategoryReadMostByUserId(userId);
-    const listCategoryIdReaded = categoryReadMostByUserId.map(item => item.categoryId);
+    const listCategoryIdReaded = categoryReadMostByUserId.map((item: any) => item.categoryId);
 
-    const postsResponse = await this.postRepository.getSuggestPosts(listCategoryIdReaded, listPostsIdReaded, perPage * (page - 1), perPage)
-    const total = await this.postRepository.countSuggestPosts(listCategoryIdReaded, listPostsIdReaded,);
+    const listAuthorFollowByUserId = await this.followRepository.getListAuthorFollowsByUserId(userId);
+
+    const postsResponse = await this.postRepository.getSuggestPosts(listCategoryIdReaded, listPostsIdReaded, listAuthorFollowByUserId, perPage * (page - 1), perPage)
+    const total = await this.postRepository.countSuggestPosts(listCategoryIdReaded, listPostsIdReaded, listAuthorFollowByUserId);
     if (postsResponse.length <= 10) {
       return await this.suggestForAnonymus(perPage, page)
     }

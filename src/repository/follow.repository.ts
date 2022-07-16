@@ -6,11 +6,11 @@ import { EntityRepository, Repository } from "typeorm";
 @EntityRepository(FollowEntity)
 export class FollowRepository extends Repository<FollowEntity>{
 
-  async getFollows(userID: string, skip?: number, take?: number): Promise<FollowEntity[]> {
+  async getFollows(userId: string, skip?: number, take?: number): Promise<FollowEntity[]> {
     const follows = await this.find(
       {
         where: {
-          userID: userID,
+          userId: userId,
         },
         skip: skip || 0,
         take: take || null
@@ -19,18 +19,14 @@ export class FollowRepository extends Repository<FollowEntity>{
     return follows;
   }
 
-  async countFollows(userID: string): Promise<number> {
-    if (userID) return await this.count({ where: { id: userID } });
+  async countFollows(userId: string): Promise<number> {
+    if (userId) return await this.count({ where: { userId: userId } });
   }
 
-  async checkValidFollows(userID: string): Promise<boolean> {
-    const currentUser = await this.findOne(userID);
-    if (currentUser) return false;
-  }
 
-  async sumFollowsByUserId(userId: string) {
+  async sumFollowsByuserId(userId: string) {
     const { count } = await this.createQueryBuilder("follows")
-      .where('follows.followID = :userId', { userId })
+      .where('follows.followId = :userId', { userId })
       .select("COUNT(*)", "count")
       .getRawOne();
     return parseInt(count ? count : 0);
@@ -51,7 +47,7 @@ export class FollowRepository extends Repository<FollowEntity>{
       .where('follows.dateFollowed >= :from', { from })
       .andWhere('follows.dateFollowed <= :to', { to })
       .leftJoinAndSelect('follows.user', 'users')
-      .andWhere('follows.followID = :authorId', { authorId })
+      .andWhere('follows.followId = :authorId', { authorId })
       .select(group, 'date')
       .addSelect('users.roles', 'name')
       .addSelect("COUNT(*)", "value")
@@ -60,5 +56,13 @@ export class FollowRepository extends Repository<FollowEntity>{
       .getRawMany();
 
     return statisticComments;
+  }
+
+  async getListAuthorFollowsByUserId(userId: string) {
+    const authorIdList = await this.createQueryBuilder('follows')
+      .where('follows.userId = :userId', { userId })
+      .select('follows.followId', 'followId')
+      .getRawMany();
+    return authorIdList;
   }
 }

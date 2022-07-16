@@ -72,9 +72,10 @@ export class PostRepository extends Repository<PostEntity>{
     return postsResponse;
   }
 
-  async getSuggestPosts(listCategoryIdReaded: string[], listPostsIdReaded: string[], skip?: number, take?: number) {
+  async getSuggestPosts(listCategoryIdReaded: string[], listPostsIdReaded: string[], listAuthorFollowByUserId: string[], skip?: number, take?: number) {
     const posts = await this.find({
       where: {
+        authorId: In(listAuthorFollowByUserId),
         categoryId: In(listCategoryIdReaded),
         id: Not(In(listPostsIdReaded)),
         status: StatusPost.Publish
@@ -125,9 +126,10 @@ export class PostRepository extends Repository<PostEntity>{
     return parseInt(count ? count : 0);
   }
 
-  async countSuggestPosts(listCategoryIdReaded: string[], listPostsIdReaded: string[]): Promise<number> {
+  async countSuggestPosts(listCategoryIdReaded: string[], listPostsIdReaded: string[], listAuthorFollowByUserId: string[]): Promise<number> {
     const count = await this.count({
       where: {
+        authorId : In(listAuthorFollowByUserId),
         categoryId: In(listCategoryIdReaded),
         id: Not(In(listPostsIdReaded)),
         status: StatusPost.Publish

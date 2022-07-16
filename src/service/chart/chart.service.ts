@@ -75,7 +75,7 @@ export class ChartService {
 
     const totalIncomes = await this.bonusStatisticReposiotry.sumBonusByUserId(userId);
 
-    const totalFollows = await this.followRepository.sumFollowsByUserId(userId);
+    const totalFollows = await this.followRepository.sumFollowsByuserId(userId);
 
     return new WriterTotalResponse(totalViews, totalViews, totalPosts, totalIncomes, totalFollows)
 

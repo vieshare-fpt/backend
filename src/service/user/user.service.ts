@@ -57,10 +57,9 @@ export class UserService {
   async getListsUsers(orderBy: UserOrderBy, sort: Sort, roles: Role, isdelete: string, perPage: number, page: number) {
     sort = sort && Sort[sort.toLocaleUpperCase()] ? Sort[sort] : Sort.ASC;
     page = page ? page : 1;
-    const isDelete = isdelete == 'true' ? true : false;
+    const isDelete = isdelete == 'true' ? true : isdelete == 'false' ? false : undefined;
     orderBy = UserOrderBy[orderBy];
     const where = await this.commonService.removeUndefined({ isDelete, roles });
-
     const users = await this.userRepository.getUsersOrderBy(where, orderBy, sort, perPage * (page - 1), perPage);
     const total = await this.userRepository.countUsers(where);
     const usersResponse = await Promise.all(users.map(async (user: UserEntity) => {
