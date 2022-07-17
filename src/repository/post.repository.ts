@@ -4,6 +4,7 @@ import { StatusPost } from '@constant/status-post.enum';
 import { TimeFrame } from '@constant/time-frame.enum';
 import { TypePost } from '@constant/types-post.enum';
 import { PostEntity } from '@data/entity/post.entity';
+import { UserEntity } from '@data/entity/user.entity';
 import { PostsResponse } from '@data/response/posts.response';
 import { EntityRepository, FindCondition, FindConditions, In, Not, Repository } from 'typeorm';
 
@@ -44,11 +45,11 @@ export class PostRepository extends Repository<PostEntity>{
   }
 
 
-  async getPostsOrderBy(where: FindConditions<PostEntity>, orderBy: PostOrderBy, sort: Sort, skip?: number, take?: number): Promise<PostsResponse[] | any> {
+  async getPostsOrderBy(where: FindConditions<PostEntity>, authorWhere: FindConditions<UserEntity>, orderBy: PostOrderBy, sort: Sort, skip?: number, take?: number): Promise<PostsResponse[] | any> {
     const order = orderBy ? { [orderBy]: sort } : {};
     const posts = await this.find(
       {
-        where: where,
+        where: { ...where, author: { ...authorWhere } },
         order: order,
         relations: ['author', 'category'],
         skip: skip || 0,
@@ -129,7 +130,7 @@ export class PostRepository extends Repository<PostEntity>{
   async countSuggestPosts(listCategoryIdReaded: string[], listPostsIdReaded: string[], listAuthorFollowByUserId: string[]): Promise<number> {
     const count = await this.count({
       where: {
-        authorId : In(listAuthorFollowByUserId),
+        authorId: In(listAuthorFollowByUserId),
         categoryId: In(listCategoryIdReaded),
         id: Not(In(listPostsIdReaded)),
         status: StatusPost.Publish
@@ -168,10 +169,15 @@ export class PostRepository extends Repository<PostEntity>{
   }
 
 
-  async countPosts(where: FindConditions<PostEntity>): Promise<number> {
+  async countPosts(where: FindConditions<PostEntity>, authorWhere: FindConditions<UserEntity>): Promise<number> {
     const count = await this.count(
       {
-        where: where
+        where: {
+          ...where,
+          author: {
+            ...authorWhere
+          }
+        }
       });
 
     return count;

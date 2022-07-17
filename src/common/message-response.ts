@@ -21,6 +21,7 @@ export const MessageResponse: IMessageResponse = {
   [StatusCode.BAD_REQUEST]: 'Bad request.',
   [StatusCode.ROOM_CODE_INVALID]: 'Meeting code is invalid.',
   [StatusCode.USER_NOT_EXISTED]: 'User not existed.',
+  [StatusCode.USER_NOT_AUTHORIZED]: 'User not authorized.',
   [StatusCode.AUTHOR_NOT_EXISTED]: 'Author not existed.',
   [StatusCode.CONTACT_EXISTED]: 'Contact existed.',
   [StatusCode.CONTACT_NOT_EXISTED]: 'Contact not existed.',

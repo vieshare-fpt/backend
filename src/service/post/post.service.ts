@@ -22,6 +22,8 @@ import { Sort } from "@constant/sort.enum";
 import { HistoryRepository } from "@repository/history.repository";
 import { CommonService } from "@service/common/common.service";
 import { FollowRepository } from "@repository/follow.repository";
+import { FindCondition } from "typeorm";
+import { UserNotAuthorizedException } from "@exception/user/user-not-authorizated.exception";
 
 
 @Injectable()
@@ -68,16 +70,18 @@ export class PostService {
     postEntity.lastUpdated = postEntity.publishDate;
     postEntity.views = 0;
     postEntity.type = newPostRequest.type;
+    postEntity.status = StatusPost.Draft;
 
     return await this.postRepository.save(postEntity)
 
   }
 
   async updatePost(
+    postId: string,
     updatePostRequest: UpdatePostRequest,
     authorId: string
   ): Promise<Boolean> {
-    const existedPost = await this.postRepository.findOne(updatePostRequest.id)
+    const existedPost = await this.postRepository.findOne(postId)
     if (!existedPost) {
       throw new PostNotExistedException();
     }
@@ -86,29 +90,29 @@ export class PostService {
     if (!existedUser) {
       throw new UserNotExistedException();
     }
+    const isAuthor = authorId == existedPost.authorId;
+    const isCensor = existedUser.roles.includes(Role.Censor);
+    if (!isAuthor && !isCensor) {
+        throw new UserNotAuthorizedException();
 
-    if (authorId !== existedPost.authorId) {
-      throw new UserNotAuthorPostException();
     }
 
     const exsitedCategory = await this.cateRepostory.isExist(updatePostRequest.categoryId);
-    if (!exsitedCategory) {
+    if (updatePostRequest.categoryId != undefined && !exsitedCategory) {
       throw new CategoryNotExistedException();
     }
 
-    const postEntity: PostEntity = new PostEntity();
-    postEntity.title = updatePostRequest.title;
-    postEntity.categoryId = updatePostRequest.categoryId;
-    postEntity.content = updatePostRequest.content;
-    postEntity.lastUpdated = new Date();
-    postEntity.type = updatePostRequest.type;
 
-    return (await this.postRepository.update({ id: existedPost.id }, { ...existedPost, ...postEntity })).affected ? true : false
+    return (
+      await this.postRepository.update(
+        { id: existedPost.id },
+        { ...existedPost, ...updatePostRequest, lastUpdated: new Date() })
+    ).affected ? true : false
   }
 
 
   async updateViewsPost(postId: string): Promise<boolean> {
-    const post = await this.getPostById(postId);
+    const post = await this.getPostById({ id: postId });
     if (!post) {
       throw new PostNotExistedException();
     }
@@ -117,8 +121,8 @@ export class PostService {
   }
 
 
-  async getPostById(id: string): Promise<any> {
-    const post = await this.postRepository.getPost({ id: id })
+  async getPostById(where: FindCondition<PostEntity>): Promise<any> {
+    const post = await this.postRepository.getPost(where)
     return post;
   }
 
@@ -135,7 +139,7 @@ export class PostService {
   }
 
   async getRelatedPosts(postId: string, perPage: number, page: number) {
-    const post = await this.getPostById(postId);
+    const post = await this.getPostById({ id: postId });
 
     if (!post) {
       throw new PostNotExistedException();
@@ -169,19 +173,20 @@ export class PostService {
     status = status == StatusPost.All ? undefined : status;
     orderBy = PostOrderBy[orderBy];
     const userExsited = await this.userRepository.findOne({ where: { id: userId } });
-    let isWriter = false;
+    let isAuthor = false;
+    let authorIsDelete = false;
     if (userExsited) {
-      isWriter = userExsited.roles.includes(Role.Writer) ? true : false;
+      isAuthor = userExsited.roles.includes(Role.Writer) ? true : false;
     }
-    if (isWriter) {
+    if (isAuthor) {
       authorId = userExsited.id;
+      authorIsDelete = undefined;
     }
     if (authorId) {
       const author = await this.userRepository.findOne({ where: { id: authorId, } });
       if (!author) {
         throw new AuthorNotExistedException()
       }
-
     }
     if (categoryId) {
       const category = await this.cateRepostory.findOne({ where: { id: categoryId } });
@@ -191,9 +196,22 @@ export class PostService {
     }
 
 
-    const where = await this.commonService.removeUndefined({ authorId, categoryId, status });
-    const postsResponse = await this.postRepository.getPostsOrderBy(where, orderBy, sort, perPage * (page - 1), perPage);
-    const total = await this.postRepository.countPosts(where);
+    const where = await this.commonService.removeUndefined(
+      {
+        authorId,
+        categoryId,
+        status,
+
+      }
+    )
+    const authorWhere = await this.commonService.removeUndefined(
+      {
+        isDelete: authorIsDelete
+      }
+    );
+
+    const postsResponse = await this.postRepository.getPostsOrderBy(where, authorWhere, orderBy, sort, perPage * (page - 1), perPage);
+    const total = await this.postRepository.countPosts(where, authorWhere);
     return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
 
   }

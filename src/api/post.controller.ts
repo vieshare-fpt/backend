@@ -50,13 +50,14 @@ export class PostController {
   }
 
   @ApiBearerAuth()
-  @Patch()
+  @Patch(':post_id')
   @HttpCode(HttpStatus.OK)
   async updatePost(
     @CurrentUser() user: User,
-    @Body() updatePost: UpdatePostRequest
+    @Body() updatePost: UpdatePostRequest,
+    @Param('post_id') postId : string
   ): Promise<HttpResponse<Boolean>> {
-    const post = await this.postService.updatePost(updatePost, user.id);
+    const post = await this.postService.updatePost(postId,updatePost, user.id);
     return HttpResponse.success(post)
   }
 
@@ -124,12 +125,18 @@ export class PostController {
     @CurrentUser() user: User,
     @Param('id') postId: string
   ): Promise<HttpResponse<PostEntity>> {
-    const post = await this.postService.getPostById(postId);
+
+    let post = await this.postService.getPostById({ id: postId });
     const userExsited = user?.id ? await this.userSerice.getUserByUserId(user.id) : null;
+
     const isAdmin = userExsited ? userExsited.roles.includes(Role.Admin) : false;
     const isSensor = userExsited ? userExsited.roles.includes(Role.Censor) : false;
     const isAuthor = userExsited ? await this.postService.isAuthor(user.id, postId) : false;
     const isUserPremium = userExsited ? await this.subscriptionService.checkUserIsPremium(userExsited.id) : false;
+    if (!isUserPremium && !isAdmin && !isSensor) {
+      post = await this.postService.getPostById({ id: postId, author: { isDelete: false }, status: StatusPost.Publish })
+    }
+
     if (!post || (post.status != StatusPost.Publish && !isAuthor)) {
       throw new PostNotExistedException()
     }
