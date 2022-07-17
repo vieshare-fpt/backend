@@ -22,6 +22,7 @@ import { PagingRequest } from '@data/request/paging.request';
 import { Sort } from '@constant/sort.enum';
 import { UserOrderBy } from '@constant/user-order-by.enum';
 import { UpdateUserRequest } from '@data/request/update-user.request';
+import { PublicPrivate } from '@decorator/public-private.decorator';
 
 @ApiTags('User')
 @Controller('api/users')
@@ -69,13 +70,16 @@ export class UserController {
   }
 
 
-  @Public()
+  @PublicPrivate()
+  @ApiBearerAuth()
   @Get('/info/:id')
   @ApiParam({ name: 'id', type: 'string', required: true, example: 'ccff1be6-8db1-4d95-8022-41b62df5edb4' })
   async getInfoByUserId(
+    @CurrentUser() user: User,
     @Param('id') userId: string
   ): Promise<InfoUserResponse> {
-    const info = await this.userService.getInfoByUserId(userId)
+    const userIdQuery = user?.id
+    const info = await this.userService.getInfoByUserId(userIdQuery, userId)
     return info;
   }
 

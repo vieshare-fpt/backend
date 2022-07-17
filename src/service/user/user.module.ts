@@ -11,10 +11,11 @@ import { CommonService } from '@service/common/common.service';
 import { SubscriptionService } from '@service/subcription/subscription.service';
 import { SubscriptionRepository } from '@repository/subscription.repository';
 import { PackageRepository } from '@repository/package.repository';
+import { FollowRepository } from '@repository/follow.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserRepository,SubscriptionRepository,PackageRepository,WalletRepository]), AuthModule],
-  providers: [CryptStrategy, UserService,CommonService,SubscriptionService],
+  imports: [TypeOrmModule.forFeature([UserRepository, SubscriptionRepository, PackageRepository, WalletRepository, FollowRepository]), AuthModule],
+  providers: [CryptStrategy, UserService, CommonService, SubscriptionService],
   exports: [UserService],
 })
-export class UserModule {}
+export class UserModule { }

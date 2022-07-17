@@ -19,6 +19,7 @@ import { UserResponse } from '@data/response/user.response';
 import { CommonService } from '@service/common/common.service';
 import { SubscriptionService } from '@service/subcription/subscription.service';
 import { UpdateUserRequest } from '@data/request/update-user.request';
+import { FollowRepository } from '@repository/follow.repository';
 
 const MAX_RECOMMEND_USER = 15;
 
@@ -28,6 +29,7 @@ export class UserService {
     private userRepository: UserRepository,
     private cryptStrategy: CryptStrategy,
     private commonService: CommonService<UserEntity | UserResponse | any>,
+    private followRepository: FollowRepository,
     private subscriptionService: SubscriptionService
   ) { }
 
@@ -79,9 +81,27 @@ export class UserService {
     return await this.userRepository.findAllByEmails(email);
   }
 
-  async getInfoByUserId(userId: string): Promise<InfoUserResponse> {
+  async getInfoByUserId(userIdQuery: string, userId: string): Promise<InfoUserResponse | any> {
+
+    const userQuery = await this.getUserByUserId(userIdQuery);
+
+    if (userIdQuery != undefined && !userQuery) {
+      throw new UserNotExistedException();
+    }
+
+
     const userEntity = await this.getUserByUserId(userId);
+
+
     const infoUserResponse = InfoUserResponse.formatEntity(userEntity);
+
+    if (userQuery?.roles.includes(Role.User) && userEntity?.roles.includes(Role.Writer)) {
+      const follow = await this.followRepository.findOne({ userId: userIdQuery, followerId: userId });
+      if (!follow) {
+        return { ...infoUserResponse, isFollow: false }
+      }
+      return { ...infoUserResponse, isFollow: true }
+    }
 
     return infoUserResponse
   }

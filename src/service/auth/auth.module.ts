@@ -17,6 +17,7 @@ import { CommonService } from '@service/common/common.service';
 import { SubscriptionService } from '@service/subcription/subscription.service';
 import { SubscriptionRepository } from '@repository/subscription.repository';
 import { PackageRepository } from '@repository/package.repository';
+import { FollowRepository } from '@repository/follow.repository';
 
 
 @Module({
@@ -28,7 +29,7 @@ import { PackageRepository } from '@repository/package.repository';
         configService.get<JwtConfig>(JWT_PATH_CONFIG),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([UserRepository, TokenRepository,WalletRepository,TransactionRepository,SubscriptionRepository,PackageRepository])
+    TypeOrmModule.forFeature([UserRepository, TokenRepository,WalletRepository,TransactionRepository,SubscriptionRepository,PackageRepository,FollowRepository])
   ],
   providers: [
     AuthService,
