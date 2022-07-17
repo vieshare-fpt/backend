@@ -13,6 +13,7 @@ import { OnlyUserCanFollowException } from '@exception/follow/only-user-can-foll
 import { OnlyFollowWriterException } from '@exception/follow/only-can-follow-writer.exception';
 import { FollowExistedException } from '@exception/follow/follow-exsited.exception';
 import { FollowNotExistedException } from '@exception/follow/follow-not-existed.exception';
+import { UserNotExistedException } from '@exception/user/user-not-existed.exception';
 
 @Injectable()
 export class FollowService {
@@ -70,15 +71,34 @@ export class FollowService {
   }
 
   async getFollows(
-    userID: string,
+    userId: string,
     paging: PagingRequest
   ): Promise<HttpResponse<FollowEntity[]> | HttpPagingResponse<FollowEntity[]>> {
     const page = paging.page | 1;
     const perPage = paging.per_page;
-    const follows = await this.followRepository.getFollows(userID, perPage * (page - 1), perPage)
-    const total = await this.followRepository.countFollows(userID);
-    const totalPages = Math.ceil(total / perPage);
+    let follows = null;
+    let total = 0;
+    let totalPages = 0;
+    const userExsited = await this.userRepositroy.findOne({ id: userId });
+
+    if (!userExsited) {
+      throw new UserNotExistedException();
+    }
+
+    if (userExsited.roles.includes(Role.User)) {
+      follows = await this.followRepository.getFollows({ userId: userId }, perPage * (page - 1), perPage)
+      total = await this.followRepository.countFollows({ userId: userId });
+    }
+
+    if (userExsited.roles.includes(Role.Writer)) {
+      follows = await this.followRepository.getFollows({ followerId: userId }, perPage * (page - 1), perPage)
+      total = await this.followRepository.countFollows({ followerId: userId });
+    }
+
+    totalPages = Math.ceil(total / perPage);
     const metaData = new PagingRepsone(page, perPage, total, totalPages);
+
+
     if (!perPage) {
       return HttpResponse.success(follows);
     }

@@ -1,26 +1,26 @@
 import { TimeFrame } from "@constant/time-frame.enum";
 import { FollowEntity } from "@data/entity/follow.entity";
-import { EntityRepository, Repository } from "typeorm";
+import { EntityRepository, FindConditions, Repository } from "typeorm";
 
 
 @EntityRepository(FollowEntity)
 export class FollowRepository extends Repository<FollowEntity>{
 
-  async getFollows(userId: string, skip?: number, take?: number): Promise<FollowEntity[]> {
+  async getFollows(where: FindConditions<FollowEntity>, skip?: number, take?: number): Promise<FollowEntity[]> {
     const follows = await this.find(
       {
-        where: {
-          userId: userId,
-        },
+        where,
+        relations: ['user', 'follow'],
         skip: skip || 0,
         take: take || null
       });
 
-    return follows;
+    const formatFollowResponse = await this.formatFollowsResponse(follows);
+    return formatFollowResponse;
   }
 
-  async countFollows(userId: string): Promise<number> {
-    if (userId) return await this.count({ where: { userId: userId } });
+  async countFollows(where: FindConditions<FollowEntity>): Promise<number> {
+    return await this.count({ where });
   }
 
 
@@ -64,5 +64,29 @@ export class FollowRepository extends Repository<FollowEntity>{
       .select('follows.followId', 'followId')
       .getRawMany();
     return authorIdList;
+  }
+
+  private formatFollowsResponse(object: any) {
+    const followsResponse = object.map(({ content, authorId, categoryId, ...followResponse }) => {
+      this.changeNamePropertyObject(followResponse, '__follow__', 'follow');
+      this.changeNamePropertyObject(followResponse, '__user__', 'user');
+      delete followResponse['follow']['password'];
+      delete followResponse['user']['password'];
+      return followResponse;
+    })
+    return followsResponse;
+  }
+
+  private formatFollowResponse(object: any) {
+    const { authorId, categoryId, ...followResponse } = object;
+    this.changeNamePropertyObject(followResponse, '__author__', 'author');
+    this.changeNamePropertyObject(followResponse, '__category__', 'category');
+    delete followResponse['author']['password'];
+    return followResponse;
+  }
+  private changeNamePropertyObject(object: any, oldName: string, newName: string) {
+    object[newName] = object[oldName];
+    delete object[oldName];
+    return object;
   }
 }
