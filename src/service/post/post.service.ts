@@ -93,7 +93,7 @@ export class PostService {
     const isAuthor = authorId == existedPost.authorId;
     const isCensor = existedUser.roles.includes(Role.Censor);
     if (!isAuthor && !isCensor) {
-        throw new UserNotAuthorizedException();
+      throw new UserNotAuthorizedException();
 
     }
 
@@ -204,14 +204,10 @@ export class PostService {
 
       }
     )
-    const authorWhere = await this.commonService.removeUndefined(
-      {
-        isDelete: authorIsDelete
-      }
-    );
 
-    const postsResponse = await this.postRepository.getPostsOrderBy(where, authorWhere, orderBy, sort, perPage * (page - 1), perPage);
-    const total = await this.postRepository.countPosts(where, authorWhere);
+
+    const postsResponse = await this.postRepository.getPostsOrderBy(where, { isDelete: authorIsDelete }, orderBy, sort, perPage * (page - 1), perPage);
+    const total = await this.postRepository.countPosts(where, { isDelete: authorIsDelete });
     return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
 
   }

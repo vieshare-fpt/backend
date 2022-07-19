@@ -44,17 +44,41 @@ export class PostRepository extends Repository<PostEntity>{
     return postsResponse;
   }
 
+  _parseQueryWhereConditon(where: Object, tableName: string) {
+    const listConditon = [];
+    for (const property in where) {
+      listConditon.push(
+        { [`${tableName}.${property}`]: where[property] }
+      )
+    }
 
-  async getPostsOrderBy(where: FindConditions<PostEntity>, authorWhere: FindConditions<UserEntity>, orderBy: PostOrderBy, sort: Sort, skip?: number, take?: number): Promise<PostsResponse[] | any> {
-    const order = orderBy ? { [orderBy]: sort } : {};
-    const posts = await this.find(
-      {
-        where: { ...where, author: { ...authorWhere } },
-        order: order,
-        relations: ['author', 'category'],
-        skip: skip || 0,
-        take: take || null
-      });
+    let query = '';
+    const length = listConditon.length;
+    if (length <= 0) return query;
+    listConditon.forEach((element, index) => {
+      const key = Object.keys(element)[0]
+      const value = element[key];
+      query += `${key} = ${value}`;
+      if (index < length - 1) query += ' AND '
+    })
+    return query;
+  }
+
+
+  async getPostsOrderBy(where: FindConditions<PostEntity>, whereAuthor: FindCondition<UserEntity>, orderBy: PostOrderBy, sort: Sort, skip?: number, take?: number): Promise<PostsResponse[] | any> {
+    let postsWhereAndJoin = this.createQueryBuilder('posts')
+      .innerJoinAndSelect('posts.author', 'author')
+      .innerJoinAndSelect('posts.category', 'category')
+      .where(this._parseQueryWhereConditon(where, 'posts'))
+      .where(this._parseQueryWhereConditon(whereAuthor, 'author'))
+    if (orderBy) {
+      postsWhereAndJoin = postsWhereAndJoin.orderBy(`posts.${orderBy}`, sort)
+    }
+    const posts = await postsWhereAndJoin
+      .skip(skip || 0)
+      .take(take || null)
+      .getMany();
+
     const postsResponse = this.formatPostsResponse(posts)
     return postsResponse;
 
@@ -169,16 +193,14 @@ export class PostRepository extends Repository<PostEntity>{
   }
 
 
-  async countPosts(where: FindConditions<PostEntity>, authorWhere: FindConditions<UserEntity>): Promise<number> {
-    const count = await this.count(
-      {
-        where: {
-          ...where,
-          author: {
-            ...authorWhere
-          }
-        }
-      });
+  async countPosts(where: FindConditions<PostEntity>, whereAuthor: FindCondition<UserEntity>): Promise<number> {
+
+    const count = await this.createQueryBuilder('posts')
+      .innerJoinAndSelect('posts.author', 'author')
+      .innerJoinAndSelect('posts.category', 'category')
+      .where(this._parseQueryWhereConditon(where, 'posts'))
+      .where(this._parseQueryWhereConditon(whereAuthor, 'author'))
+      .getCount();
 
     return count;
   }
