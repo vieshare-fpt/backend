@@ -50,14 +50,13 @@ export class PostController {
   }
 
   @ApiBearerAuth()
-  @Patch(':post_id')
+  @Patch('')
   @HttpCode(HttpStatus.OK)
   async updatePost(
     @CurrentUser() user: User,
     @Body() updatePost: UpdatePostRequest,
-    @Param('post_id') postId : string
   ): Promise<HttpResponse<Boolean>> {
-    const post = await this.postService.updatePost(postId,updatePost, user.id);
+    const post = await this.postService.updatePost(updatePost.id, updatePost, user.id);
     return HttpResponse.success(post)
   }
 

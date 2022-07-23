@@ -1,9 +1,14 @@
 import { StatusPost } from "@constant/status-post.enum";
 import { TypePost } from "@constant/types-post.enum";
 import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty } from "class-validator";
 
 
 export class UpdatePostRequest {
+    @ApiProperty()
+    @IsNotEmpty()
+    id : string
+
     @ApiProperty()
     title: string
 
