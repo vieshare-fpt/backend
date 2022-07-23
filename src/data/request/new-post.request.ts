@@ -1,3 +1,4 @@
+import { StatusPost } from "@constant/status-post.enum";
 import { TypePost } from "@constant/types-post.enum";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEnum, IsNotEmpty, IsUUID } from "class-validator";
@@ -28,4 +29,8 @@ export class NewPostRequest {
     @IsNotEmpty()
     @IsEnum(TypePost)
     type: TypePost;
+
+    @ApiProperty()
+    status : StatusPost;
+
 }

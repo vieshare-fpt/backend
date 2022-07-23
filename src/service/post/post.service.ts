@@ -71,7 +71,7 @@ export class PostService {
     postEntity.lastUpdated = postEntity.publishDate;
     postEntity.views = 0;
     postEntity.type = newPostRequest.type;
-    postEntity.status = StatusPost.Draft;
+    postEntity.status = newPostRequest.status ? newPostRequest.status : StatusPost.Draft;
 
     return await this.postRepository.save(postEntity)
 
