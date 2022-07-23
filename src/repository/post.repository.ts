@@ -87,7 +87,26 @@ export class PostRepository extends Repository<PostEntity>{
     return postsResponse;
 
   }
+  async getPostsFollowerOrderBy(where: FindConditions<PostEntity>, whereAuthor: FindCondition<UserEntity>, listAuthor: Array<string>, orderBy: PostOrderBy, sort: Sort, skip?: number, take?: number): Promise<PostsResponse[] | any> {
+    if (listAuthor.length == 0) return [];
+    let postsWhereAndJoin = this.createQueryBuilder('posts')
+      .innerJoinAndSelect('posts.author', 'author')
+      .innerJoinAndSelect('posts.category', 'category');
+    postsWhereAndJoin = this._parseQueryWhereConditon(postsWhereAndJoin, where, 'posts', true)
+    postsWhereAndJoin = this._parseQueryWhereConditon(postsWhereAndJoin, whereAuthor, 'author')
+    if (orderBy) {
+      postsWhereAndJoin = postsWhereAndJoin.orderBy(`posts.${orderBy}`, sort)
+    }
+    const posts = await postsWhereAndJoin
+      .andWhere("author.id IN(:...ids)", { ids: [...listAuthor] })
+      .skip(skip || 0)
+      .take(take || null)
+      .getMany();
 
+    const postsResponse = this.formatPostsResponse(posts)
+    return postsResponse;
+
+  }
   async getPostsRandom(skip?: number, take?: number): Promise<PostsResponse[] | any> {
     const posts = await this.createQueryBuilder('posts')
       .innerJoinAndSelect('posts.author', 'author')
@@ -211,7 +230,21 @@ export class PostRepository extends Repository<PostEntity>{
 
     return count;
   }
+  async countPostsFollower(where: FindConditions<PostEntity>, whereAuthor: FindCondition<UserEntity>, listAuthor: Array<string>): Promise<number> {
+    if (listAuthor.length == 0) return 0;
+    let postsWhereAndJoin = this.createQueryBuilder('posts')
+      .innerJoinAndSelect('posts.author', 'author')
+      .innerJoinAndSelect('posts.category', 'category');
+    postsWhereAndJoin = this._parseQueryWhereConditon(postsWhereAndJoin, where, 'posts', true)
+    postsWhereAndJoin = this._parseQueryWhereConditon(postsWhereAndJoin, whereAuthor, 'author')
 
+    const count = await postsWhereAndJoin
+      .andWhere("author.id IN(:...ids)", { ids: [...listAuthor] })
+      .getCount();
+
+
+    return count;
+  }
 
   async isAuthor(authorId: string, postId: string) {
     return await this.count({ where: { authorId: authorId, id: postId } })

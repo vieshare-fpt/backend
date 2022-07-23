@@ -211,7 +211,44 @@ export class PostService {
     return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
 
   }
+  async getPostFollowOrderBy(userId: string, status: StatusPost, orderBy: PostOrderBy, sort: Sort, categoryId: string, perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
+    sort = sort && Sort[sort.toLocaleUpperCase()] ? Sort[sort] : Sort.ASC;
+    page = page ? page : 1;
+    status = status == StatusPost.All ? undefined : status;
+    orderBy = PostOrderBy[orderBy];
+    const userExsited = await this.userRepository.findOne({ where: { id: userId } });
+    let authorIsDelete = false;
+    const follows = await this.followRepository.find({
+      where: {
+        userId: userExsited.id
+      }
+    })
+    const listAuthor = [];
+    follows.forEach(item => { listAuthor.push(item.followerId) });
 
+
+    if (categoryId) {
+      const category = await this.cateRepostory.findOne({ where: { id: categoryId } });
+      if (!category) {
+        throw new CategoryNotExistedException();
+      }
+    }
+
+
+    const where = await this.commonService.removeUndefined(
+      {
+        categoryId,
+        status,
+
+      }
+    )
+
+
+    const postsResponse = await this.postRepository.getPostsFollowerOrderBy(where, { isDelete: authorIsDelete }, listAuthor, orderBy, sort, perPage * (page - 1), perPage);
+    const total = await this.postRepository.countPostsFollower(where, { isDelete: authorIsDelete }, listAuthor);
+    return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
+
+  }
   async suggestForAnonymus(perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
     page = page ? page : 1;
     const postsResponse = await this.postRepository.getPostsRandom(perPage * (page - 1), perPage)

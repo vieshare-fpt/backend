@@ -86,6 +86,28 @@ export class PostController {
     return postsResponse;
   }
 
+  @ApiBearerAuth()
+  @Get('follow')
+  @HttpCode(HttpStatus.OK)
+  @ApiQuery({ name: 'status', type: 'enum', enum: StatusPost, example: StatusPost.Publish, required: false })
+  @ApiQuery({ name: 'order_by', type: 'enum', enum: PostOrderBy, example: PostOrderBy.views, required: false })
+  @ApiQuery({ name: 'sort', type: 'enum', enum: Sort, example: Sort.DESC, required: false })
+  @ApiQuery({ name: 'category_id', type: 'string', example: 'ccff1be6-8db1-4d95-8022-41b62df5edb4', required: false })
+  @ApiQuery({ name: 'per_page', type: 'number', example: 10, required: false })
+  @ApiQuery({ name: 'page', type: 'number', example: 1, required: false })
+  async getAllPostFollow(
+    @CurrentUser() user: User,
+    @Query('status') status: StatusPost,
+    @Query('order_by') orderBy: PostOrderBy,
+    @Query('sort') sort: Sort,
+    @Query('category_id') categoryId: string,
+    @Query() paging: PagingRequest
+  ): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
+    const userId = user?.id;
+    const postsResponse = await this.postService.getPostFollowOrderBy(userId, status, orderBy, sort, categoryId, paging.per_page, paging.page);
+    return postsResponse;
+  }
+
   @PublicPrivate()
   @ApiBearerAuth()
   @Get('suggest')
