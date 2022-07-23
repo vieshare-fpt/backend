@@ -172,12 +172,14 @@ export class PostController {
       throw new UserNotPremiumException()
     }
 
-    if (!isPostPremium || isAuthor || isAdmin || isSensor) {
+    if ((!isPostPremium && !userExsited )|| isAuthor || isAdmin || isSensor) {
+      
       return HttpResponse.success(post)
     }
 
     if ((isPostPremium && isUserPremium) || !isPostPremium) {
       const saveHistory = await this.historyService.saveHistoryForUsers(postId, user.id);
+
       if (saveHistory) {
         await this.postService.updateViewsPost(postId);
         if (isPostPremium) {
