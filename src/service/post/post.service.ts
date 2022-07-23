@@ -24,6 +24,7 @@ import { CommonService } from "@service/common/common.service";
 import { FollowRepository } from "@repository/follow.repository";
 import { FindCondition } from "typeorm";
 import { UserNotAuthorizedException } from "@exception/user/user-not-authorizated.exception";
+import { UserEntity } from "@data/entity/user.entity";
 
 
 @Injectable()
@@ -121,9 +122,10 @@ export class PostService {
   }
 
 
-  async getPostById(where: FindCondition<PostEntity>): Promise<any> {
-    const post = await this.postRepository.getPost(where)
+  async getPostById(where: FindCondition<PostEntity>, authorWhere?: FindCondition<UserEntity>): Promise<any> {
+    const post = await this.postRepository.getPost(where, authorWhere)
     return post;
+
   }
 
   async searchPost(key: string, perPage: number, page: number) {

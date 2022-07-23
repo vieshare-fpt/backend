@@ -148,28 +148,31 @@ export class PostController {
   ): Promise<HttpResponse<PostEntity>> {
 
     let post = await this.postService.getPostById({ id: postId });
+
     const userExsited = user?.id ? await this.userSerice.getUserByUserId(user.id) : null;
 
     const isAdmin = userExsited ? userExsited.roles.includes(Role.Admin) : false;
     const isSensor = userExsited ? userExsited.roles.includes(Role.Censor) : false;
     const isAuthor = userExsited ? await this.postService.isAuthor(user.id, postId) : false;
     const isUserPremium = userExsited ? await this.subscriptionService.checkUserIsPremium(userExsited.id) : false;
-    if (!isUserPremium && !isAdmin && !isSensor) {
-      post = await this.postService.getPostById({ id: postId, author: { isDelete: false }, status: StatusPost.Publish })
+    const isUser = !isAdmin && !isSensor && !isAuthor;
+
+    if (isUser) {
+      post = await this.postService.getPostById({ id: postId, status: StatusPost.Publish }, { isDelete: false })
     }
 
-    if (!post || (post.status != StatusPost.Publish && !isAuthor)) {
+    if (!post || (post.status != StatusPost.Publish && !isAuthor)) { // post not existed or ( post not puslish and user is not author)
       throw new PostNotExistedException()
     }
 
     const isPostPremium = post.type == TypePost.Premium;
 
 
-    if (isPostPremium && !isUserPremium) {
+    if (isPostPremium && !isUserPremium && isUser) {
       throw new UserNotPremiumException()
     }
 
-    if ((!isPostPremium && !userExsited) || isAuthor || isAdmin || isSensor) {
+    if (!isPostPremium || isAuthor || isAdmin || isSensor) {
       return HttpResponse.success(post)
     }
 

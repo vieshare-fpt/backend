@@ -11,13 +11,20 @@ import { EntityRepository, FindCondition, FindConditions, In, Not, Repository, S
 @EntityRepository(PostEntity)
 export class PostRepository extends Repository<PostEntity>{
 
-  async getPost(where: FindCondition<PostEntity>) {
-    const post = await this.findOne({
-      where: where,
-      relations: ['author', 'category']
-    })
-    const postResponse = this.formatPostResponse(post);
-    return postResponse;
+  async getPost(where: FindCondition<PostEntity>, authorWhere?: FindCondition<UserEntity>) {
+    let postsWhereAndJoin = this.createQueryBuilder('posts')
+      .innerJoinAndSelect('posts.author', 'author')
+      .innerJoinAndSelect('posts.category', 'category');
+    postsWhereAndJoin = this._parseQueryWhereConditon(postsWhereAndJoin, where, 'posts', true)
+    if (authorWhere) {
+      postsWhereAndJoin = this._parseQueryWhereConditon(postsWhereAndJoin, authorWhere, 'author')
+    }
+    const post = await postsWhereAndJoin
+      .getOne();
+    if (!post) return null;
+    const postsResponse = this.formatPostResponse(post)
+    return postsResponse;
+
   }
 
   async getPosts(where: FindConditions<PostEntity>, skip?: number, take?: number): Promise<PostsResponse[] | any> {
@@ -29,6 +36,8 @@ export class PostRepository extends Repository<PostEntity>{
     })
     const postsResponse = this.formatPostsResponse(posts)
     return postsResponse;
+
+
   }
 
   async searchPost(key: string, skip?: number, take?: number): Promise<PostsResponse[] | any> {
@@ -262,6 +271,7 @@ export class PostRepository extends Repository<PostEntity>{
 
   private formatPostResponse(object: any) {
     const { authorId, categoryId, ...postResponse } = object;
+
     this.changeNamePropertyObject(postResponse, '__author__', 'author');
     this.changeNamePropertyObject(postResponse, '__category__', 'category');
     delete postResponse['author']['password'];
