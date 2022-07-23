@@ -1,7 +1,9 @@
 import { User } from "@common/user";
+import { Role } from "@constant/role.enum";
 import { SubscriptionEntity } from "@data/entity/subscription.entity";
 import { PackageNotExistedException } from "@exception/package/package-not-existed.exception";
 import { UserAlreadyPremiumException } from "@exception/subscription/user-already-premium.exception";
+import { UserNotAuthorizedException } from "@exception/user/user-not-authorizated.exception";
 import { UserNotExistedException } from "@exception/user/user-not-existed.exception";
 import { BalanceNotEnoughException } from "@exception/wallet/balance-not-enough.exception";
 import { WalletNotExistedException } from "@exception/wallet/wallet-not-existed.exception";
@@ -35,6 +37,10 @@ export class SubscriptionService {
     const userExsited = await this.userRepository.findOne({ id: user.id });
     if (!userExsited) {
       throw new UserNotExistedException()
+    }
+
+    if (userExsited.roles.includes(Role.User) && userExsited.roles.length == 1) {
+      throw new UserNotAuthorizedException()
     }
 
     const packageExisted = await this.packageRepository.findOne({ id: packageId });
