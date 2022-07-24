@@ -20,6 +20,8 @@ export class PostRepository extends Repository<PostEntity>{
       postsWhereAndJoin = this._parseQueryWhereConditon(postsWhereAndJoin, authorWhere, 'author')
     }
     const post = await postsWhereAndJoin
+      .andWhere('author.roles IN (:...roles)', { roles: ['Writer'] })
+      .andWhere('author.isDelete = :isDelete', { isDelete: false })
       .getOne();
     if (!post) return null;
     const postsResponse = this.formatPostResponse(post)
@@ -45,9 +47,10 @@ export class PostRepository extends Repository<PostEntity>{
       .innerJoinAndSelect('posts.author', 'author')
       .innerJoinAndSelect('posts.category', 'category')
       .where('posts.status = :status', { status: StatusPost.Publish })
-      .where("posts.title like :key", { key: `%${key}%` })
+      .andWhere("posts.title like :key", { key: `%${key}%` })
+      .andWhere('author.roles IN (:...roles)', { roles: ['Writer'] })
+      .andWhere('author.isDelete = :isDelete', { isDelete: false })
       .orWhere("author.name like :key", { key: `%${key}%` })
-      .where('posts.status = :status', { status: StatusPost.Publish })
       .getMany();
     const postsResponse = this.formatPostsResponse(posts)
     return postsResponse;
@@ -88,6 +91,8 @@ export class PostRepository extends Repository<PostEntity>{
       postsWhereAndJoin = postsWhereAndJoin.orderBy(`posts.${orderBy}`, sort)
     }
     const posts = await postsWhereAndJoin
+      .andWhere('author.roles IN (:...roles)', { roles: ['Writer'] })
+      .andWhere('author.isDelete = :isDelete', { isDelete: false })
       .skip(skip || 0)
       .take(take || null)
       .getMany();
@@ -108,6 +113,8 @@ export class PostRepository extends Repository<PostEntity>{
     }
     const posts = await postsWhereAndJoin
       .andWhere("author.id IN(:...ids)", { ids: [...listAuthor] })
+      .andWhere('author.roles IN (:...roles)', { roles: ['Writer'] })
+      .andWhere('author.isDelete = :isDelete', { isDelete: false })
       .skip(skip || 0)
       .take(take || null)
       .getMany();
@@ -121,6 +128,8 @@ export class PostRepository extends Repository<PostEntity>{
       .innerJoinAndSelect('posts.author', 'author')
       .innerJoinAndSelect('posts.category', 'category')
       .where('posts.status = :status', { status: StatusPost.Publish })
+      .andWhere('author.roles IN (:...roles)', { roles: ['Writer'] })
+      .andWhere('author.isDelete = :isDelete', { isDelete: false })
       .orderBy('RAND()')
       .skip(skip || 0)
       .take(take || null)
@@ -169,6 +178,9 @@ export class PostRepository extends Repository<PostEntity>{
   async sumPosts(typePost: TypePost) {
     const { count } = await this.createQueryBuilder("posts")
       .where("posts.type = :typePost", { typePost })
+      .innerJoinAndSelect('posts.author', 'author')
+      .andWhere('author.roles IN (:...roles)', { roles: ['Writer'] })
+      .andWhere('author.isDelete = :isDelete', { isDelete: false })
       .select("COUNT(posts.id)", "count")
       .getRawOne();
     return parseInt(count ? count : 0);
@@ -203,6 +215,8 @@ export class PostRepository extends Repository<PostEntity>{
       .where('posts.categoryId = :categoryId', { categoryId: cateId })
       .andWhere('posts.id != :id', { id: post.id })
       .andWhere('posts.status = :status', { status: StatusPost.Publish })
+      .andWhere('author.roles IN (:...roles)', { roles: ['Writer'] })
+      .andWhere('author.isDelete = :isDelete', { isDelete: false })
       .orderBy('RAND()')
       .skip(skip || 0)
       .take(take || null)
@@ -213,27 +227,44 @@ export class PostRepository extends Repository<PostEntity>{
   }
 
 
-  async countRelatedPosts(post: PostEntity): Promise<number> {
-    const cateId = (await post.category).id;
+  async countRelatedPosts(key: string): Promise<number> {
+    const count = await this.createQueryBuilder("posts")
+      .innerJoinAndSelect('posts.author', 'author')
+      .where('posts.status = :status', { status: StatusPost.Publish })
+      .andWhere("posts.title like :key", { key: `%${key}%` })
+      .andWhere('author.roles IN (:...roles)', { roles: ['Writer'] })
+      .andWhere('author.isDelete = :isDelete', { isDelete: false })
+      .orWhere("author.name like :key", { key: `%${key}%` })
+      .getCount();
+
+    return count;
+  }
+ 
+  
+  async countSearchPost(key: string): Promise<number> {
     const count = await this.createQueryBuilder('posts')
-      .where('posts.categoryId = :categoryId', { categoryId: cateId })
-      .andWhere('posts.id != :id', { id: post.id })
+      .innerJoinAndSelect('posts.author', 'author')
+      .where('author.roles IN (:...roles)', { roles: ['Writer'] })
+      .andWhere('author.isDelete = :isDelete', { isDelete: false })
       .andWhere('posts.status = :status', { status: StatusPost.Publish })
+      .andWhere("posts.title like :key", { key: `%${key}%` })
+      .orWhere("author.name like :key", { key: `%${key}%` })
       .getCount();
 
     return count;
   }
 
-
   async countPosts(where: FindConditions<PostEntity>, whereAuthor: FindCondition<UserEntity>): Promise<number> {
     let postsWhereAndJoin = this.createQueryBuilder('posts')
       .innerJoinAndSelect('posts.author', 'author')
       .innerJoinAndSelect('posts.category', 'category');
+
     postsWhereAndJoin = this._parseQueryWhereConditon(postsWhereAndJoin, where, 'posts', true)
     postsWhereAndJoin = this._parseQueryWhereConditon(postsWhereAndJoin, whereAuthor, 'author')
 
     const count = await postsWhereAndJoin
-
+      .andWhere('author.roles IN (:...roles)', { roles: ['Writer'] })
+      .andWhere('author.isDelete = :isDelete', { isDelete: false })
       .getCount();
 
 
@@ -249,11 +280,15 @@ export class PostRepository extends Repository<PostEntity>{
 
     const count = await postsWhereAndJoin
       .andWhere("author.id IN(:...ids)", { ids: [...listAuthor] })
+      .andWhere('author.roles IN (:...roles)', { roles: ['Writer'] })
+      .andWhere('author.isDelete = :isDelete', { isDelete: false })
       .getCount();
 
 
     return count;
   }
+
+
 
   async isAuthor(authorId: string, postId: string) {
     return await this.count({ where: { authorId: authorId, id: postId } })

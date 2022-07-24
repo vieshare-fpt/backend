@@ -130,14 +130,16 @@ export class PostService {
 
   async searchPost(key: string, perPage: number, page: number) {
     page = page ? page : 1;
-    const post = await this.postRepository.searchPost(key, perPage * (page - 1), perPage)
-    return post;
+    const post = await this.postRepository.searchPost(key, perPage * (page - 1), perPage);
+    const total = await this.postRepository.countSearchPost(key);
+    return this.commonService.getPagingResponse(post, perPage, page, total)
+
   }
 
 
 
   async isExisted(postId: string): Promise<boolean> {
-    return (await this.postRepository.count({ where: { id: postId } })) > 0 ? true : false;
+    return (await this.postRepository.countPosts({ id: postId }, {})) > 0 ? true : false;
   }
 
   async getRelatedPosts(postId: string, perPage: number, page: number) {
@@ -254,7 +256,7 @@ export class PostService {
   async suggestForAnonymus(perPage: number, page: number): Promise<HttpResponse<PostsResponse[]> | HttpPagingResponse<PostsResponse[]>> {
     page = page ? page : 1;
     const postsResponse = await this.postRepository.getPostsRandom(perPage * (page - 1), perPage)
-    const total = await this.postRepository.count();
+    const total = await this.postRepository.countPosts({ status: StatusPost.Publish }, {});
     return this.commonService.getPagingResponse(postsResponse, perPage, page, total)
   }
 
