@@ -1,16 +1,17 @@
 import { TransactionEnum } from "@constant/type-transaction.enum";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEnum, IsNotEmpty } from "class-validator";
+import { IsEnum, IsNotEmpty, IsNumber } from "class-validator";
 
 
 export class UpdateWalletRequest {
-    @ApiProperty()
+  @ApiProperty({format: "enum", enum: TransactionEnum })
     @IsNotEmpty()
     @IsEnum(TransactionEnum)
     type: TransactionEnum;
 
-    @ApiProperty({format: "enum", enum: TransactionEnum })
+    @ApiProperty()
     @IsNotEmpty()
+    @IsNumber()
     amount: number;
 
     @ApiProperty()

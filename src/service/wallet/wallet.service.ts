@@ -37,7 +37,7 @@ export class WalletService {
     return await this.walletRepository.save(walletEntity);
   }
 
-    
+
   async updateWallet(
     userId: string,
     updateWalletRequest: UpdateWalletRequest,
@@ -47,22 +47,31 @@ export class WalletService {
       throw new UserNotExistedException();
     }
 
+
+    let walletId = await this.walletRepository.getWalletId(userId);
+    if (!walletId) {
+      const newWallet = await this.createWallet(userId);
+      walletId = newWallet.id;
+    }
+
+
     const isCheck = await this.walletRepository.isCheckBalance(userId, updateWalletRequest.amount, updateWalletRequest.type);
     if (!isCheck) {
       throw new BalanceNotEnoughException();
     }
 
 
+
     const newBalance = await this.walletRepository.getNewBalance(userId, updateWalletRequest.amount, updateWalletRequest.type);
     const updateResult = (await this.walletRepository.
-      update({ id: userId }, { balance: newBalance })).affected ? true : false;
-    
-    const walletId = await this.walletRepository.getWalletId(userId);
-    
-    const createTransaction = await this.transactionRepository.createTransaction(walletId, updateResult, updateWalletRequest);
+      update({ id: walletId }, { balance: newBalance })).affected ? true : false;
 
 
-    return  updateResult;
+
+    await this.transactionRepository.createTransaction(walletId, updateResult, updateWalletRequest);
+
+
+    return updateResult;
   }
 
 

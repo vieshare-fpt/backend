@@ -24,25 +24,25 @@ export class WalletRepository extends Repository<WalletEntity> {
     amount: number,
     typeTrans: string,
   ): Promise<boolean> {
-    return TransactionEnum.Withdraw == typeTrans && amount <= await this.getBalanceByUserId(userId);
+    return TransactionEnum.WITHDRAW == typeTrans && amount <= await this.getBalanceByUserId(userId);
   }
 
   async getNewBalance(
     userId: string,
     amount: number,
     typeTrans: string,
-  ) : Promise<number> {
+  ): Promise<number> {
     const balance = await this.getBalanceByUserId(userId);
-    if(TransactionEnum.Withdraw == typeTrans) {
-      return balance -  amount;
+    if (TransactionEnum.WITHDRAW == typeTrans) {
+      return balance - amount;
     }
     return balance + amount;
   }
 
-  async getWalletId(userId: string): 
-  Promise<string> {
-    const walletId = await (await this.findOne({userId: userId})).id;
-    
+  async getWalletId(userId: string):
+    Promise<string> {
+    const walletId = await (await this.findOne({ userId: userId })).id;
+
     return walletId;
   }
 
