@@ -2,13 +2,13 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class FollowResponse {
     @ApiProperty()
-    followerId: string;
+    followId: string;
 
     @ApiProperty()
     followAt: Date;
 
-    constructor(followerId: string, followAt: Date) {
-        this.followerId = followerId;
+    constructor(followId: string, followAt: Date) {
+        this.followId = followId;
         this.followAt = followAt;
     }
 }

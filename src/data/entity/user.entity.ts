@@ -105,4 +105,18 @@ export class UserEntity {
     (coverLetterEntity) => coverLetterEntity.user
   )
   coverLetters: Promise<CoverLetterEntity[]>
+
+
+  
+  @OneToMany(
+    () => FollowEntity,
+    (followEntity) => followEntity.follow
+  )
+  follows: Promise<FollowEntity[]>
+
+  @OneToMany(
+    () => FollowEntity,
+    (followEntity) => followEntity.user
+  )
+  followers: Promise<FollowEntity[]>
 }

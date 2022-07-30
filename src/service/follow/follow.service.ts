@@ -24,20 +24,20 @@ export class FollowService {
 
   async createFollow(
     userId: string,
-    followerId: string,
+    followId: string,
   ): Promise<any> {
     const user = await this.userRepositroy.findOne({ where: { id: userId } });
     if (!user.roles.includes(Role.User) && user.roles.length <= 1) {
       throw new OnlyUserCanFollowException();
     }
-    const author = await this.userRepositroy.findOne({ where: { id: followerId } });
+    const author = await this.userRepositroy.findOne({ where: { id: followId } });
     if (!author.roles.includes(Role.Writer)) {
       throw new OnlyFollowWriterException();
     }
 
     const existedFollow = await this.followRepository.findOne({
       where: {
-        userId, followerId
+        userId, followId
       }
     })
     if (existedFollow) throw new FollowExistedException();
@@ -45,26 +45,26 @@ export class FollowService {
     const newFollow: FollowEntity = new FollowEntity();
     newFollow.followAt = new Date();
     newFollow.userId = userId;
-    newFollow.followerId = followerId;
+    newFollow.followId = followId;
 
     return await this.followRepository.save(newFollow);
   }
 
   async deleteFollow(
     userId: string,
-    followerId: string
+    followId: string
   ): Promise<any> {
 
     const existedFollow = await this.followRepository.findOne({
       where: {
-        userId, followerId
+        userId, followId
       }
     })
     if (!existedFollow) throw new FollowNotExistedException();
 
 
     const deleteFollow = await this.followRepository.delete(
-      { userId, followerId }
+      { userId, followId }
     )
 
     return deleteFollow.affected ? true : false;
@@ -91,8 +91,8 @@ export class FollowService {
     }
 
     if (userExsited.roles.includes(Role.Writer)) {
-      follows = await this.followRepository.getFollows({ followerId: userId }, perPage * (page - 1), perPage)
-      total = await this.followRepository.countFollows({ followerId: userId });
+      follows = await this.followRepository.getFollows({ followId: userId }, perPage * (page - 1), perPage)
+      total = await this.followRepository.countFollows({ followId: userId });
     }
 
     totalPages = Math.ceil(total / perPage);

@@ -96,7 +96,7 @@ export class UserService {
     const infoUserResponse = InfoUserResponse.formatEntity(userEntity);
 
     if (userQuery?.roles.includes(Role.User) && userEntity?.roles.includes(Role.Writer)) {
-      const follow = await this.followRepository.findOne({ userId: userIdQuery, followerId: userId });
+      const follow = await this.followRepository.findOne({ userId: userIdQuery, followId: userId });
       if (!follow) {
         return { ...infoUserResponse, isFollow: false }
       }

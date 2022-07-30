@@ -228,7 +228,7 @@ export class PostService {
       }
     })
     const listAuthor = [];
-    follows.forEach(item => { listAuthor.push(item.followerId) });
+    follows.forEach(item => { listAuthor.push(item.followId) });
 
 
     if (categoryId) {
