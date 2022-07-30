@@ -20,7 +20,7 @@ export class TransactionRepository extends Repository<TransactionEntity> {
         transaction.isSuccess = isSuccess;
         transaction.walletId = walletId;
         
-        return await this.create(transaction);
+        return await this.save(transaction);
 
 
     }
