@@ -24,7 +24,11 @@ export class WalletRepository extends Repository<WalletEntity> {
     amount: number,
     typeTrans: string,
   ): Promise<boolean> {
-    return TransactionEnum.WITHDRAW == typeTrans && amount <= await this.getBalanceByUserId(userId);
+    if (TransactionEnum.WITHDRAW == typeTrans && amount <= await this.getBalanceByUserId(userId)) {
+      return false
+    }
+    return true;
+
   }
 
   async getNewBalance(
