@@ -21,7 +21,5 @@ export class TransactionRepository extends Repository<TransactionEntity> {
         transaction.walletId = walletId;
         
         return await this.save(transaction);
-
-
     }
 }

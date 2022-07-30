@@ -30,7 +30,7 @@ export class WalletController {
 
   @ApiBearerAuth()
   @Patch()
-  @Roles(Role.Admin, Role.Writer)
+  @Roles(Role.Admin, Role.Writer, Role.User)
   @HttpCode(HttpStatus.OK)
   async updateWallet(
     @CurrentUser() user: User,
