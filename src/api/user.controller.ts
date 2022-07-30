@@ -106,6 +106,17 @@ export class UserController {
     return HttpResponse.success(updateInfo);
   }
 
+  @ApiBearerAuth()
+  @Patch('avatar')
+  async updateAvatar(
+    @CurrentUser() user: User,
+    @Body() newAvatar: UpdateAvatarRequest,
+  ): Promise<HttpResponse<Boolean>> {
+    const updateInfo = await this.userService.updateAvatar(user.id, newAvatar.avatar);
+    return HttpResponse.success(updateInfo);
+  }
+
+
   @Roles(Role.Admin)
   @ApiBearerAuth()
   @Patch('/:id')
@@ -118,15 +129,6 @@ export class UserController {
     return HttpResponse.success(updateInfo);
   }
 
-  @ApiBearerAuth()
-  @Patch('avatar')
-  async updateAvatar(
-    @CurrentUser() user: User,
-    @Body() newAvatar: UpdateAvatarRequest,
-  ): Promise<HttpResponse<Boolean>> {
-    const updateInfo = await this.userService.updateAvatar(user.id, newAvatar.avatar);
-    return HttpResponse.success(updateInfo);
-  }
 
   @ApiBearerAuth()
   @Patch('password')
