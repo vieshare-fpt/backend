@@ -39,7 +39,7 @@ export class SubscriptionService {
       throw new UserNotExistedException()
     }
 
-    if (userExsited.roles.includes(Role.User) && userExsited.roles.length == 1) {
+    if (!userExsited.roles.includes(Role.User) && userExsited.roles.length == 1) {
       throw new UserNotAuthorizedException()
     }
 

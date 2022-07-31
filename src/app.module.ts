@@ -42,6 +42,8 @@ import { BankModule } from '@service/bank/bank.module';
 import { BankController } from '@api/bank.controller';
 import { ChartModule } from '@service/chart/chart.module';
 import { ChartController } from '@api/chart.controller';
+import { TransactionController } from '@api/transaction.controller';
+import { TransactionsModule } from '@service/transaction/transaction.module';
 
 
 @Module({
@@ -78,7 +80,8 @@ import { ChartController } from '@api/chart.controller';
     BonusStatisticModule,
     CoverLetterModule,
     BankModule,
-    ChartModule
+    ChartModule,
+    TransactionsModule
   ],
   controllers: [
     AuthController,
@@ -96,7 +99,8 @@ import { ChartController } from '@api/chart.controller';
     BonusStatisticController,
     CoverLetterController,
     BankController,
-    ChartController
+    ChartController,
+    TransactionController
   ],
   providers: [
     AppService,
