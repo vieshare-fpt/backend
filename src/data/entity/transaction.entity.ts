@@ -1,5 +1,5 @@
 import { TransactionEnum } from "@constant/type-transaction.enum";
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { BankEntity } from "./bank.entity";;
 import { WalletEntity } from "./wallet.entity";
 
@@ -20,7 +20,7 @@ export class TransactionEntity {
   walletId: string;
 
 
-  @PrimaryColumn({ name: 'date', type: 'date' })
+  @PrimaryColumn({ name: 'date'})
   date: Date;
 
   @Column({ name: 'amount', type: 'float' })

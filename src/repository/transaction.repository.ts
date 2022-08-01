@@ -26,12 +26,12 @@ export class TransactionRepository extends Repository<TransactionEntity> {
 
 
 
-    async getTransactionsOrderBy(walletId: string,where: FindConditions<TransactionEntity> , sort?: Sort, skip?: number, take?: number):
+    async getTransactionsOrderBy(walletId: string, where: FindConditions<TransactionEntity>, sort?: Sort, skip?: number, take?: number):
         Promise<TransactionEntity[] | any> {
         let transactionsWhereAndJoin = this.createQueryBuilder('transactions')
             .innerJoinAndSelect('transactions.bank', 'bank');
 
-       
+
         const transaction = await transactionsWhereAndJoin
             .andWhere(where)
             .skip(skip || 0)
