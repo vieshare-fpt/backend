@@ -23,7 +23,7 @@ export class SubscriptionService {
     private walletRepository: WalletRepository,
   ) { }
 
-  async getSubscriptionByUserId(userId: string) {
+  async getSubscriptions(userId: string) {
     const userExsited = await this.userRepository.findOne({ id: userId });
     if (!userExsited) {
       throw new UserNotExistedException()

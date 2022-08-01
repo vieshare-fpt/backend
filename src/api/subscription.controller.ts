@@ -18,7 +18,7 @@ export class SubscriptionController {
   async getSubsciption(
     @CurrentUser() user: User
   ){
-    const subcription = await this.subscriptionService.getSubscriptionByUserId(user.id);
+    const subcription = await this.subscriptionService.getSubscriptions(user.id);
     return subcription
   }
 

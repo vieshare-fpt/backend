@@ -12,6 +12,7 @@ import { UpdateResult } from "typeorm";
 import { Public } from "@decorator/public.decorator";
 import { HttpPagingResponse } from "@common/http-paging.response";
 import { PagingRequest } from "@data/request/paging.request";
+import { NewCategoryRequest } from "@data/request/new-category.request";
 
 
 
@@ -22,16 +23,16 @@ export class CategoryController {
         private categoryService: CategoryService) { }
 
 
-    // @ApiBearerAuth()
-    // @Roles(Role.Admin)
-    // @Post()
-    // @HttpCode(HttpStatus.CREATED)
-    // async createCategory(
-    //     @Body() request: NewCategoryRequest,
-    //     ): Promise<HttpResponse<CreateCategoryResponse>> {
-    //     const category = await this.categoryService.createCategory(request)
-    //     return HttpResponse.success(new CreateCategoryResponse(category.id));
-    // } 
+    @ApiBearerAuth()
+    @Roles(Role.Admin)
+    @Post()
+    @HttpCode(HttpStatus.CREATED)
+    async createCategory(
+        @Body() request: NewCategoryRequest,
+        ): Promise<HttpResponse<CreateCategoryResponse>> {
+        const category = await this.categoryService.createCategory(request)
+        return HttpResponse.success(new CreateCategoryResponse(category.id));
+    } 
 
     @ApiBearerAuth()
     @Roles(Role.Admin)

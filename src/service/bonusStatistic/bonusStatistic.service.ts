@@ -148,7 +148,7 @@ export class BonusStatisticService {
     if (!walletExsited) {
       throw new WalletNotExistedException()
     }
-    if (!withdrawn.raw[0]) {
+    if (withdrawn.affected <= 0) {
       return false;
     }
     const updateBalance = await this.walletRepository.update({ id: withdrawn.raw[0].id }, { balance: walletExsited.balance + bonus });
