@@ -30,9 +30,8 @@ export class TransactionService {
 
     async getTransactions(
         userId: string,
-        bankId: string,
-        type: TransactionEnum,
-        isSuccess: boolean,
+        bankId?: string,
+        type?: TransactionEnum,
         sort?: Sort,
         paging?: PagingRequest
     ): Promise<HttpResponse<TransactionEntity[]> | HttpPagingResponse<TransactionEntity[]>> {
@@ -47,10 +46,11 @@ export class TransactionService {
         let total = 0;
         let totalPages = 0;
         sort = sort && Sort[sort.toLocaleUpperCase()] ? Sort[sort] : Sort.ASC;
+        const walletId = wallet.id;
         const where = await this.commonService.removeUndefined({
+            walletId,
             bankId,
             type,
-            isSuccess
         });
         const transactions = await this.transactionRepository.getTransactionsOrderBy(wallet.id, where, sort, perPage * (page - 1), perPage);
         total = await this.transactionRepository.countTransactionByWalletId(wallet.id);
