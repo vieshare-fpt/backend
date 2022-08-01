@@ -1,6 +1,7 @@
+import { Sort } from "@constant/sort.enum";
 import { TimeFrame } from "@constant/time-frame.enum";
 import { SubscriptionEntity } from "@data/entity/subscription.entity";
-import { EntityRepository, Repository } from "typeorm";
+import { EntityRepository, FindConditions, Repository } from "typeorm";
 
 @EntityRepository(SubscriptionEntity)
 export class SubscriptionRepository extends Repository<SubscriptionEntity>{
@@ -80,4 +81,55 @@ export class SubscriptionRepository extends Repository<SubscriptionEntity>{
 
     return statisticCounts;
   }
+
+  private changeNamePropertyObject(object: any, oldName: string, newName: string) {
+    object[newName] = object[oldName];
+    delete object[oldName];
+    return object;
+  }
+
+  private formatSubscriptionsResponse(object: any) {
+    const subscriptionsResponse =
+      object.map(({ id, userId, packageId, ...subscriptionsResponse }) => {
+        this.changeNamePropertyObject(subscriptionsResponse, '__package__', 'package');
+        this.changeNamePropertyObject(subscriptionsResponse, '__user__', 'user');
+        delete subscriptionsResponse['user']['password'];
+        delete subscriptionsResponse['user']['dob'];
+        delete subscriptionsResponse['user']['isDefaultPassword'];
+        delete subscriptionsResponse['user']['avatar'];
+        delete subscriptionsResponse['package']['createDate'];
+        delete subscriptionsResponse['package']['isActive'];
+        return subscriptionsResponse;
+      })
+    return subscriptionsResponse;
+  }
+  async findSubsciptions(
+    where: FindConditions<SubscriptionEntity>,
+    sort?: Sort, skip?: number, take?: number
+  ): Promise<SubscriptionEntity[] | any> {
+    const subscriptions = await this.find(
+      {
+        where: where,
+        relations: ['package', 'user'],
+        order: {
+          date: 'DESC'
+        },
+        skip: skip || 0,
+        take: take || null
+      }
+    );
+    return this.formatSubscriptionsResponse(subscriptions);
+  }
+
+
+  async countSubscriptions(userId: string): Promise<number> {
+    const count = await this.count(
+      {
+        where: {
+          userId: userId
+        }
+      });
+    return count;
+  }
+
 }

@@ -4,8 +4,8 @@ import { Role } from "@constant/role.enum";
 import { BankEntity } from "@data/entity/bank.entity";
 import { Public } from "@decorator/public.decorator";
 import { Roles } from "@decorator/role.decorator";
-import { Body, Controller, Get, HttpCode, HttpStatus, Patch } from "@nestjs/common";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Get, HttpCode, HttpStatus, Patch, Post, Query } from "@nestjs/common";
+import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { BankService } from "@service/bank/bank.service";
 
 @ApiTags("Bank")
@@ -27,12 +27,13 @@ export class BankController {
 
     @ApiBearerAuth()
     @Roles(Role.Admin)
-    @Patch()
+    @Post('')
     @HttpCode(HttpStatus.OK)
+    @ApiQuery({name: 'bankName', type: 'string', example:'VietcomBank',required: true})
     async addNewBank(
-        @Body() name: string
+        @Query('bankName') bankName: string,
     ): Promise<HttpResponse<BankEntity>>{
-        const newBank = await this.bankService.addNewbank(name);
+        const newBank = await this.bankService.addNewbank(bankName);
         return HttpResponse.success(newBank);
     }
 
