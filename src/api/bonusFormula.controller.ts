@@ -22,6 +22,23 @@ export class BonusFormulaController {
 
   @ApiBearerAuth()
   @Roles(Role.Admin)
+  @Get('/all')
+  @HttpCode(HttpStatus.OK)
+  @ApiQuery({ name: 'order_by', type: 'enum', enum: BonusFormulaOrderBy, example: BonusFormulaOrderBy.createDate, required: false })
+  @ApiQuery({ name: 'sort', type: 'enum', enum: Sort, example: Sort.DESC, required: false })
+  @ApiQuery({ name: 'per_page', type: 'number', example: 10, required: false })
+  @ApiQuery({ name: 'page', type: 'number', example: 1, required: false })
+  async getFormulas(
+    @Query('order_by') orderBy: BonusFormulaOrderBy,
+    @Query('sort') sort: Sort,
+    @Query() paging: PagingRequest
+  ): Promise<HttpResponse<BonusFormulaEntity[]>> {
+    const bonusFormulaResponse = await this.bonusFormulaService.getAllBounsFormualOrderBy(orderBy, sort, paging.per_page, paging.page)
+    return bonusFormulaResponse;
+  }
+
+  @ApiBearerAuth()
+  @Roles(Role.Admin)
   @Patch('')
   @HttpCode(HttpStatus.OK)
   async activationTheFormula(
@@ -71,20 +88,5 @@ export class BonusFormulaController {
     return HttpResponse.success(await this.bonusFormulaService.getBonusFormulaById(id))
   }
 
-  @ApiBearerAuth()
-  @Roles(Role.Admin)
-  @Get('/all')
-  @HttpCode(HttpStatus.OK)
-  @ApiQuery({ name: 'order_by', type: 'enum', enum: BonusFormulaOrderBy, example: BonusFormulaOrderBy.createDate, required: false })
-  @ApiQuery({ name: 'sort', type: 'enum', enum: Sort, example: Sort.DESC, required: false })
-  @ApiQuery({ name: 'per_page', type: 'number', example: 10, required: false })
-  @ApiQuery({ name: 'page', type: 'number', example: 1, required: false })
-  async getFormulas(
-    @Query('order_by') orderBy: BonusFormulaOrderBy,
-    @Query('sort') sort: Sort,
-    @Query() paging: PagingRequest
-  ): Promise<HttpResponse<BonusFormulaEntity[]>> {
-    const bonusFormulaResponse = await this.bonusFormulaService.getAllBounsFormualOrderBy(orderBy, sort, paging.per_page, paging.page)
-    return bonusFormulaResponse;
-  }
+  
 }

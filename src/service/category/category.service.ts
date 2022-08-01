@@ -7,6 +7,8 @@ import { HttpResponse } from "@common/http.response";
 import { CategoryResponse } from "@data/response/category.response";
 import { HttpPagingResponse } from "@common/http-paging.response";
 import { CommonService } from "@service/common/common.service";
+import { NewCategoryRequest } from "@data/request/new-category.request";
+import { CategoryExistedException } from "@exception/category/category-existed.exception";
 
 
 @Injectable()
@@ -16,16 +18,16 @@ export class CategoryService {
         private commonService: CommonService<CategoryResponse | CategoryEntity>
     ) { }
 
-    // async createCategory(
-    //     request: NewCategoryRequest,
-    // ): Promise<CategoryEntity> {
-    //     if (!this.categoryRepository.isExist(request.name)) {
-    //         throw new CategoryExistedException();
-    //     }
-    //     const categoryEntity: CategoryEntity = new CategoryEntity();
-    //     categoryEntity.name = request.name;
-    //     return await this.categoryRepository.save(categoryEntity);
-    // };
+    async createCategory(
+        request: NewCategoryRequest,
+    ): Promise<CategoryEntity> {
+        if (!this.categoryRepository.isExist(request.name)) {
+            throw new CategoryExistedException();
+        }
+        const categoryEntity: CategoryEntity = new CategoryEntity();
+        categoryEntity.name = request.name;
+        return await this.categoryRepository.save(categoryEntity);
+    };
 
     async getCategoryById(
         id: string,

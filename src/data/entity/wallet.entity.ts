@@ -1,4 +1,4 @@
-import { Length } from "class-validator";
+import { Length, Min } from "class-validator";
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { TransactionEntity } from "./transaction.entity";
 import { UserEntity } from "./user.entity";
@@ -18,7 +18,7 @@ export class WalletEntity {
     @Column({ name: 'userId'})
     userId: string;
     
-    @Length(0)
+    @Min(0)
     @Column({ name: 'balance', type: 'float', default: 0 })
     balance: number;
 
