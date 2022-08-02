@@ -4,6 +4,7 @@ import { WalletEntity } from '@data/entity/wallet.entity';
 import { UpdateWalletRequest } from '@data/request/update-wallet.request';
 import { UserNotExistedException } from '@exception/user/user-not-existed.exception';
 import { BalanceNotEnoughException } from '@exception/wallet/balance-not-enough.exception';
+import { InvalidAmountException } from '@exception/wallet/invalid-amout.exception';
 import { WalletAlreadyExistedException } from '@exception/wallet/wallet-already-existed.exception';
 import { Injectable } from '@nestjs/common';
 import { TransactionRepository } from '@repository/transaction.repository';
@@ -46,8 +47,9 @@ export class WalletService {
     if (!userExisted) {
       throw new UserNotExistedException();
     }
-
-
+    if (updateWalletRequest.amount < 10000) {
+      throw new InvalidAmountException();
+    }
     let walletId = await this.walletRepository.getWalletId(userId);
     if (!walletId) {
       const newWallet = await this.createWallet(userId);
