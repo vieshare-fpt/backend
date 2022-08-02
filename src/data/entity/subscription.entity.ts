@@ -31,6 +31,4 @@ export class SubscriptionEntity {
   date: Date
 
 
-
-
 }

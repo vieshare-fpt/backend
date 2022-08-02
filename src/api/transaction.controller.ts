@@ -7,7 +7,6 @@ import { TransactionEnum } from "@constant/type-transaction.enum";
 import { TransactionEntity } from "@data/entity/transaction.entity";
 import { PagingRequest } from "@data/request/paging.request";
 import { CurrentUser } from "@decorator/current-user.decorator";
-import { Public } from "@decorator/public.decorator";
 import { Controller, Get, HttpCode, HttpStatus, Query } from "@nestjs/common";
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { TransactionService } from "@service/transaction/transaction.service";

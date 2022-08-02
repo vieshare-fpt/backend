@@ -18,7 +18,7 @@ export class BankService {
 
     async addNewbank(name: string): Promise<BankEntity> {
         const bank: BankEntity = new BankEntity();
-        bank.id = name;
+        bank.name= name;
         return await this.bankRepository.save(bank);
 
     }

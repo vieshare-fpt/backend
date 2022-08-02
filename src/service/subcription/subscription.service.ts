@@ -1,18 +1,23 @@
+import { HttpPagingResponse } from "@common/http-paging.response";
 import { User } from "@common/user";
 import { Role } from "@constant/role.enum";
+import { Sort } from "@constant/sort.enum";
 import { SubscriptionEntity } from "@data/entity/subscription.entity";
+import { PagingRequest } from "@data/request/paging.request";
+import { PagingRepsone } from "@data/response/paging.response";
 import { PackageNotExistedException } from "@exception/package/package-not-existed.exception";
 import { UserAlreadyPremiumException } from "@exception/subscription/user-already-premium.exception";
 import { UserNotAuthorizedException } from "@exception/user/user-not-authorizated.exception";
 import { UserNotExistedException } from "@exception/user/user-not-existed.exception";
 import { BalanceNotEnoughException } from "@exception/wallet/balance-not-enough.exception";
 import { WalletNotExistedException } from "@exception/wallet/wallet-not-existed.exception";
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
 import { PackageRepository } from "@repository/package.repository";
 import { SubscriptionRepository } from "@repository/subscription.repository";
 import { UserRepository } from "@repository/user.repository";
 import { WalletRepository } from "@repository/wallet.repository";
-import { WalletService } from "@service/wallet/wallet.service";
+import { CommonService } from "@service/common/common.service";
+
 
 @Injectable()
 export class SubscriptionService {
@@ -21,16 +26,43 @@ export class SubscriptionService {
     private userRepository: UserRepository,
     private packageRepository: PackageRepository,
     private walletRepository: WalletRepository,
+    private commonService: CommonService<SubscriptionEntity | any>,
   ) { }
 
-  async getSubscriptions(userId: string) {
+  async getSubscriptions(
+    userId: string,
+    packageId?: string,
+    sort?: Sort,
+    paging?: PagingRequest
+  ) {
     const userExsited = await this.userRepository.findOne({ id: userId });
     if (!userExsited) {
       throw new UserNotExistedException()
     }
 
-    const subscriptions = await this.subscriptionRepository.find({ userId: userId })
-    return subscriptions
+    const where = await this.commonService.removeUndefined({
+      userId,
+      packageId
+    })
+    let page = paging.page | 1;
+    let perPage = paging.per_page;
+    let total = 0;
+    let totalPages = 0;
+    sort = sort && Sort[sort.toLocaleUpperCase()] ? Sort[sort] : Sort.ASC;
+    const subscriptions = await this.subscriptionRepository.
+      findSubsciptions(where, sort, perPage * (page - 1), perPage);
+
+    total = await this.subscriptionRepository.countSubscriptions(userId);
+    totalPages = Math.ceil(total / totalPages);
+    const metaData = new PagingRepsone(page, perPage, total, totalPages);
+    if(!subscriptions){
+     throw new HttpException(NotFoundException, HttpStatus.NO_CONTENT);  
+    }
+    if(!perPage){
+      return HttpPagingResponse.success(subscriptions);
+    }
+
+    return HttpPagingResponse.success(subscriptions, metaData);
   }
 
   async newSubscription(user: User, packageId: string) {
