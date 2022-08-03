@@ -2,6 +2,8 @@
 import { CryptStrategy } from "@auth/crypt.strategy";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { BonusFormulaReposiotry } from "@repository/bonusFormula.repository";
+import { BonusStatisticReposiotry } from "@repository/bonusStatistic.repository";
 import { CategoryRepository } from "@repository/category.repository";
 import { FollowRepository } from "@repository/follow.repository";
 import { HistoryRepository } from "@repository/history.repository";
@@ -24,7 +26,9 @@ import { PostService } from "./post.service";
     SubscriptionRepository,
     PackageRepository,
     WalletRepository,
-    FollowRepository
+    FollowRepository,
+    BonusFormulaReposiotry,
+    BonusStatisticReposiotry
   ])],
   providers: [CryptStrategy, PostService, UserService, SubscriptionService, CommonService],
   exports: [PostService]

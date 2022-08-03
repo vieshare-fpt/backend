@@ -1,4 +1,5 @@
 export enum BonusStatisticStatus {
   Processing = 'Processing',
-  Done = 'Done'
+  Done = 'Done',
+  Complete = 'Complete'
 }

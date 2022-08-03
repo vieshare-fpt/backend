@@ -36,7 +36,7 @@ export class PostController {
     private bonusStatisticService: BonusStatisticService
 
   ) { }
-
+ 
   @ApiBearerAuth()
   @Post()
   @Roles(Role.Writer)
@@ -172,8 +172,8 @@ export class PostController {
       throw new UserNotPremiumException()
     }
 
-    if ((!isPostPremium && !userExsited )|| isAuthor || isAdmin || isSensor) {
-      
+    if ((!isPostPremium && !userExsited) || isAuthor || isAdmin || isSensor) {
+
       return HttpResponse.success(post)
     }
 

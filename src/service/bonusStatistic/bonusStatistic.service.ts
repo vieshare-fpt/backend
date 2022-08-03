@@ -114,6 +114,7 @@ export class BonusStatisticService {
     if (!orderBy) {
       throw new BadRequestException()
     }
+    await this.bonusStatisticRepository.autoUpdateStatus()
     const bonusStatisticResponse = await this.bonusStatisticRepository.getBonusStatisticByUserIdOrderBy(id, orderBy, sort, perPage * (page - 1), perPage);
     const total = await this.bonusStatisticRepository.countBonusStatisticByUserId(id)
     return this.commonService.getPagingResponse(bonusStatisticResponse, perPage, page, total)
@@ -125,7 +126,7 @@ export class BonusStatisticService {
       throw new UserNotExistedException()
     }
 
-
+    await this.bonusStatisticRepository.autoUpdateStatus()
 
     const bonusStatisitcExisted = await this.bonusStatisticRepository.findOne({ id: bonusStatisitcId });
     if (!bonusStatisitcExisted) {
@@ -133,25 +134,26 @@ export class BonusStatisticService {
     }
 
 
-    if (bonusStatisitcExisted.status == BonusStatisticStatus.Done) {
+    if (bonusStatisitcExisted.status == BonusStatisticStatus.Complete) {
       throw new BonusHasWithdrawnBeforeException()
     }
 
-    if (bonusStatisitcExisted.to.getTime() > new Date().getTime()) {
+    if (bonusStatisitcExisted.to.getTime() > new Date().getTime() || bonusStatisitcExisted.status == BonusStatisticStatus.Processing) {
       throw new NowCanNotWithdrawBonusException()
     }
 
-    const withdrawn = await this.bonusStatisticRepository.update({ id: bonusStatisitcExisted.id }, { status: BonusStatisticStatus.Done });
+    const withdrawn = await this.bonusStatisticRepository.update({ id: bonusStatisitcExisted.id }, { status: BonusStatisticStatus.Complete });
     const walletExsited = await this.walletRepository.findOne({ userId: userExisted.id });
     const formula = await this.bonusFormulaReposiotry.findOne({ id: bonusStatisitcExisted.bonusFormulaId })
     const bonus = bonusStatisitcExisted.views * formula.bonusPerView;
     if (!walletExsited) {
       throw new WalletNotExistedException()
     }
+
     if (withdrawn.affected <= 0) {
       return false;
     }
-    const updateBalance = await this.walletRepository.update({ id: withdrawn.raw[0].id }, { balance: walletExsited.balance + bonus });
+    const updateBalance = await this.walletRepository.update({ id: walletExsited.id }, { balance: walletExsited.balance + bonus });
 
     return updateBalance.affected ? true : false;
 

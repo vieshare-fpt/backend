@@ -25,6 +25,9 @@ import { FollowRepository } from "@repository/follow.repository";
 import { FindCondition } from "typeorm";
 import { UserNotAuthorizedException } from "@exception/user/user-not-authorizated.exception";
 import { UserEntity } from "@data/entity/user.entity";
+import { BonusStatisticEntity } from "@data/entity/bonus-statistic.entity";
+import { BonusFormulaReposiotry } from "@repository/bonusFormula.repository";
+import { BonusStatisticReposiotry } from "@repository/bonusStatistic.repository";
 
 
 @Injectable()
@@ -35,9 +38,14 @@ export class PostService {
     private cateRepostory: CategoryRepository,
     private historyRepository: HistoryRepository,
     private followRepository: FollowRepository,
-    private commonService: CommonService<PostEntity | PostsResponse | any>
+    private commonService: CommonService<PostEntity | PostsResponse | any>,
+    private bonusFormulaRepository: BonusFormulaReposiotry,
+    private bonusStatisticRepository: BonusStatisticReposiotry
   ) { }
-
+  randomDate(start: any, end: any) {
+    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+  }
+ 
   async isAuthor(userId: string, postId: string): Promise<boolean> {
     if (!userId || !postId) {
       return false

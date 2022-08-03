@@ -1,12 +1,22 @@
 import { BonusStatisticOrderBy } from "@constant/bonus-statistic-order-by.enum";
+import { BonusStatisticStatus } from "@constant/bonus-statistic-status.enum";
 import { Sort } from "@constant/sort.enum";
 import { TimeFrame } from "@constant/time-frame.enum";
 import { BonusFormulaEntity } from "@data/entity/bonus-formula.entity";
 import { BonusStatisticEntity } from "@data/entity/bonus-statistic.entity";
-import { EntityRepository, In, Repository } from "typeorm";
+import { EntityRepository, In, LessThan, Repository } from "typeorm";
 
 @EntityRepository(BonusStatisticEntity)
 export class BonusStatisticReposiotry extends Repository<BonusStatisticEntity> {
+  async autoUpdateStatus() {
+    return await this.createQueryBuilder("bounusStatistics")
+      .where("status = :status", { status: BonusStatisticStatus.Processing })
+      .andWhere("to <= :date", { date: new Date() })
+      .update<BonusStatisticEntity>(BonusStatisticEntity, { status: BonusStatisticStatus.Done })
+      .updateEntity(true)
+      .execute();
+
+  }
   async getBonusStatisticByUserId(userId: string, skip?: number, take?: number): Promise<BonusStatisticEntity[]> {
     const bonusResponse = await this.createQueryBuilder('bounus-statistics')
       .select('bounus-statistics.id', 'id')
