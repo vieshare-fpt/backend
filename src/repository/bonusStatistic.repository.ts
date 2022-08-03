@@ -12,7 +12,7 @@ export class BonusStatisticReposiotry extends Repository<BonusStatisticEntity> {
     return await this.createQueryBuilder("bounusStatistics")
       .where("status = :status", { status: BonusStatisticStatus.Processing })
       .andWhere("to <= :date", { date: new Date() })
-      .update<BonusStatisticEntity>(BonusStatisticEntity, { status: BonusStatisticStatus.Done })
+      .update<BonusStatisticEntity>(BonusStatisticEntity, { status: BonusStatisticStatus.Ready })
       .updateEntity(true)
       .execute();
 
