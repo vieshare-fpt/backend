@@ -36,7 +36,12 @@ export class PostController {
     private bonusStatisticService: BonusStatisticService
 
   ) { }
- 
+  // @Public()
+  // @Get('fake-data')
+  // async fakeData(
+  // ): Promise<HttpResponse<any>> {
+  //   return HttpResponse.success(await this.postService.fakeData())
+  // }
   @ApiBearerAuth()
   @Post()
   @Roles(Role.Writer)

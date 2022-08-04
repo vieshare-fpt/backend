@@ -115,7 +115,12 @@ export class BonusStatisticService {
       throw new BadRequestException()
     }
     await this.bonusStatisticRepository.autoUpdateStatus()
-    const bonusStatisticResponse = await this.bonusStatisticRepository.getBonusStatisticByUserIdOrderBy(id, orderBy, sort, perPage * (page - 1), perPage);
+    const bonusStatisticResponse = (await this.bonusStatisticRepository.getBonusStatisticByUserIdOrderBy(id, orderBy, sort, perPage * (page - 1), perPage)).map((item:any) => {
+      return {
+        ...item,
+        price: item.views * item.bonusPerView
+      }
+    });
     const total = await this.bonusStatisticRepository.countBonusStatisticByUserId(id)
     return this.commonService.getPagingResponse(bonusStatisticResponse, perPage, page, total)
   }
